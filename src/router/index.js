@@ -10,7 +10,7 @@ const routes = [
   },
   {
     path: '/file/:name',  // 檔案頁面，顯示檔案詳細內容
-    name: 'About',
+    name: 'FilePage',  // 更改路由名稱為 FilePage
     component: AboutView,
     props: true, // 使路由參數作為 props 傳遞
   },

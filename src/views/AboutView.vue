@@ -1,22 +1,28 @@
 <template>
-  <div class="file-page">
-    <h1>File Page</h1>
-    <p>Viewing file: {{ name }}</p>
+  <div class="hello-page">
+    <h1>Hello, {{ name }}!</h1> <!-- 顯示傳遞過來的檔案名稱 -->
+    <p>Welcome to the temporary page.</p>
   </div>
 </template>
 
 <script>
 export default {
-  props: ['name'],  // 接收路由傳遞的 name 參數
-}
+  props: ['name'], // 接收路由參數 name
+};
 </script>
 
 <style scoped>
-.file-page {
+.hello-page {
   text-align: center;
+  margin-top: 50px;
   color: white;
 }
+
 h1 {
   font-size: 30px;
+}
+
+p {
+  font-size: 20px;
 }
 </style>
