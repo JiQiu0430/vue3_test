@@ -57,11 +57,11 @@
 
       <!-- 頁面方塊 -->
       <div class="pagination">
-        <button @click="prevPage" :disabled="page === 1">« Prev</button>
+        <button @click="prevPage" :disabled="page === 1">«</button>
         <button v-for="p in totalPages" :key="p" @click="setPage(p)" :class="{ active: page === p }">
           {{ p }}
         </button>
-        <button @click="nextPage" :disabled="page === totalPages">Next »</button>
+        <button @click="nextPage" :disabled="page === totalPages">»</button>
       </div>
 
       <!-- 上傳視窗 -->
