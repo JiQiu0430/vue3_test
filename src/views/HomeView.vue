@@ -1,16 +1,6 @@
 <template>
   <div class="app-container">
-    <!-- 白色部分 -->
-    <header class="header">
-      <div class="logo-box">
-        <img src="/v5_logo.jpg" class="logo-img" />
-      </div>
-      <div class="avatar-box">
-        <img src="/user.png" alt="User Avatar" class="avatar-img" />
-      </div>
-    </header>
-
-    <!-- 標題 -->
+    <!-- 黑色部分 -->
     <main class="main-content">
       <h1 class="main-title">DICOM Upload</h1>
 
@@ -179,34 +169,7 @@ const submitUpload = () => {
   display: flex;
   flex-direction: column;
 }
-.header {
-  background: white;
-  color: black;
-  padding: 12px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.logo-box {
-  display: flex;
-  align-items: center;
-}
-.logo-img {
-  height: 48px;
-  width: auto;
-  margin-right: 12px;
-  object-fit: contain;
-}
-.avatar-box {
-  display: flex;
-  align-items: center;
-}
-.avatar-img {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
-}
+
 .main-content {
   padding: 20px;
   flex: 1;
