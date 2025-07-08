@@ -1,18 +1,33 @@
 <template>
   <div class="app-container">
-    <!-- 白色部分 -->
     <header class="header">
       <div class="logo-box">
         <img src="/v5_logo.jpg" class="logo-img" />
       </div>
 
-      <!-- 橫向選單 -->
+      <!-- 選單 -->
       <nav class="nav-menu">
         <ul>
-          <li @click="goToHomePage">DICOM List</li>
-          <li>CAD Config</li>
-          <li>History</li>
-          <li>System</li>
+          <li:
+            class="{ active: $route.name === 'Home' }"
+            @click="goToPage('Home')">
+            DICOM List
+          </li>
+          <li:
+            class="{ active: $route.name === 'CAD' }"
+            @click="goToPage('CAD')">
+            CAD Config
+          </li>
+          <li:
+            class="{ active: $route.name === 'History' }"
+            @click="goToPage('History')">
+            History
+          </li>
+          <li
+            :class="{ active: $route.name === 'System' }"
+            @click="goToPage('System')">
+            System
+          </li>
         </ul>
       </nav>
 
@@ -21,9 +36,8 @@
       </div>
     </header>
 
-    <!-- 黑色部分 -->
     <main class="main-content">
-      <router-view></router-view> <!-- 顯示對應的頁面 -->
+      <router-view></router-view>
     </main>
   </div>
 </template>
@@ -32,9 +46,8 @@
 export default {
   name: 'App',
   methods: {
-    // 跳轉到 DICOM List
-    goToHomePage() {
-      this.$router.push({ name: 'Home' });
+    goToPage(name) {
+      this.$router.push({ name });
     },
   },
 };
@@ -52,10 +65,11 @@ export default {
 .header {
   background: white;
   color: black;
-  padding: 12px 20px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: stretch;
+  padding: 0 20px;
+  height: 68px;
 }
 
 .logo-box {
@@ -64,36 +78,65 @@ export default {
 }
 
 .logo-img {
-  height: 48px;
+  height: 40px;
   width: auto;
   object-fit: contain;
 }
 
 .nav-menu {
-  background-color: white;
-  padding: 10px;
-  list-style: none;
-  display: flex;
-  justify-content: space-around;
   flex-grow: 1;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
 }
 
 .nav-menu ul {
+  display: flex;
+  align-items: stretch;
+  gap: 48px; /* 選單間距 */
   padding: 0;
   margin: 0;
-  display: flex;
-  list-style-type: none;
+  list-style: none;
 }
 
 .nav-menu li {
-  cursor: pointer;
-  margin-right: 20px; /* 選單項目的間距 */
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
   font-weight: bold;
   color: black;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s, color 0.2s;
 }
 
+/* hover 效果 */
 .nav-menu li:hover {
-  color: #1e90ff; /* 鼠標點選的顏色 */
+  background-color: #f0f0f0;
+}
+
+/* 被選中選單 */
+.nav-menu li.active {
+  background-color: #0892D0;
+  color: white;
+}
+
+.nav-menu li.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 0%;
+  width: 100%;
+  background-color: #0892D0;
+  z-index: -1;
+  border-bottom: 4px solid #0892D0;
+  border-radius: 0;
+}
+
+/* 避免遮住文字 */
+.nav-menu li.active {
+  z-index: 1;
 }
 
 .avatar-box {

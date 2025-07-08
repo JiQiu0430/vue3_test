@@ -19,7 +19,7 @@
       <table class="job-table">
         <thead>
           <tr>
-            <th class="status-header"></th> <!-- 無標題 -->
+            <th class="status-header"></th>
             <th>Job</th>
             <th>Upload Time</th>
             <th>Name</th>
@@ -127,6 +127,7 @@ const searchQuery = ref('')
 const page = ref(1)
 const pageSize = 10
 
+/* 模擬資料 */
 const jobs = ref([
   { job: 'test-001', time: '2024-07-7 12:00', name: '七月', series: 5, status: 'Analyzed' },
   { job: 'test-002', time: '2024-07-7 12:30', name: '十三月', series: 3, status: 'Pending' },

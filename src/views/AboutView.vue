@@ -9,7 +9,7 @@
         <input v-model="searchQuery" type="text" placeholder="Search cases..." class="search-input" />
       </div>
 
-      <!-- Table -->
+      <!-- 列表 -->
       <table class="job-table">
         <thead>
           <tr>
@@ -54,7 +54,7 @@ const jobId = route.params.id
 
 const searchQuery = ref('')
 
-// 模擬資料
+/* 模擬資料 */
 const caseData = ref([
   {
     caseId: jobId,
@@ -127,8 +127,9 @@ const checkMark = (value) => (value ? '✔' : '✘')
   color: white;
 }
 
+/* 間隔線 */
 .job-table tbody tr + tr {
-  border-top: 1px solid #003366; /* 深藍色列間隔線 */
+  border-top: 1px solid #003366;
 }
 .icon-button {
   background: none;
