@@ -83,8 +83,8 @@
             </label>
             <div v-if="uploadedFiles.length > 0" class="file-list">
               <!-- 前三筆 -->
-              <p v-for="(file, i) in uploadedFiles.slice(0, 3)" :key="i">{{ file.name }}</p>
-              
+              <p v-for="(file, i) in uploadedFiles.slice(0, 3)" :key="i">{{ file.name }}</p>    
+
               <!-- 中間省略提示 -->
               <p v-if="uploadedFiles.length > 4">... ({{ uploadedFiles.length - 4 }} files hidden) ...</p>
 
@@ -120,9 +120,10 @@ const searchQuery = ref('')
 const uploadedFiles = ref([])
 const uploadProgress = ref(0)
 
+// 模擬資料
 const jobs = ref([
   { job: 'test-001', time: '2024-07-7 12:00', name: '七月', series: 5, status: 'Analyzed' },
-  { job: 'test-002', time: '2024-07-7 12:30', name: '七月二次', series: 3, status: 'Pending' },
+  { job: 'test-002', time: '2024-07-7 12:30', name: '十三月', series: 3, status: 'Pending' },
 ])
 const page = ref(1)
 const pageSize = 10
@@ -175,7 +176,7 @@ const submitUpload = () => {
   jobs.value.push({
     job: newJob.value.name, // 使用者輸入的 job 名稱
     time: new Date().toLocaleString(),
-    name: detectedFolderName.value, // 這裡改為上傳的資料夾名稱
+    name: detectedFolderName.value, // 改為上傳的資料夾名稱
     series: uploadedFiles.value.length,
     status: 'Uploaded',
   })
