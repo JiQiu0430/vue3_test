@@ -167,8 +167,8 @@ const deleteCase = (name) => {
   border-collapse: collapse;
 }
 .job-table th {
-  background-color: #2a2a2a;
-  color: #ccc;
+  background-color: black;
+  color: white;
   padding: 10px 12px;
   text-align: left;
   border: none;

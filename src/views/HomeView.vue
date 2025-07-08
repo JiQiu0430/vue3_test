@@ -295,8 +295,8 @@ const handleSingleFileUpload = (e) => {
 }
 
 .job-table thead {
-  background-color: #2a2a2a;
-  color: #ccc;
+  background-color: black;
+  color: white;
 }
 .icon-button {
   background: none;
