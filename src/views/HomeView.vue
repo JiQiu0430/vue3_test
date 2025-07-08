@@ -61,7 +61,7 @@
         </tbody>
       </table>
 
-      <!-- 頁碼 -->
+      <!-- 頁面方塊 -->
       <div class="pagination">
         <button @click="prevPage" :disabled="page === 1">«</button>
         <button v-for="p in totalPages" :key="p" @click="setPage(p)" :class="{ active: page === p }">
@@ -114,7 +114,7 @@
         </div>
       </div>
 
-      <!-- 單檔上傳 -->
+      <!-- 單一檔案上傳 -->
       <input type="file" ref="fileInput" hidden @change="handleSingleFileUpload" />
     </main>
   </div>
@@ -215,7 +215,7 @@ const deleteJob = (jobId) => {
   }
 }
 
-// 新增單一檔案(更新 series 與 status)
+// 新增單一檔案
 const selectFileForJob = (jobId) => {
   currentUploadJob.value = jobId
   fileInput.value?.click()
@@ -250,6 +250,7 @@ const handleSingleFileUpload = (e) => {
   padding: 20px;
   flex: 1;
   overflow-y: auto;
+  font-size: 13px;
 }
 .main-title {
   text-align: center;
@@ -289,11 +290,9 @@ const handleSingleFileUpload = (e) => {
   border: none;
   color: white;
 }
-
 .job-table tbody tr + tr {
   border-top: 1px solid #003366;
 }
-
 .job-table thead {
   background-color: black;
   color: white;
@@ -301,13 +300,13 @@ const handleSingleFileUpload = (e) => {
 .icon-button {
   background: none;
   border: none;
-  padding: 4px;
-  margin-right: 4px;
+  padding: 2px;
+  margin-right: 2px;
   cursor: pointer;
 }
 .action-icon {
-  width: 18px;
-  height: 18px;
+  width: 14px;
+  height: 14px;
   object-fit: contain;
 }
 .modal-overlay {

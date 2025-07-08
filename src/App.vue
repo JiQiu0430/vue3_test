@@ -57,11 +57,11 @@ export default {
 .app-container {
   background: black;
   color: white;
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
-
 .header {
   background: white;
   color: black;
@@ -71,25 +71,21 @@ export default {
   padding: 0 20px;
   height: 68px;
 }
-
 .logo-box {
   display: flex;
   align-items: center;
 }
-
 .logo-img {
   height: 40px;
   width: auto;
   object-fit: contain;
 }
-
 .nav-menu {
   flex-grow: 1;
   display: flex;
   align-items: stretch;
   justify-content: center;
 }
-
 .nav-menu ul {
   display: flex;
   align-items: stretch;
@@ -98,7 +94,6 @@ export default {
   margin: 0;
   list-style: none;
 }
-
 .nav-menu li {
   display: flex;
   align-items: center;
@@ -109,18 +104,15 @@ export default {
   position: relative;
   transition: background 0.2s, color 0.2s;
 }
-
 /* hover 效果 */
 .nav-menu li:hover {
   background-color: #f0f0f0;
 }
-
 /* 被選中選單 */
 .nav-menu li.active {
   background-color: #0892D0;
   color: white;
 }
-
 .nav-menu li.active::after {
   content: '';
   position: absolute;
@@ -133,27 +125,24 @@ export default {
   border-bottom: 4px solid #0892D0;
   border-radius: 0;
 }
-
 /* 避免遮住文字 */
 .nav-menu li.active {
   z-index: 1;
 }
-
 .avatar-box {
   display: flex;
   align-items: center;
 }
-
 .avatar-img {
   width: 32px;
   height: 32px;
   border-radius: 50%;
   object-fit: cover;
 }
-
 .main-content {
-  padding: 20px;
+  padding: 10px 16px;
   flex: 1;
   overflow-y: auto;
+  font-size: 13px;
 }
 </style>

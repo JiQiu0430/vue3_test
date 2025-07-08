@@ -144,6 +144,7 @@ const deleteCase = (name) => {
   padding: 20px;
   flex: 1;
   overflow-y: auto;
+  font-size: 13px;
 }
 .main-title {
   text-align: center;
@@ -166,13 +167,7 @@ const deleteCase = (name) => {
   background-color: #1c1c1c;
   border-collapse: collapse;
 }
-.job-table th {
-  background-color: black;
-  color: white;
-  padding: 10px 12px;
-  text-align: left;
-  border: none;
-}
+.job-table th,
 .job-table td {
   padding: 10px 12px;
   text-align: left;
@@ -182,19 +177,22 @@ const deleteCase = (name) => {
 .job-table tbody tr + tr {
   border-top: 1px solid #003366;
 }
+.job-table thead {
+  background-color: black;
+  color: white;
+}
 .icon-button {
   background: none;
   border: none;
-  padding: 4px;
-  margin-right: 4px;
+  padding: 2px;
+  margin-right: 2px;
   cursor: pointer;
 }
 .action-icon {
-  width: 18px;
-  height: 18px;
+  width: 14px;
+  height: 14px;
   object-fit: contain;
 }
-
 /* 分頁樣式 */
 .pagination {
   display: flex;
