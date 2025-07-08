@@ -11,7 +11,7 @@
       <!-- 上傳按鈕 -->
       <div class="upload-button-box">
         <svg class="icon upload-plus" viewBox="0 0 24 24" fill="none" @click="openUploadDialog">
-          <path d="M12 5V19M5 12H19" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 5V19M5 12H19" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </div>
 
@@ -49,7 +49,9 @@
               <button class="icon-button" @click="viewFile(item.job)">
                 <img src="/eye.png" class="action-icon" alt="view" />
               </button>
-              <button class="icon-button"><img src="/file.png" class="action-icon" alt="report" /></button>
+              <button class="icon-button" @click="selectFileForJob(item.job)">
+                <img src="/file.png" class="action-icon" alt="upload file" />
+              </button>
               <button class="icon-button"><img src="/download.png" class="action-icon" alt="download" /></button>
               <button class="icon-button" @click="deleteJob(item.job)">
                 <img src="/trash-bin.png" class="action-icon" alt="delete" />
@@ -111,6 +113,9 @@
           </div>
         </div>
       </div>
+
+      <!-- 隱藏單檔上傳 -->
+      <input type="file" ref="fileInput" hidden @change="handleSingleFileUpload" />
     </main>
   </div>
 </template>
@@ -128,11 +133,26 @@ const detectedFolderName = ref('')
 const searchQuery = ref('')
 const page = ref(1)
 const pageSize = 10
+const fileInput = ref(null)
+const currentUploadJob = ref(null)
 
-/* 模擬資料 */
 const jobs = ref([
-  { job: 'test-001', time: '2024-07-7 12:00', name: '七月', series: 5, status: 'Analyzed' },
-  { job: 'test-002', time: '2024-07-7 12:30', name: '十三月', series: 3, status: 'Pending' },
+  {
+    job: 'test-001',
+    time: '2024-07-7 12:00',
+    name: '七月',
+    series: 5,
+    status: 'Analyzed',
+    files: [],
+  },
+  {
+    job: 'test-002',
+    time: '2024-07-7 12:30',
+    name: '十三月',
+    series: 3,
+    status: 'Pending',
+    files: [],
+  },
 ])
 
 const totalPages = computed(() => Math.ceil(jobs.value.length / pageSize))
@@ -179,23 +199,43 @@ const submitUpload = () => {
     time: new Date().toLocaleString(),
     name: detectedFolderName.value,
     series: uploadedFiles.value.length,
-    status: 'Pending'
+    status: 'Pending',
+    files: [...uploadedFiles.value],
   })
 
   closeDialog()
 }
 
-// 刪除按鍵
 const deleteJob = (jobId) => {
   if (confirm(`Are you sure you want to delete job "${jobId}"?`)) {
     jobs.value = jobs.value.filter(job => job.job !== jobId)
-    // 若目前頁面超出總頁數，回到最後一頁
     if (page.value > totalPages.value) {
       page.value = totalPages.value
     }
   }
 }
 
+// ✅ 單一檔案上傳：更新 series 與 status
+const selectFileForJob = (jobId) => {
+  currentUploadJob.value = jobId
+  fileInput.value?.click()
+}
+
+const handleSingleFileUpload = (e) => {
+  const file = e.target.files[0]
+  if (!file || !currentUploadJob.value) return
+
+  const job = jobs.value.find(j => j.job === currentUploadJob.value)
+  if (job) {
+    job.files.push(file)
+    job.series += 1
+    job.status = 'Pending'
+    alert(`File "${file.name}" uploaded to job "${job.job}". Status updated to Pending.`)
+  }
+
+  e.target.value = ''
+  currentUploadJob.value = null
+}
 </script>
 
 <style scoped>
