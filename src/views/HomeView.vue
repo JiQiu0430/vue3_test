@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <!-- 黑色部分 -->
+    <!-- 標題 -->
     <main class="main-content">
       <h1 class="main-title">DICOM Upload</h1>
 
@@ -71,7 +71,14 @@
           <div class="form-group">
             <label>2. Select upload folder</label>
             <label class="upload-box">
-              <input type="file" multiple hidden @change="handleFileUpload" />
+              <input
+                type="file"
+                multiple
+                webkitdirectory
+                directory
+                hidden
+                @change="handleFileUpload"
+              />
               Drag or click to upload DICOM
             </label>
             <div v-if="uploadedFiles.length > 0" class="file-list">
@@ -107,8 +114,8 @@ const uploadedFiles = ref([])
 const uploadProgress = ref(0)
 
 const jobs = ref([
-  { job: 'test-001', time: '2024-07-7 12:00', name: 'A123456789', series: 5, status: 'Analyzed' },
-  { job: 'test-002', time: '2024-07-7 12:30', name: 'B987654321', series: 3, status: 'Pending' },
+  { job: 'test-001', time: '2024-07-7 12:00', name: '七月', series: 5, status: 'Analyzed' },
+  { job: 'test-002', time: '2024-07-7 12:30', name: '七月二次', series: 3, status: 'Pending' },
 ])
 const page = ref(1)
 const pageSize = 10
@@ -138,7 +145,16 @@ const closeDialog = () => {
 }
 
 const handleFileUpload = (e) => {
-  uploadedFiles.value = Array.from(e.target.files)
+  const files = Array.from(e.target.files)
+
+  if (files.length === 0) return
+
+  uploadedFiles.value = files
+
+  // 解析資料夾名稱
+  const firstPath = files[0].webkitRelativePath || ''
+  const folderName = firstPath.split('/')[0] || 'UnknownFolder'
+  detectedFolderName.value = folderName
 }
 
 const submitUpload = () => {
@@ -150,15 +166,18 @@ const submitUpload = () => {
   uploadProgress.value = 100
 
   jobs.value.push({
-    job: `JOB-${Date.now()}`,
+    job: newJob.value.name, // 使用者輸入的 job 名稱
     time: new Date().toLocaleString(),
-    name: newJob.value.name,
+    name: detectedFolderName.value, // 這裡改為上傳的資料夾名稱
     series: uploadedFiles.value.length,
     status: 'Uploaded',
   })
 
   closeDialog()
 }
+
+const detectedFolderName = ref('')
+
 </script>
 
 <style scoped>
@@ -249,7 +268,7 @@ const submitUpload = () => {
   position: relative;
 }
 .modal input {
-  width: 100%;
+  width: 95%;
   padding: 8px;
   background: #333;
   border: 1px solid #555;
