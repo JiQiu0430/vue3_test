@@ -99,6 +99,7 @@ export default {
   align-items: center;
   padding: 0 20px;
   font-weight: bold;
+  font-size: 20px;
   color: black;
   cursor: pointer;
   position: relative;
@@ -142,7 +143,7 @@ export default {
 .main-content {
   padding: 10px 16px;
   flex: 1;
-  overflow-y: auto;
+  overflow-y: hidden;
   font-size: 13px;
 }
 </style>
