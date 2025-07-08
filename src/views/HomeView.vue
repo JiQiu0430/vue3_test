@@ -36,7 +36,7 @@
             <td>{{ item.series }}</td>
             <td>{{ item.status }}</td>
             <td>
-              <!-- 修改眼睛按鈕，將 name 作為參數傳遞 -->
+              <!-- 修改眼睛按鈕，將 job 作為參數傳遞 -->
               <button class="icon-button" @click="viewFile(item.job)">
                 <img src="/eye.png" class="action-icon" alt="view" />
               </button>
@@ -82,7 +82,14 @@
               Drag or click to upload DICOM
             </label>
             <div v-if="uploadedFiles.length > 0" class="file-list">
-              <p v-for="(file, i) in uploadedFiles" :key="i">{{ file.name }}</p>
+              <!-- 前三筆 -->
+              <p v-for="(file, i) in uploadedFiles.slice(0, 3)" :key="i">{{ file.name }}</p>
+              
+              <!-- 中間省略提示 -->
+              <p v-if="uploadedFiles.length > 4">... ({{ uploadedFiles.length - 4 }} files hidden) ...</p>
+
+              <!-- 最後一筆 -->
+              <p>{{ uploadedFiles[uploadedFiles.length - 1].name }}</p>
             </div>
           </div>
 
