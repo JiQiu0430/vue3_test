@@ -224,16 +224,25 @@ const submitUpload = () => {
 }
 .job-table {
   width: 100%;
+  background-color: #1c1c1c;
   border-collapse: collapse;
-  background: #111;
 }
-.job-table th, .job-table td {
-  padding: 8px;
-  border: 1px solid #444;
+
+.job-table th,
+.job-table td {
+  padding: 10px 12px;
   text-align: left;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  border: none;
+  color: white;
+}
+
+.job-table tbody tr + tr {
+  border-top: 1px solid #003366;
+}
+
+.job-table thead {
+  background-color: #2a2a2a;
+  color: #ccc;
 }
 .icon-button {
   background: none;

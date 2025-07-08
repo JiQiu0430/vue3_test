@@ -96,7 +96,7 @@ const checkMark = (value) => (value ? '✔' : '✘')
   margin-bottom: 20px;
 }
 .toolbar {
-  margin-bottom: 10px;
+  margin-bottom: 40px;
 }
 .search-input {
   width: 250px;
@@ -108,17 +108,27 @@ const checkMark = (value) => (value ? '✔' : '✘')
 }
 .job-table {
   width: 100%;
+  background-color: #1c1c1c; /* 深灰色底 */
   border-collapse: collapse;
-  background: #111;
 }
-.job-table th,
-.job-table td {
-  padding: 8px;
-  border: 1px solid #444;
+
+.job-table th {
+  background-color: #2a2a2a;
+  color: #ccc;
+  padding: 10px 12px;
   text-align: left;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  border: none;
+}
+
+.job-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border: none;
+  color: white;
+}
+
+.job-table tbody tr + tr {
+  border-top: 1px solid #003366; /* 深藍色列間隔線 */
 }
 .icon-button {
   background: none;
