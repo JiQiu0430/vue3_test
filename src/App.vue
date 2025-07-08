@@ -8,18 +8,18 @@
       <!-- 選單 -->
       <nav class="nav-menu">
         <ul>
-          <li:
-            class="{ active: $route.name === 'Home' }"
+          <li
+            :class="{ active: $route.name === 'Home' }"
             @click="goToPage('Home')">
             DICOM List
           </li>
-          <li:
-            class="{ active: $route.name === 'CAD' }"
+          <li
+            :class="{ active: $route.name === 'CAD' }"
             @click="goToPage('CAD')">
             CAD Config
           </li>
-          <li:
-            class="{ active: $route.name === 'History' }"
+          <li
+            :class="{ active: $route.name === 'History' }"
             @click="goToPage('History')">
             History
           </li>

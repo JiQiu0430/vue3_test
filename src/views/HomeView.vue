@@ -51,7 +51,9 @@
               </button>
               <button class="icon-button"><img src="/file.png" class="action-icon" alt="report" /></button>
               <button class="icon-button"><img src="/download.png" class="action-icon" alt="download" /></button>
-              <button class="icon-button"><img src="/trash-bin.png" class="action-icon" alt="delete" /></button>
+              <button class="icon-button" @click="deleteJob(item.job)">
+                <img src="/trash-bin.png" class="action-icon" alt="delete" />
+              </button>
             </td>
           </tr>
         </tbody>
@@ -182,6 +184,18 @@ const submitUpload = () => {
 
   closeDialog()
 }
+
+// 刪除按鍵
+const deleteJob = (jobId) => {
+  if (confirm(`Are you sure you want to delete job "${jobId}"?`)) {
+    jobs.value = jobs.value.filter(job => job.job !== jobId)
+    // 若目前頁面超出總頁數，回到最後一頁
+    if (page.value > totalPages.value) {
+      page.value = totalPages.value
+    }
+  }
+}
+
 </script>
 
 <style scoped>
@@ -228,7 +242,6 @@ const submitUpload = () => {
   background-color: #1c1c1c;
   border-collapse: collapse;
 }
-
 .job-table th,
 .job-table td {
   padding: 10px 12px;
