@@ -37,7 +37,7 @@
             <td>{{ item.status }}</td>
             <td>
               <!-- 修改眼睛按鈕，將 name 作為參數傳遞 -->
-              <button class="icon-button" @click="viewFile(item.name)">
+              <button class="icon-button" @click="viewFile(item.job)">
                 <img src="/eye.png" class="action-icon" alt="view" />
               </button>
               <!-- 其他按鈕 -->
@@ -131,9 +131,9 @@ const nextPage = () => { if (page.value < totalPages.value) page.value++ }
 
 const router = useRouter()
 
-// 跳轉到檔案頁面，使用 name 作為 ID
-const viewFile = (fileName) => {
-  router.push({ name: 'FilePage', params: { name: fileName } })  // 根據檔案的 name 跳轉
+// 跳轉到檔案頁面，使用 job 作為 ID
+const viewFile = (jobId) => {
+  router.push({ name: 'FilePage', params: { id: jobId } })  // 根據 job 跳轉
 }
 
 const openUploadDialog = () => { showDialog.value = true }

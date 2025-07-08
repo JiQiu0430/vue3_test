@@ -1,18 +1,18 @@
 <template>
-  <div class="hello-page">
-    <h1>Hello, {{ name }}!</h1> <!-- 顯示傳遞過來的name -->
+  <div class="about-page">
+    <h1>Hello, {{ id }}!</h1>
     <p>Welcome to the temporary page.</p>
   </div>
 </template>
 
 <script>
 export default {
-  props: ['name'], // 接收路由參數 name
+  props: ['id'],
 };
 </script>
 
 <style scoped>
-.hello-page {
+.about-page {
   text-align: center;
   margin-top: 50px;
   color: white;
