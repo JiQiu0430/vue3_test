@@ -1,18 +1,18 @@
 <template>
   <div class="app-container">
-    <!-- 白色部分 (選單) -->
+    <!-- 白色部分 -->
     <header class="header">
       <div class="logo-box">
         <img src="/v5_logo.jpg" class="logo-img" />
       </div>
 
-      <!-- 橫向導航選單 -->
+      <!-- 橫向選單 -->
       <nav class="nav-menu">
         <ul>
           <li @click="goToHomePage">DICOM List</li>
-          <li>CAD Config</li> <!-- 這裡不需要跳轉 -->
-          <li>History</li> <!-- 這裡不需要跳轉 -->
-          <li>System</li> <!-- 這裡不需要跳轉 -->
+          <li>CAD Config</li>
+          <li>History</li>
+          <li>System</li>
         </ul>
       </nav>
 
@@ -21,7 +21,7 @@
       </div>
     </header>
 
-    <!-- 黑色部分：顯示 Home 或 FilePage -->
+    <!-- 黑色部分 -->
     <main class="main-content">
       <router-view></router-view> <!-- 顯示對應的頁面 -->
     </main>
@@ -32,7 +32,7 @@
 export default {
   name: 'App',
   methods: {
-    // 跳轉到 DICOM List 頁面
+    // 跳轉到 DICOM List
     goToHomePage() {
       this.$router.push({ name: 'Home' });
     },
@@ -53,9 +53,9 @@ export default {
   background: white;
   color: black;
   padding: 12px 20px;
-  display: flex;  /* 使用 Flexbox 將元素排列成行 */
-  justify-content: space-between;  /* 在 header 中平分空間 */
-  align-items: center;  /* 垂直居中對齊項目 */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .logo-box {
@@ -73,9 +73,9 @@ export default {
   background-color: white;
   padding: 10px;
   list-style: none;
-  display: flex; /* 使用 Flexbox 使選單橫向排列 */
-  justify-content: space-around; /* 水平分佈項目 */
-  flex-grow: 1;  /* 讓選單佔滿中間空間 */
+  display: flex;
+  justify-content: space-around;
+  flex-grow: 1;
 }
 
 .nav-menu ul {
@@ -87,13 +87,13 @@ export default {
 
 .nav-menu li {
   cursor: pointer;
-  margin-right: 20px; /* 每個選單項目間的間距 */
+  margin-right: 20px; /* 選單項目的間距 */
   font-weight: bold;
   color: black;
 }
 
 .nav-menu li:hover {
-  color: #1e90ff; /* 鼠標懸停時的顏色 */
+  color: #1e90ff; /* 鼠標點選的顏色 */
 }
 
 .avatar-box {

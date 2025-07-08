@@ -1,6 +1,6 @@
 <template>
   <div class="hello-page">
-    <h1>Hello, {{ name }}!</h1> <!-- 顯示傳遞過來的檔案名稱 -->
+    <h1>Hello, {{ name }}!</h1> <!-- 顯示傳遞過來的name -->
     <p>Welcome to the temporary page.</p>
   </div>
 </template>
