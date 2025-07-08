@@ -96,7 +96,7 @@
             <div v-if="uploadedFiles.length > 0" class="file-list">
               <p v-for="(file, i) in uploadedFiles.slice(0, 3)" :key="i">{{ file.name }}</p>
               <p v-if="uploadedFiles.length > 4">... ({{ uploadedFiles.length - 4 }} files hidden) ...</p>
-              <p>{{ uploadedFiles[uploadedFiles.length - 1].name }}</p>
+              <p v-if="uploadedFiles.length > 4">{{ uploadedFiles[uploadedFiles.length - 1].name }}</p>
             </div>
           </div>
 
@@ -114,7 +114,7 @@
         </div>
       </div>
 
-      <!-- 隱藏單檔上傳 -->
+      <!-- 單檔上傳 -->
       <input type="file" ref="fileInput" hidden @change="handleSingleFileUpload" />
     </main>
   </div>
@@ -215,7 +215,7 @@ const deleteJob = (jobId) => {
   }
 }
 
-// ✅ 單一檔案上傳：更新 series 與 status
+// 新增單一檔案(更新 series 與 status)
 const selectFileForJob = (jobId) => {
   currentUploadJob.value = jobId
   fileInput.value?.click()
