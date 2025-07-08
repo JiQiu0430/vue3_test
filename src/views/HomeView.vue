@@ -1,6 +1,5 @@
 <template>
   <div class="app-container">
-    <!-- 標題 -->
     <main class="main-content">
       <h1 class="main-title">DICOM Upload</h1>
 
@@ -16,10 +15,11 @@
         </svg>
       </div>
 
-      <!-- 列表 -->
+      <!-- 表格 -->
       <table class="job-table">
         <thead>
           <tr>
+            <th class="status-header"></th> <!-- 無標題 -->
             <th>Job</th>
             <th>Upload Time</th>
             <th>Name</th>
@@ -30,17 +30,25 @@
         </thead>
         <tbody>
           <tr v-for="(item, index) in paginatedJobs" :key="index">
+            <td>
+              <span
+                class="status-indicator"
+                :class="{
+                  green: item.status === 'Analyzed',
+                  white: item.status === 'Pending',
+                  red: item.status === 'Error'
+                }"
+              ></span>
+            </td>
             <td>{{ item.job }}</td>
             <td>{{ item.time }}</td>
             <td>{{ item.name }}</td>
             <td>{{ item.series }}</td>
             <td>{{ item.status }}</td>
             <td>
-              <!-- 修改眼睛按鈕，將 job 作為參數傳遞 -->
               <button class="icon-button" @click="viewFile(item.job)">
                 <img src="/eye.png" class="action-icon" alt="view" />
               </button>
-              <!-- 其他按鈕 -->
               <button class="icon-button"><img src="/file.png" class="action-icon" alt="report" /></button>
               <button class="icon-button"><img src="/download.png" class="action-icon" alt="download" /></button>
               <button class="icon-button"><img src="/trash-bin.png" class="action-icon" alt="delete" /></button>
@@ -49,7 +57,7 @@
         </tbody>
       </table>
 
-      <!-- 頁面方塊 -->
+      <!-- 頁碼 -->
       <div class="pagination">
         <button @click="prevPage" :disabled="page === 1">«</button>
         <button v-for="p in totalPages" :key="p" @click="setPage(p)" :class="{ active: page === p }">
@@ -79,16 +87,11 @@
                 hidden
                 @change="handleFileUpload"
               />
-              Drag or click to upload DICOM
+              click to upload DICOM
             </label>
             <div v-if="uploadedFiles.length > 0" class="file-list">
-              <!-- 前三筆 -->
-              <p v-for="(file, i) in uploadedFiles.slice(0, 3)" :key="i">{{ file.name }}</p>    
-
-              <!-- 中間省略提示 -->
+              <p v-for="(file, i) in uploadedFiles.slice(0, 3)" :key="i">{{ file.name }}</p>
               <p v-if="uploadedFiles.length > 4">... ({{ uploadedFiles.length - 4 }} files hidden) ...</p>
-
-              <!-- 最後一筆 -->
               <p>{{ uploadedFiles[uploadedFiles.length - 1].name }}</p>
             </div>
           </div>
@@ -114,35 +117,31 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const showDialog = ref(false)
 const newJob = ref({ name: '' })
-const searchQuery = ref('')
 const uploadedFiles = ref([])
 const uploadProgress = ref(0)
+const detectedFolderName = ref('')
+const searchQuery = ref('')
+const page = ref(1)
+const pageSize = 10
 
-// 模擬資料
 const jobs = ref([
   { job: 'test-001', time: '2024-07-7 12:00', name: '七月', series: 5, status: 'Analyzed' },
   { job: 'test-002', time: '2024-07-7 12:30', name: '十三月', series: 3, status: 'Pending' },
 ])
-const page = ref(1)
-const pageSize = 10
 
 const totalPages = computed(() => Math.ceil(jobs.value.length / pageSize))
 const paginatedJobs = computed(() =>
-  jobs.value.slice((page.value - 1) * pageSize, page.value * pageSize)
+  jobs.value
+    .filter(item => item.job.includes(searchQuery.value) || item.name.includes(searchQuery.value))
+    .slice((page.value - 1) * pageSize, page.value * pageSize)
 )
 
 const setPage = (p) => { page.value = p }
 const prevPage = () => { if (page.value > 1) page.value-- }
 const nextPage = () => { if (page.value < totalPages.value) page.value++ }
-
-const router = useRouter()
-
-// 跳轉到檔案頁面，使用 job 作為 ID
-const viewFile = (jobId) => {
-  router.push({ name: 'FilePage', params: { id: jobId } })  // 根據 job 跳轉
-}
 
 const openUploadDialog = () => { showDialog.value = true }
 const closeDialog = () => {
@@ -152,14 +151,14 @@ const closeDialog = () => {
   uploadProgress.value = 0
 }
 
+const viewFile = (jobId) => {
+  router.push({ name: 'FilePage', params: { id: jobId } })
+}
+
 const handleFileUpload = (e) => {
   const files = Array.from(e.target.files)
-
   if (files.length === 0) return
-
   uploadedFiles.value = files
-
-  // 解析資料夾名稱
   const firstPath = files[0].webkitRelativePath || ''
   const folderName = firstPath.split('/')[0] || 'UnknownFolder'
   detectedFolderName.value = folderName
@@ -172,20 +171,16 @@ const submitUpload = () => {
   }
 
   uploadProgress.value = 100
-
   jobs.value.push({
-    job: newJob.value.name, // 使用者輸入的 job 名稱
+    job: newJob.value.name,
     time: new Date().toLocaleString(),
-    name: detectedFolderName.value, // 改為上傳的資料夾名稱
+    name: detectedFolderName.value,
     series: uploadedFiles.value.length,
-    status: 'Uploaded',
+    status: 'Pending'
   })
 
   closeDialog()
 }
-
-const detectedFolderName = ref('')
-
 </script>
 
 <style scoped>
@@ -196,12 +191,10 @@ const detectedFolderName = ref('')
   display: flex;
   flex-direction: column;
 }
-
 .main-content {
   padding: 20px;
   flex: 1;
   overflow-y: auto;
-  position: relative;
 }
 .main-title {
   text-align: center;
@@ -227,13 +220,20 @@ const detectedFolderName = ref('')
 .upload-plus {
   width: 24px;
   height: 24px;
-  fill: white;
   cursor: pointer;
 }
-.action-icon {
-  width: 18px;
-  height: 18px;
-  object-fit: contain;
+.job-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #111;
+}
+.job-table th, .job-table td {
+  padding: 8px;
+  border: 1px solid #444;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .icon-button {
   background: none;
@@ -242,22 +242,10 @@ const detectedFolderName = ref('')
   margin-right: 4px;
   cursor: pointer;
 }
-.text-red {
-  color: #e74c3c;
-}
-.job-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: #111;
-}
-.job-table th,
-.job-table td {
-  padding: 8px;
-  border: 1px solid #444;
-  text-align: left;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.action-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
 }
 .modal-overlay {
   position: fixed;
@@ -273,7 +261,6 @@ const detectedFolderName = ref('')
   padding: 20px;
   border-radius: 8px;
   width: 360px;
-  position: relative;
 }
 .modal input {
   width: 95%;
@@ -307,13 +294,6 @@ const detectedFolderName = ref('')
   height: 100%;
   border-radius: 4px;
 }
-.close-btn {
-  background: none;
-  border: none;
-  color: #aaa;
-  font-size: 20px;
-  cursor: pointer;
-}
 .submit-btn {
   padding: 8px 16px;
   background: #1e90ff;
@@ -322,22 +302,23 @@ const detectedFolderName = ref('')
   border-radius: 4px;
   cursor: pointer;
 }
-.form-group {
-  margin-bottom: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.modal-title {
-  margin-bottom: 12px;
+.close-btn {
+  background: none;
+  border: none;
+  color: #aaa;
   font-size: 20px;
-  font-weight: bold;
-  color: white;
+  cursor: pointer;
 }
 .modal-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+.form-group {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 .pagination {
   display: flex;
@@ -360,5 +341,26 @@ const detectedFolderName = ref('')
 .pagination button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* 狀態燈樣式 */
+.status-indicator {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.status-indicator.green {
+  background-color: #2ecc71;
+}
+.status-indicator.white {
+  background-color: #ecf0f1;
+}
+.status-indicator.red {
+  background-color: #e74c3c;
+}
+.status-header {
+  width: 24px;
+  padding: 0;
 }
 </style>

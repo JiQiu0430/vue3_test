@@ -2,7 +2,7 @@
   <div class="app-container">
     <!-- Main -->
     <main class="main-content">
-      <h1 class="main-title">Case Detail</h1>
+      <h1 class="main-title">Work Space</h1>
 
       <!-- 搜尋欄 -->
       <div class="toolbar">
