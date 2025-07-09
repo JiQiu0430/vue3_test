@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <main class="main-content">
-      <h1 class="main-title">Work Space</h1>
+      <h1 class="main-title">V5 ImPrep</h1>
 
       <!-- 搜尋欄 -->
       <div class="toolbar">
@@ -151,7 +151,12 @@ const deleteCase = (name) => {
 .main-title {
   text-align: center;
   font-size: 24px;
-  margin-bottom: 20px;
+  margin: -10px 0 20px 0;
+  background-color: #0892D0;
+  padding: 10px 20px;
+  border-radius: 0px;
+  color: white;
+  display: inline-block;
 }
 .toolbar {
   margin-bottom: 40px;

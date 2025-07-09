@@ -1,18 +1,19 @@
 <template>
   <div class="app-container">
     <main class="main-content">
-      <h1 class="main-title">DICOM Upload</h1>
+      <h1 class="main-title">V5 ImPrep</h1>
 
-      <!-- 搜尋欄 -->
-      <div class="toolbar">
-        <input v-model="searchQuery" type="text" placeholder="Search jobs..." class="search-input" />
-      </div>
-
-      <!-- 上傳按鈕 -->
-      <div class="upload-button-box">
-        <svg class="icon upload-plus" viewBox="0 0 24 24" fill="none" @click="openUploadDialog">
-          <path d="M12 5V19M5 12H19" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
+      <!-- 上傳與搜尋工具列 -->
+      <div class="toolbar-row">
+        <!-- 上傳按鈕 -->
+        <button class="add-job-btn" @click="openUploadDialog">+ Job</button>
+        <!-- 搜尋欄 -->
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Search jobs..."
+          class="search-input"
+        />
       </div>
 
       <!-- 列表 -->
@@ -266,10 +267,18 @@ const handleSingleFileUpload = (e) => {
 .main-title {
   text-align: center;
   font-size: 24px;
-  margin-bottom: 20px;
+  margin: -10px 0 20px 0;
+  background-color: #0892D0;
+  padding: 10px 20px;
+  border-radius: 0px;
+  color: white;
+  display: inline-block;
 }
-.toolbar {
-  margin-bottom: 10px;
+.toolbar-row {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 14px;
 }
 .search-input {
   width: 250px;
@@ -279,15 +288,19 @@ const handleSingleFileUpload = (e) => {
   background: #111;
   color: white;
 }
-.upload-button-box {
-  display: flex;
-  justify-content: flex-start;
-  margin: 6px 0 14px 0;
-}
-.upload-plus {
-  width: 24px;
-  height: 24px;
+.add-job-btn {
+  background: black;
+  color: white;
+  border: 1px solid white;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 14px;
   cursor: pointer;
+  transition: background 0.2s;
+}
+.add-job-btn:hover {
+  background: #1e90ff;
+  border-color: #1e90ff;
 }
 .job-table {
   width: 100%;
