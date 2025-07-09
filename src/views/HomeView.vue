@@ -15,7 +15,7 @@
         </svg>
       </div>
 
-      <!-- 表格 -->
+      <!-- 列表 -->
       <table class="job-table">
         <thead>
           <tr>
@@ -46,6 +46,7 @@
             <td>{{ item.series }}</td>
             <td>{{ item.status }}</td>
             <td>
+              <!-- 個別檔案按鈕 -->
               <button class="icon-button" @click="viewFile(item.job)">
                 <img src="/eye.png" class="action-icon" alt="view" />
               </button>
@@ -93,6 +94,7 @@
               />
               click to upload DICOM
             </label>
+            <!-- 檔案名條列壓縮 -->
             <div v-if="uploadedFiles.length > 0" class="file-list">
               <p v-for="(file, i) in uploadedFiles.slice(0, 3)" :key="i">{{ file.name }}</p>
               <p v-if="uploadedFiles.length > 4">... ({{ uploadedFiles.length - 4 }} files hidden) ...</p>
@@ -136,6 +138,7 @@ const pageSize = 10
 const fileInput = ref(null)
 const currentUploadJob = ref(null)
 
+// 模擬資料
 const jobs = ref([
   {
     job: 'test-001',
@@ -155,17 +158,22 @@ const jobs = ref([
   },
 ])
 
+// 頁面計算
 const totalPages = computed(() => Math.ceil(jobs.value.length / pageSize))
+
+// 搜尋欄
 const paginatedJobs = computed(() =>
   jobs.value
     .filter(item => item.job.includes(searchQuery.value) || item.name.includes(searchQuery.value))
     .slice((page.value - 1) * pageSize, page.value * pageSize)
 )
 
+// 頁數切換
 const setPage = (p) => { page.value = p }
 const prevPage = () => { if (page.value > 1) page.value-- }
 const nextPage = () => { if (page.value < totalPages.value) page.value++ }
 
+// 開關上傳視窗
 const openUploadDialog = () => { showDialog.value = true }
 const closeDialog = () => {
   showDialog.value = false
@@ -174,10 +182,12 @@ const closeDialog = () => {
   uploadProgress.value = 0
 }
 
+// 跳轉頁面
 const viewFile = (jobId) => {
   router.push({ name: 'FilePage', params: { id: jobId } })
 }
 
+// 上傳資料夾
 const handleFileUpload = (e) => {
   const files = Array.from(e.target.files)
   if (files.length === 0) return
@@ -187,6 +197,7 @@ const handleFileUpload = (e) => {
   detectedFolderName.value = folderName
 }
 
+// 將資料夾內容加入列表
 const submitUpload = () => {
   if (!newJob.value.name || uploadedFiles.value.length === 0) {
     alert('Please enter job name and upload files.')
@@ -206,6 +217,7 @@ const submitUpload = () => {
   closeDialog()
 }
 
+// 刪除job+更新頁面
 const deleteJob = (jobId) => {
   if (confirm(`Are you sure you want to delete job "${jobId}"?`)) {
     jobs.value = jobs.value.filter(job => job.job !== jobId)
@@ -215,12 +227,11 @@ const deleteJob = (jobId) => {
   }
 }
 
-// 新增單一檔案
+// 新增指定job單一檔案
 const selectFileForJob = (jobId) => {
   currentUploadJob.value = jobId
   fileInput.value?.click()
 }
-
 const handleSingleFileUpload = (e) => {
   const file = e.target.files[0]
   if (!file || !currentUploadJob.value) return
@@ -405,7 +416,6 @@ const handleSingleFileUpload = (e) => {
   cursor: not-allowed;
 }
 
-/* 狀態燈樣式 */
 .status-indicator {
   display: inline-block;
   width: 10px;

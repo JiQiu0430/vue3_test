@@ -1,6 +1,5 @@
 <template>
   <div class="app-container">
-    <!-- Main -->
     <main class="main-content">
       <h1 class="main-title">Work Space</h1>
 
@@ -44,7 +43,7 @@
         </tbody>
       </table>
 
-      <!-- 分頁 -->
+      <!-- 頁面方塊 -->
       <div class="pagination">
         <button @click="prevPage" :disabled="page === 1">«</button>
         <button
@@ -67,11 +66,11 @@ import { ref, computed } from 'vue'
 
 const route = useRoute()
 const jobId = route.params.id
-
 const searchQuery = ref('')
 const page = ref(1)
 const pageSize = 10
 
+模擬資料
 const caseData = ref([
   {
     caseId: jobId,
@@ -100,9 +99,12 @@ const caseData = ref([
     postAI: false,
     postPACS: false,
   },
-  // ... 可加入更多資料以測試分頁效果
 ])
 
+// 頁面計算
+const totalPages = computed(() => Math.ceil(filteredData.value.length / pageSize))
+
+// 搜尋欄
 const filteredData = computed(() =>
   caseData.value.filter(row =>
     row.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
@@ -110,20 +112,20 @@ const filteredData = computed(() =>
   )
 )
 
-const totalPages = computed(() =>
-  Math.ceil(filteredData.value.length / pageSize)
-)
-
+// 搜尋後的頁數
 const paginatedData = computed(() =>
   filteredData.value.slice((page.value - 1) * pageSize, page.value * pageSize)
 )
 
+// 頁數切換
 const setPage = (p) => { page.value = p }
 const prevPage = () => { if (page.value > 1) page.value-- }
 const nextPage = () => { if (page.value < totalPages.value) page.value++ }
 
+// 檢查狀況
 const checkMark = (value) => (value ? '✔' : '✘')
 
+// 刪除資料+更新頁面
 const deleteCase = (name) => {
   if (confirm(`Are you sure you want to delete patient "${name}"?`)) {
     caseData.value = caseData.value.filter(row => row.name !== name)
@@ -193,7 +195,6 @@ const deleteCase = (name) => {
   height: 14px;
   object-fit: contain;
 }
-/* 分頁樣式 */
 .pagination {
   display: flex;
   justify-content: flex-end;

@@ -89,7 +89,7 @@ export default {
 .nav-menu ul {
   display: flex;
   align-items: stretch;
-  gap: 48px; /* 選單間距 */
+  gap: 48px; /* 間距 */
   padding: 0;
   margin: 0;
   list-style: none;
