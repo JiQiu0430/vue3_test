@@ -130,10 +130,10 @@ const caseData = ref([
     caseId: 'C000000000',
     name: 'Patient C',
     series: 2,
-    upload: false,
-    mapping: false,
-    postAI: false,
-    postPACS: false,
+    upload: null,
+    mapping: null,
+    postAI: null,
+    postPACS: null,
     status: 'Pending'
   },
 ])
@@ -161,7 +161,7 @@ const exportCSV = () => {
   link.click()
 }
 
-//頁數計算
+// 頁數計算
 const totalPages = computed(() =>
   Math.ceil(caseData.value.length / pageSize)
 )
@@ -172,7 +172,12 @@ const setPage = (p) => (page.value = p)
 const prevPage = () => { if (page.value > 1) page.value-- }
 const nextPage = () => { if (page.value < totalPages.value) page.value++ }
 
-const checkMark = (value) => {return value ? '✔' : '<span class="red-cross">✘</span>'}
+// 顯示勾/叉
+const checkMark = (value) => {
+  if (value === true) return '✔'
+  if (value === false) return '<span class="red-cross">✘</span>'
+  return ''
+}
 
 // 刪除資料
 const deleteCase = (name) => {
