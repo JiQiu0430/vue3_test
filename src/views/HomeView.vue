@@ -4,7 +4,7 @@
       <h1 class="main-title">V5 ImPrep</h1>
 
       <!-- 上傳與搜尋工具列 -->
-      <div class="toolbar-row">
+      <div class="toolbar">
         <!-- 上傳按鈕 -->
         <button class="add-job-btn" @click="openUploadDialog">+ Job</button>
         <!-- 搜尋欄 -->
@@ -124,8 +124,8 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { ref, computed } from 'vue'
 
 const router = useRouter()
 const showDialog = ref(false)
@@ -274,7 +274,7 @@ const handleSingleFileUpload = (e) => {
   color: white;
   display: inline-block;
 }
-.toolbar-row {
+.toolbar {
   display: flex;
   align-items: center;
   gap: 24px;
@@ -407,10 +407,15 @@ const handleSingleFileUpload = (e) => {
   gap: 4px;
 }
 .pagination {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: black;
+  padding: 6px 10px;
+  border-radius: 6px;
   display: flex;
-  justify-content: flex-end;
-  margin-top: 20px;
   gap: 6px;
+  z-index: 1000;
 }
 .pagination button {
   background: #222;

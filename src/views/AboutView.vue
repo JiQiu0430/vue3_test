@@ -5,6 +5,7 @@
 
       <!-- 搜尋欄 -->
       <div class="toolbar">
+        <button class="back-button" @click="goBackHome">Back to Job</button>
         <input v-model="searchQuery" type="text" placeholder="Search cases..." class="search-input" />
       </div>
 
@@ -61,10 +62,16 @@
 </template>
 
 <script setup>
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ref, computed } from 'vue'
 
+// 返回鍵
 const route = useRoute()
+const router = useRouter()
+const goBackHome = () => {
+  router.push({ name: 'Home' })
+}
+
 const jobId = route.params.id
 const searchQuery = ref('')
 const page = ref(1)
@@ -159,7 +166,23 @@ const deleteCase = (name) => {
   display: inline-block;
 }
 .toolbar {
-  margin-bottom: 40px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.back-button {
+  background: #111;
+  color: white;
+  border: 1px solid #666;
+  padding: 6px 10px;
+  border-radius: 4px;
+  margin-right: 16px;
+  cursor: pointer;
+}
+.back-button:hover {
+  background: #1e90ff;
+  border-color: #1e90ff;
 }
 .search-input {
   width: 250px;
@@ -201,10 +224,15 @@ const deleteCase = (name) => {
   object-fit: contain;
 }
 .pagination {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: black;
+  padding: 6px 10px;
+  border-radius: 6px;
   display: flex;
-  justify-content: flex-end;
-  margin-top: 20px;
   gap: 6px;
+  z-index: 1000;
 }
 .pagination button {
   background: #222;
