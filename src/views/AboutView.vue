@@ -271,7 +271,7 @@ const deleteCase = (name) => {
   color: white;
 }
 .job-table tbody tr + tr {
-  border-top: 1px solid #003366;
+  border-top: 2px solid #003366;
 }
 /* 錯誤變明顯 */
 ::v-deep .red-cross {
