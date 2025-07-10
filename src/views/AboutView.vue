@@ -22,7 +22,7 @@
       <table class="job-table">
         <thead>
           <tr>
-            <th class="status-header"></th>
+            <th></th>
             <th>Case ID</th>
             <th>Patient Name</th>
             <th>Series Count</th>
@@ -111,9 +111,9 @@ const caseData = ref([
     name: 'Patient A',
     series: 5,
     upload: true,
-    mapping: false,
+    mapping: true,
     postAI: true,
-    postPACS: false,
+    postPACS: true,
     status: 'Analyzed'
   },
   {
@@ -123,8 +123,8 @@ const caseData = ref([
     upload: true,
     mapping: true,
     postAI: false,
-    postPACS: true,
-    status: 'Pending'
+    postPACS: false,
+    status: 'Error'
   },
   {
     caseId: 'C000000000',
@@ -134,7 +134,7 @@ const caseData = ref([
     mapping: false,
     postAI: false,
     postPACS: false,
-    status: 'Error'
+    status: 'Pending'
   },
 ])
 
@@ -184,6 +184,8 @@ const deleteCase = (name) => {
 </script>
 
 <style scoped>
+
+/* App 整體 */
 .app-container {
   background: black;
   color: white;
@@ -191,12 +193,16 @@ const deleteCase = (name) => {
   display: flex;
   flex-direction: column;
 }
+
+/* 主內容 */
 .main-content {
   padding: 20px;
   flex: 1;
   overflow-y: auto;
   font-size: 13px;
 }
+
+/* 標題 */
 .main-title {
   text-align: center;
   font-size: 24px;
@@ -206,6 +212,8 @@ const deleteCase = (name) => {
   color: white;
   display: inline-block;
 }
+
+/* 返回鍵+資訊文字+搜尋列 */
 .toolbar {
   display: flex;
   justify-content: space-between;
@@ -244,6 +252,8 @@ const deleteCase = (name) => {
 .job-info span {
   white-space: nowrap;
 }
+
+/* 列表 */
 .job-table {
   width: 100%;
   background-color: #1c1c1c;
@@ -258,6 +268,7 @@ const deleteCase = (name) => {
 .job-table tbody tr + tr {
   border-top: 1px solid #003366;
 }
+/* 錯誤變明顯 */
 ::v-deep .red-cross {
   color: #ff4d4f;
   font-weight: bold;
@@ -266,6 +277,8 @@ const deleteCase = (name) => {
   background-color: black;
   color: white;
 }
+
+/* 狀態燈 */
 .status-indicator {
   display: inline-block;
   width: 10px;
@@ -280,19 +293,14 @@ const deleteCase = (name) => {
 .status-indicator.red {
   background-color: #e74c3c;
 }
+
+/* icon按鈕 */
 .icon-button {
   background: none;
   border: none;
   padding: 2px;
   margin-right: 2px;
   cursor: pointer;
-}
-.icon-button.reload {
-  background-color: #1c1c1c;
-}
-.icon-button.delete {
-  background-color: #1c1c1c;
-  border-radius: 20%
 }
 .icon-button.delete:hover {
   background-color: #ff4d4f;
@@ -307,6 +315,8 @@ const deleteCase = (name) => {
   height: 14px;
   object-fit: contain;
 }
+
+/* 分頁 */
 .pagination {
   position: fixed;
   bottom: 20px;

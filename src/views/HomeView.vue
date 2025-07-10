@@ -80,11 +80,13 @@
         <div class="modal">
           <h2 class="modal-title">Create Job</h2>
 
+          <!-- 輸入jobName -->
           <div class="form-group">
             <label>1. Input job name</label>
             <input v-model="newJob.name" type="text" />
           </div>
 
+          <!-- 上傳資料夾 -->
           <div class="form-group">
             <label>2. Select upload folder</label>
             <label class="upload-box">
@@ -107,13 +109,20 @@
             </div>
           </div>
 
+          <!-- 進度條 -->
           <div class="form-group">
             <label>3. Upload</label>
-            <div class="progress-bar">
-              <div class="progress" :style="{ width: uploadProgress + '%' }"></div>
+            <div class="progress-container">
+              <div class="progress-bar">
+                <div class="progress" :style="{ width: uploadProgress + '%' }"></div>
+              </div>
+              <button class="retry-btn" @click="retryUpload">
+                <img src="/reload.png" class="action-icon" alt="retry" />
+              </button>
             </div>
           </div>
 
+          <!-- 上傳/取消按鈕 -->
           <div class="modal-actions">
             <button class="submit-btn" @click="submitUpload">Upload</button>
             <button @click="closeDialog" class="close-btn">Cancel</button>
@@ -132,14 +141,28 @@ import { useRouter } from 'vue-router'
 import { ref, computed } from 'vue'
 
 const router = useRouter()
+
+// 控制上傳視窗顯示
 const showDialog = ref(false)
+
+// 新 Job 名稱
 const newJob = ref({ name: '' })
+
+// 上傳的檔案清單
 const uploadedFiles = ref([])
+
+// 上傳進度條
 const uploadProgress = ref(0)
+
+// 偵測資料夾名稱
 const detectedFolderName = ref('')
+
 const searchQuery = ref('')
+
+// 翻頁設定
 const page = ref(1)
 const pageSize = 10
+
 const fileInput = ref(null)
 const currentUploadJob = ref(null)
 
@@ -158,7 +181,7 @@ const jobs = ref([
     time: '2024-07-7 12:30',
     name: '十三月',
     series: 3,
-    status: 'Pending',
+    status: 'Error',
     files: [],
   },
 ])
@@ -230,6 +253,12 @@ const submitUpload = () => {
   closeDialog()
 }
 
+// 重試上傳
+const retryUpload = () => {
+  uploadProgress.value = 0
+  alert('Retry upload triggered.')
+}
+
 // 刪除job+更新頁面
 const deleteJob = (jobId) => {
   if (confirm(`Are you sure you want to delete job "${jobId}"?`)) {
@@ -263,6 +292,8 @@ const handleSingleFileUpload = (e) => {
 </script>
 
 <style scoped>
+
+/* App 整體 */
 .app-container {
   background: black;
   color: white;
@@ -270,12 +301,16 @@ const handleSingleFileUpload = (e) => {
   display: flex;
   flex-direction: column;
 }
+
+/* 主內容 */
 .main-content {
   padding: 20px;
   flex: 1;
   overflow-y: auto;
   font-size: 13px;
 }
+
+/* 標題 */
 .main-title {
   text-align: center;
   font-size: 24px;
@@ -286,6 +321,8 @@ const handleSingleFileUpload = (e) => {
   color: white;
   display: inline-block;
 }
+
+/* 上傳搜尋列 */
 .toolbar {
   display: flex;
   align-items: center;
@@ -314,6 +351,8 @@ const handleSingleFileUpload = (e) => {
   background: #0892D0;
   border-color: #0892D0;
 }
+
+/* 列表 */
 .job-table {
   width: 100%;
   background-color: #1c1c1c;
@@ -333,6 +372,8 @@ const handleSingleFileUpload = (e) => {
   background-color: black;
   color: white;
 }
+
+/* icon工具列 */
 .icon-button {
   background: none;
   border: none;
@@ -345,6 +386,8 @@ const handleSingleFileUpload = (e) => {
   height: 14px;
   object-fit: contain;
 }
+
+/* 彈窗及遮罩 */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -360,6 +403,8 @@ const handleSingleFileUpload = (e) => {
   border-radius: 8px;
   width: 360px;
 }
+
+/* 上傳輸入及條列 */
 .modal input {
   width: 95%;
   padding: 8px;
@@ -381,16 +426,47 @@ const handleSingleFileUpload = (e) => {
   margin-top: 4px;
   color: #ccc;
 }
+
+/* 上傳進度 */
+.form-group {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 .progress-bar {
+  flex: 1;
   background: #555;
   height: 6px;
   border-radius: 4px;
-  margin-bottom: 8px;
+  overflow: hidden;
 }
 .progress {
   background: #0892D0;
   height: 100%;
   border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+/* 重新上傳鍵 */
+.retry-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+}
+
+/* 上傳及取消鍵 */
+.modal-actions {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 12px;
 }
 .submit-btn {
   padding: 8px 16px;
@@ -407,18 +483,8 @@ const handleSingleFileUpload = (e) => {
   font-size: 14px;
   cursor: pointer;
 }
-.modal-actions {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 12px;
-}
-.form-group {
-  margin-bottom: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
+
+/* 分頁 */
 .pagination {
   position: fixed;
   bottom: 20px;
@@ -447,6 +513,7 @@ const handleSingleFileUpload = (e) => {
   cursor: not-allowed;
 }
 
+/* 狀態燈 */
 .status-indicator {
   display: inline-block;
   width: 10px;
