@@ -3,7 +3,7 @@
     <main class="main-content">
       <h1 class="main-title">V5 ImPrep</h1>
 
-      <!-- 上傳與搜尋工具列 -->
+      <!-- 工具列 -->
       <div class="toolbar">
         <!-- 上傳按鈕 -->
         <button class="add-job-btn" @click="openUploadDialog">+ Job</button>
@@ -48,7 +48,7 @@
             <td>{{ item.status }}</td>
             <td>
               <!-- 個別檔案按鈕 -->
-              <button class="icon-button" @click="viewFile(item.job)">
+              <button class="icon-button" @click="viewFile(item)">
                 <img src="/eye.png" class="action-icon" alt="view" />
               </button>
               <button class="icon-button" @click="selectFileForJob(item.job)">
@@ -184,8 +184,16 @@ const closeDialog = () => {
 }
 
 // 跳轉頁面
-const viewFile = (jobId) => {
-  router.push({ name: 'FilePage', params: { id: jobId } })
+const viewFile = (item) => {
+  router.push({
+    name: 'FilePage',
+    params: { id: item.job },
+    query: {
+      job: item.job,
+      time: item.time,
+      series: item.series
+    }
+  })
 }
 
 // 上傳資料夾
@@ -289,7 +297,7 @@ const handleSingleFileUpload = (e) => {
   color: white;
 }
 .add-job-btn {
-  background: black;
+  background: #2c2c2c;
   color: white;
   border: 1px solid white;
   padding: 6px 14px;

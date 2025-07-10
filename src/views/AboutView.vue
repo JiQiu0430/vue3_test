@@ -3,10 +3,19 @@
     <main class="main-content">
       <h1 class="main-title">V5 ImPrep</h1>
 
-      <!-- 搜尋欄 -->
+      <!-- 返回鍵與資訊欄 -->
       <div class="toolbar">
-        <button class="back-button" @click="goBackHome">Back to Job</button>
-        <input v-model="searchQuery" type="text" placeholder="Search cases..." class="search-input" />
+        <div class="left-tools">
+          <button class="back-button" @click="goBackHome">Back to Job</button>
+          <div class="job-info">
+            <span><strong>Batch ID:</strong> {{ jobInfo.job || 'N/A' }}</span>
+            <span>|</span>
+            <span><strong>Upload Time:</strong> {{ jobInfo.time || 'N/A' }}</span>
+            <span>|</span>
+            <span><strong>Total Case:</strong> {{ caseData.length }}</span>
+          </div>
+        </div>
+        <button class="export-button" @click="exportCSV">Export CSV</button>
       </div>
 
       <!-- 列表 -->
@@ -33,9 +42,7 @@
             <td>{{ checkMark(row.postAI) }}</td>
             <td>{{ checkMark(row.postPACS) }}</td>
             <td>
-              <button class="icon-button"><img src="/eye.png" class="action-icon" /></button>
-              <button class="icon-button"><img src="/file.png" class="action-icon" /></button>
-              <button class="icon-button"><img src="/download.png" class="action-icon" /></button>
+              <button class="icon-button  reload"><img src="/reload.png" class="action-icon" /></button>
               <button class="icon-button" @click="deleteCase(row.name)">
                 <img src="/trash-bin.png" class="action-icon" />
               </button>
@@ -44,7 +51,7 @@
         </tbody>
       </table>
 
-      <!-- 頁面方塊 -->
+      <!-- 頁數方塊 -->
       <div class="pagination">
         <button @click="prevPage" :disabled="page === 1">«</button>
         <button
@@ -65,15 +72,19 @@
 import { useRoute, useRouter } from 'vue-router'
 import { ref, computed } from 'vue'
 
-// 返回鍵
 const route = useRoute()
 const router = useRouter()
-const goBackHome = () => {
-  router.push({ name: 'Home' })
-}
+
+const goBackHome = () => router.push({ name: 'Home' })
+
+// 取得 job 資訊
+const jobInfo = computed(() => ({
+  job: route.query.job,
+  time: route.query.time,
+  series: route.query.series
+}))
 
 const jobId = route.params.id
-const searchQuery = ref('')
 const page = ref(1)
 const pageSize = 10
 
@@ -108,31 +119,43 @@ const caseData = ref([
   },
 ])
 
-// 頁面計算
-const totalPages = computed(() => Math.ceil(filteredData.value.length / pageSize))
+// 導出資料
+const exportCSV = () => {
+  const headers = ['Case ID', 'Patient Name', 'Series Count', 'Upload', 'Mapping', 'Post to AI', 'Post to PACS']
+  const rows = caseData.value.map(row => [
+    row.caseId,
+    row.name,
+    row.series,
+    row.upload ? 'V' : 'X',
+    row.mapping ? 'V' : 'X',
+    row.postAI ? 'V' : 'X',
+    row.postPACS ? 'V' : 'X',
+  ])
+  const csvContent = [headers, ...rows]
+    .map(e => e.map(v => `"${v}"`).join(','))
+    .join('\n')
 
-// 搜尋欄
-const filteredData = computed(() =>
-  caseData.value.filter(row =>
-    row.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-    row.caseId.toLowerCase().includes(searchQuery.value.toLowerCase())
-  )
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.setAttribute('download', 'case_data.csv')
+  link.click()
+}
+
+//頁數計算
+const totalPages = computed(() =>
+  Math.ceil(caseData.value.length / pageSize)
 )
-
-// 搜尋後的頁數
 const paginatedData = computed(() =>
-  filteredData.value.slice((page.value - 1) * pageSize, page.value * pageSize)
+  caseData.value.slice((page.value - 1) * pageSize, page.value * pageSize)
 )
-
-// 頁數切換
-const setPage = (p) => { page.value = p }
+const setPage = (p) => (page.value = p)
 const prevPage = () => { if (page.value > 1) page.value-- }
 const nextPage = () => { if (page.value < totalPages.value) page.value++ }
 
-// 檢查狀況
 const checkMark = (value) => (value ? '✔' : '✘')
 
-// 刪除資料+更新頁面
+// 刪除資料
 const deleteCase = (name) => {
   if (confirm(`Are you sure you want to delete patient "${name}"?`)) {
     caseData.value = caseData.value.filter(row => row.name !== name)
@@ -168,13 +191,19 @@ const deleteCase = (name) => {
 .toolbar {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
   margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.left-tools {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 .back-button {
-  background: #111;
+  background: #2c2c2c;
   color: white;
-  border: 1px solid #666;
+  border: 1px solid white;
   padding: 6px 10px;
   border-radius: 4px;
   margin-right: 16px;
@@ -184,13 +213,26 @@ const deleteCase = (name) => {
   background: #1e90ff;
   border-color: #1e90ff;
 }
-.search-input {
-  width: 250px;
+.job-info {
+  display: flex;
+  gap: 20px;
+  color: #bbb;
+  font-size: 14px;
+}
+.job-info span {
+  white-space: nowrap;
+}
+.export-button {
+  background: #2c2c2c;
+  color: white;
+  border: 1px solid white;
   padding: 6px 10px;
   border-radius: 4px;
-  border: 1px solid #666;
-  background: #111;
-  color: white;
+  cursor: pointer;
+}
+.export-button:hover {
+  background: #28a745;
+  border-color: #28a745;
 }
 .job-table {
   width: 100%;
@@ -201,7 +243,6 @@ const deleteCase = (name) => {
 .job-table td {
   padding: 10px 12px;
   text-align: left;
-  border: none;
   color: white;
 }
 .job-table tbody tr + tr {
@@ -213,10 +254,15 @@ const deleteCase = (name) => {
 }
 .icon-button {
   background: none;
-  border: none;
-  padding: 2px;
-  margin-right: 2px;
+  border: 1px solid transparent;
+  padding: 4px;
+  margin-right: 6px;
+  border-radius: 4px;
   cursor: pointer;
+}
+.icon-button.reload {
+  border: 1px solid #ccc;
+  background-color: #2a2a2a;
 }
 .action-icon {
   width: 14px;
