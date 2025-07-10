@@ -22,6 +22,7 @@
       <table class="job-table">
         <thead>
           <tr>
+            <th class="status-header"></th>
             <th>Case ID</th>
             <th>Patient Name</th>
             <th>Series Count</th>
@@ -34,18 +35,34 @@
         </thead>
         <tbody>
           <tr v-for="(row, i) in paginatedData" :key="i">
+            <td>
+              <span
+                class="status-indicator"
+                :class="{
+                  green: row.status === 'Analyzed',
+                  white: row.status === 'Pending',
+                  red: row.status === 'Error'
+                }"
+              ></span>
+            </td>
             <td>{{ row.caseId }}</td>
             <td>{{ row.name }}</td>
             <td>{{ row.series }}</td>
-            <td>{{ checkMark(row.upload) }}</td>
-            <td>{{ checkMark(row.mapping) }}</td>
-            <td>{{ checkMark(row.postAI) }}</td>
-            <td>{{ checkMark(row.postPACS) }}</td>
-            <td>
-              <button class="icon-button  reload"><img src="/reload.png" class="action-icon" /></button>
-              <button class="icon-button" @click="deleteCase(row.name)">
-                <img src="/trash-bin.png" class="action-icon" />
-              </button>
+            <td v-html="checkMark(row.upload)"></td>
+            <td v-html="checkMark(row.mapping)"></td>
+            <td v-html="checkMark(row.postAI)"></td>
+            <td v-html="checkMark(row.postPACS)"></td>
+            <td class="retry-cell">
+              <div class="retry-buttons">
+                <button class="icon-button reload">
+                  <img src="/reload.png" class="action-icon" />
+                </button>
+              </div>
+              <div class="delete-button-container">
+                <button class="icon-button delete" @click="deleteCase(row.name)">
+                  <img src="/trash-bin.png" class="action-icon" />
+                </button>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -84,38 +101,40 @@ const jobInfo = computed(() => ({
   series: route.query.series
 }))
 
-const jobId = route.params.id
 const page = ref(1)
 const pageSize = 10
 
 // 模擬資料
 const caseData = ref([
   {
-    caseId: jobId,
+    caseId: 'A123456789',
     name: 'Patient A',
     series: 5,
     upload: true,
     mapping: false,
     postAI: true,
     postPACS: false,
+    status: 'Analyzed'
   },
   {
-    caseId: jobId,
+    caseId: 'B246801357',
     name: 'Patient B',
     series: 4,
     upload: true,
     mapping: true,
     postAI: false,
     postPACS: true,
+    status: 'Pending'
   },
   {
-    caseId: jobId,
+    caseId: 'C000000000',
     name: 'Patient C',
     series: 2,
     upload: false,
     mapping: false,
     postAI: false,
     postPACS: false,
+    status: 'Error'
   },
 ])
 
@@ -153,7 +172,7 @@ const setPage = (p) => (page.value = p)
 const prevPage = () => { if (page.value > 1) page.value-- }
 const nextPage = () => { if (page.value < totalPages.value) page.value++ }
 
-const checkMark = (value) => (value ? '✔' : '✘')
+const checkMark = (value) => {return value ? '✔' : '<span class="red-cross">✘</span>'}
 
 // 刪除資料
 const deleteCase = (name) => {
@@ -184,34 +203,37 @@ const deleteCase = (name) => {
   margin: -10px 0 20px 0;
   background-color: #0892D0;
   padding: 10px 20px;
-  border-radius: 0px;
   color: white;
   display: inline-block;
 }
 .toolbar {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  margin-bottom: 14px;
+  align-items: center;
   flex-wrap: wrap;
+  margin-bottom: 14px;
 }
 .left-tools {
   display: flex;
   align-items: center;
   gap: 16px;
 }
-.back-button {
+.back-button,
+.export-button {
   background: #2c2c2c;
   color: white;
   border: 1px solid white;
   padding: 6px 10px;
   border-radius: 4px;
-  margin-right: 16px;
   cursor: pointer;
 }
 .back-button:hover {
-  background: #1e90ff;
-  border-color: #1e90ff;
+  background: #0892D0;
+  border-color: #0892D0;
+}
+.export-button:hover {
+  background: #28a745;
+  border-color: #28a745;
 }
 .job-info {
   display: flex;
@@ -221,18 +243,6 @@ const deleteCase = (name) => {
 }
 .job-info span {
   white-space: nowrap;
-}
-.export-button {
-  background: #2c2c2c;
-  color: white;
-  border: 1px solid white;
-  padding: 6px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.export-button:hover {
-  background: #28a745;
-  border-color: #28a745;
 }
 .job-table {
   width: 100%;
@@ -248,21 +258,49 @@ const deleteCase = (name) => {
 .job-table tbody tr + tr {
   border-top: 1px solid #003366;
 }
+::v-deep .red-cross {
+  color: #ff4d4f;
+  font-weight: bold;
+}
 .job-table thead {
   background-color: black;
   color: white;
 }
+.status-indicator {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+}
+.status-indicator.green {
+  background-color: #2ecc71;
+}
+.status-indicator.white {
+  background-color: #ffffff;
+}
+.status-indicator.red {
+  background-color: #e74c3c;
+}
 .icon-button {
   background: none;
-  border: 1px solid transparent;
-  padding: 4px;
-  margin-right: 6px;
-  border-radius: 4px;
+  border: none;
+  padding: 2px;
+  margin-right: 2px;
   cursor: pointer;
 }
 .icon-button.reload {
-  border: 1px solid #ccc;
-  background-color: #2a2a2a;
+  background-color: #1c1c1c;
+}
+.icon-button.delete {
+  background-color: #1c1c1c;
+  border-radius: 20%
+}
+.icon-button.delete:hover {
+  background-color: #ff4d4f;
+}
+.retry-cell {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 .action-icon {
   width: 14px;
@@ -289,8 +327,8 @@ const deleteCase = (name) => {
   cursor: pointer;
 }
 .pagination button.active {
-  background: #1e90ff;
-  border-color: #1e90ff;
+  background: #0892D0;
+  border-color: #0892D0;
 }
 .pagination button:disabled {
   opacity: 0.5;

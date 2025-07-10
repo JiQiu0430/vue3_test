@@ -5,8 +5,10 @@
 
       <!-- 工具列 -->
       <div class="toolbar">
+
         <!-- 上傳按鈕 -->
         <button class="add-job-btn" @click="openUploadDialog">+ Job</button>
+
         <!-- 搜尋欄 -->
         <input
           v-model="searchQuery"
@@ -47,6 +49,7 @@
             <td>{{ item.series }}</td>
             <td>{{ item.status }}</td>
             <td>
+
               <!-- 個別檔案按鈕 -->
               <button class="icon-button" @click="viewFile(item)">
                 <img src="/eye.png" class="action-icon" alt="view" />
@@ -95,6 +98,7 @@
               />
               click to upload DICOM
             </label>
+
             <!-- 檔案名條列壓縮 -->
             <div v-if="uploadedFiles.length > 0" class="file-list">
               <p v-for="(file, i) in uploadedFiles.slice(0, 3)" :key="i">{{ file.name }}</p>
@@ -112,7 +116,7 @@
 
           <div class="modal-actions">
             <button class="submit-btn" @click="submitUpload">Upload</button>
-            <button @click="closeDialog" class="close-btn">✕</button>
+            <button @click="closeDialog" class="close-btn">Cancel</button>
           </div>
         </div>
       </div>
@@ -307,8 +311,8 @@ const handleSingleFileUpload = (e) => {
   transition: background 0.2s;
 }
 .add-job-btn:hover {
-  background: #1e90ff;
-  border-color: #1e90ff;
+  background: #0892D0;
+  border-color: #0892D0;
 }
 .job-table {
   width: 100%;
@@ -384,13 +388,13 @@ const handleSingleFileUpload = (e) => {
   margin-bottom: 8px;
 }
 .progress {
-  background: #1e90ff;
+  background: #0892D0;
   height: 100%;
   border-radius: 4px;
 }
 .submit-btn {
   padding: 8px 16px;
-  background: #1e90ff;
+  background: #0892D0;
   color: white;
   border: none;
   border-radius: 4px;
@@ -400,13 +404,14 @@ const handleSingleFileUpload = (e) => {
   background: none;
   border: none;
   color: #aaa;
-  font-size: 20px;
+  font-size: 14px;
   cursor: pointer;
 }
 .modal-actions {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
+  gap: 12px;
 }
 .form-group {
   margin-bottom: 16px;
@@ -434,8 +439,8 @@ const handleSingleFileUpload = (e) => {
   cursor: pointer;
 }
 .pagination button.active {
-  background: #1e90ff;
-  border-color: #1e90ff;
+  background: #0892D0;
+  border-color: #0892D0;
 }
 .pagination button:disabled {
   opacity: 0.5;
@@ -446,13 +451,12 @@ const handleSingleFileUpload = (e) => {
   display: inline-block;
   width: 10px;
   height: 10px;
-  border-radius: 50%;
 }
 .status-indicator.green {
   background-color: #2ecc71;
 }
 .status-indicator.white {
-  background-color: #ecf0f1;
+  background-color: #ffffff;
 }
 .status-indicator.red {
   background-color: #e74c3c;
