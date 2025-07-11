@@ -130,7 +130,7 @@ const caseData = ref([
     caseId: 'C000000000',
     name: 'Patient C',
     series: 2,
-    upload: null,
+    upload: true,
     mapping: null,
     postAI: null,
     postPACS: null,
@@ -174,9 +174,9 @@ const nextPage = () => { if (page.value < totalPages.value) page.value++ }
 
 // 顯示勾/叉
 const checkMark = (value) => {
-  if (value === true) return '✔'
+  if (value === true) return '<span class="gray-cross">✔</span>'
   if (value === false) return '<span class="red-cross">✘</span>'
-  return ''
+  return '<span class="gray-cross">--</span>'
 }
 
 // 刪除資料
@@ -278,6 +278,9 @@ const deleteCase = (name) => {
   color: #ff4d4f;
   font-weight: bold;
 }
+::v-deep .gray-cross {
+  color:rgb(148, 148, 148);
+}
 .job-table thead {
   background-color: black;
   color: white;
@@ -309,6 +312,7 @@ const deleteCase = (name) => {
 }
 .icon-button.delete:hover {
   background-color: #ff4d4f;
+  border-radius : 4px;
 }
 .retry-cell {
   display: flex;
