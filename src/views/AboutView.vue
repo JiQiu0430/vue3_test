@@ -38,7 +38,8 @@
             <td :style="{ color: getTextColor(row) }">{{ row.id }}</td>
             <td :style="{ color: getTextColor(row) }">{{ row.name }}</td>
             <td v-html="checkMark(row.upload)"></td>
-            <td v-html="checkMark(row.mapping)"></td>
+            <td :style="{ color: isMappingString(row.mapping) ? '#89CFF0' : '#e74c3c' }">{{ checkMark(row.mapping) }}</td>
+            <td v-html="checkMark(row.postAI)"></td>
             <td v-html="checkMark(row.postAI)"></td>
             <td v-html="checkMark(row.postPACS)"></td>
             <td class="retry-cell">
@@ -94,7 +95,7 @@ const caseData = ref([
     caseName: '0001#A123456789#王小明#M#01',
     series: 5,
     upload: true,
-    mapping: true,
+    mapping: 'ABC001',
     postAI: true,
     postPACS: true,
     status: 'Analyzed'
@@ -103,7 +104,7 @@ const caseData = ref([
     caseName: '0002#A123456789#王小明#M#02',
     series: 4,
     upload: true,
-    mapping: true,
+    mapping: 'ABC001',
     postAI: false,
     postPACS: false,
     status: 'Error'
@@ -112,7 +113,7 @@ const caseData = ref([
     caseName: '0003#B123456789#陳大明#F#01',
     series: 2,
     upload: true,
-    mapping: null,
+    mapping: 'false',
     postAI: null,
     postPACS: null,
     status: 'Pending'
@@ -176,15 +177,24 @@ const nextPage = () => { if (page.value < totalPages.value) page.value++ }
 const checkMark = (value) => {
   if (value === true) return '<span class="gray-cross">✔</span>'
   if (value === false) return '<span class="red-cross">✘</span>'
+  if (value === 'false') return '✘';
+  if (value) return value;
   return '<span class="gray-cross">--</span>'
 }
 
 // 文字顏色變化邏輯
 const getTextColor = (row) => {
-  if (row.upload === false || row.mapping === false || row.postAI === false || row.postPACS === false) {
+  if (row.mapping === 'false') {
+    return '#e74c3c'; // 紅色
+  }
+  if (row.upload === false || row.postAI === false || row.postPACS === false) {
     return '#e74c3c';
   }
   return '#ffffff';
+}
+
+const isMappingString = (value) => {
+  return typeof value === 'string' && value !== 'false';
 }
 </script>
 
@@ -275,7 +285,7 @@ const getTextColor = (row) => {
 }
 /* 錯誤變明顯 */
 ::v-deep .red-cross {
-  color: #ff4d4f;
+  color: #e74c3c;
   font-weight: bold;
 }
 ::v-deep .gray-cross {
