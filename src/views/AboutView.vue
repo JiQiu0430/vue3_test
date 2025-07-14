@@ -22,32 +22,21 @@
       <table class="job-table">
         <thead>
           <tr>
-            <th></th>
-            <th>Case ID</th>
-            <th>Patient Name</th>
-            <th>Series Count</th>
-            <th>Upload</th>
-            <th>Mapping</th>
-            <th>Post to AI</th>
-            <th>Post to PACS</th>
-            <th>Retry</th>
+            <th>流水號</th>
+            <th>身份證字號</th>
+            <th>姓名</th>
+            <th>檔案上傳</th>
+            <th>對應工單號</th>
+            <th>傳給AI</th>
+            <th>傳給PACS</th>
+            <th>重新嘗試</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(row, i) in paginatedData" :key="i">
-            <td>
-              <span
-                class="status-indicator"
-                :class="{
-                  green: row.status === 'Analyzed',
-                  white: row.status === 'Pending',
-                  red: row.status === 'Error'
-                }"
-              ></span>
-            </td>
-            <td>{{ row.caseId }}</td>
-            <td>{{ row.name }}</td>
-            <td>{{ row.series }}</td>
+            <td :style="{ color: getTextColor(row) }">{{ row.serialNumber }}</td>
+            <td :style="{ color: getTextColor(row) }">{{ row.id }}</td>
+            <td :style="{ color: getTextColor(row) }">{{ row.name }}</td>
             <td v-html="checkMark(row.upload)"></td>
             <td v-html="checkMark(row.mapping)"></td>
             <td v-html="checkMark(row.postAI)"></td>
@@ -102,8 +91,7 @@ const pageSize = 10
 // 模擬資料
 const caseData = ref([
   {
-    caseId: 'A123456789',
-    name: 'Patient A',
+    caseName: '0001#A123456789#王小明#M#01',
     series: 5,
     upload: true,
     mapping: true,
@@ -112,8 +100,7 @@ const caseData = ref([
     status: 'Analyzed'
   },
   {
-    caseId: 'B246801357',
-    name: 'Patient B',
+    caseName: '0002#A123456789#王小明#M#02',
     series: 4,
     upload: true,
     mapping: true,
@@ -122,8 +109,7 @@ const caseData = ref([
     status: 'Error'
   },
   {
-    caseId: 'C000000000',
-    name: 'Patient C',
+    caseName: '0003#B123456789#陳大明#F#01',
     series: 2,
     upload: true,
     mapping: null,
@@ -133,13 +119,32 @@ const caseData = ref([
   },
 ])
 
+// 解析 caseName
+const parseCaseName = (caseName) => {
+  const regex = /^(\d+)#([A-Za-z0-9]+)#([\u4e00-\u9fa5]+)#(M|F)#(\d{2})$/;
+  const match = caseName.match(regex);
+  if (match) {
+    const [, serialNumber, id, name, gender, caseNumber] = match;
+    return { serialNumber, id, name, gender, caseNumber };
+  }
+  return {};
+};
+
+// 解析資料並加入到 caseData 中
+caseData.value = caseData.value.map(item => {
+  const parsedData = parseCaseName(item.caseName);
+  return {
+    ...item,
+    ...parsedData,
+  };
+})
+
 // 導出資料
 const exportCSV = () => {
-  const headers = ['Case ID', 'Patient Name', 'Series Count', 'Upload', 'Mapping', 'Post to AI', 'Post to PACS']
+  const headers = ['Case ID', 'Patient Name', 'Upload', 'Mapping', 'Post to AI', 'Post to PACS']
   const rows = caseData.value.map(row => [
     row.caseId,
     row.name,
-    row.series,
     row.upload ? 'V' : 'X',
     row.mapping ? 'V' : 'X',
     row.postAI ? 'V' : 'X',
@@ -173,6 +178,14 @@ const checkMark = (value) => {
   if (value === false) return '<span class="red-cross">✘</span>'
   return '<span class="gray-cross">--</span>'
 }
+
+// 計算文字顏色
+const getTextColor = (row) => {
+  if (row.upload === false || row.mapping === false || row.postAI === false || row.postPACS === false) {
+    return '#e74c3c'; // 條件符合時變紅
+  }
+  return '#ffffff'; // 默認顏色
+}
 </script>
 
 <style scoped>
@@ -180,7 +193,7 @@ const checkMark = (value) => {
 /* App 整體 */
 .app-container {
   background: black;
-  color: white;
+  color: #ffffff;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -201,7 +214,7 @@ const checkMark = (value) => {
   margin: -10px 0 20px 0;
   background-color: #0892D0;
   padding: 10px 20px;
-  color: white;
+  color: #ffffff;
   display: inline-block;
 }
 
@@ -221,8 +234,8 @@ const checkMark = (value) => {
 .back-button,
 .export-button {
   background: #2c2c2c;
-  color: white;
-  border: 1px solid white;
+  color: #ffffff;
+  border: 1px solid #ffffff;
   padding: 6px 10px;
   border-radius: 4px;
   cursor: pointer;
@@ -255,7 +268,7 @@ const checkMark = (value) => {
 .job-table td {
   padding: 10px 12px;
   text-align: left;
-  color: white;
+  color: #ffffff;
 }
 .job-table tbody tr + tr {
   border-top: 2px solid #003366;
@@ -270,7 +283,7 @@ const checkMark = (value) => {
 }
 .job-table thead {
   background-color: black;
-  color: white;
+  color: #ffffff;
 }
 
 /* 狀態燈 */
@@ -289,6 +302,11 @@ const checkMark = (value) => {
   background-color: #e74c3c;
 }
 
+/* 文字顯示紅色 */
+.error-text {
+  color: #e74c3c;
+}
+
 /* icon按鈕 */
 .icon-button {
   background: none;
@@ -296,10 +314,6 @@ const checkMark = (value) => {
   padding: 2px;
   margin-right: 2px;
   cursor: pointer;
-}
-.icon-button.delete:hover {
-  background-color: #ff4d4f;
-  border-radius : 4px;
 }
 .action-icon {
   width: 14px;
