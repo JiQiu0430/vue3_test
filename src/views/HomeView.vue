@@ -36,18 +36,15 @@
             <td>
               <span
                 class="status-indicator"
-                :class="{
-                  green: item.status === 'Analyzed',
-                  white: item.status === 'Pending',
-                  red: item.status === 'Error'
-                }"
+                :class="getStatusClass(item.status)"
+                :style="{ backgroundColor: getStatusClass(item.status) }"
               ></span>
             </td>
             <td>{{ item.job }}</td>
             <td>{{ item.time }}</td>
             <td>{{ item.name }}</td>
             <td>{{ item.series }}</td>
-            <td>{{ item.status }}</td>
+            <td :class="getStatusClass(item.status)" :style="getStatusStyle(item.status)">{{ item.status }}</td>
             <td>
 
               <!-- 個別檔案按鈕 -->
@@ -80,15 +77,9 @@
         <div class="modal">
           <h2 class="modal-title">Create Job</h2>
 
-          <!-- 輸入jobName -->
-          <div class="form-group">
-            <label>1. Input job name</label>
-            <input v-model="newJob.name" type="text" />
-          </div>
-
           <!-- 上傳資料夾 -->
           <div class="form-group">
-            <label>2. Select upload folder</label>
+            <label>1. Select upload folder</label>
             <label class="upload-box">
               <input
                 type="file"
@@ -100,14 +91,20 @@
               />
               click to upload DICOM
             </label>
-
-            <!-- 檔案名條列壓縮 -->
-            <div v-if="uploadedFiles.length > 0" class="file-list">
-              <p v-for="(file, i) in uploadedFiles.slice(0, 3)" :key="i">{{ file.name }}</p>
-              <p v-if="uploadedFiles.length > 4">... ({{ uploadedFiles.length - 4 }} files hidden) ...</p>
-              <p v-if="uploadedFiles.length > 4">{{ uploadedFiles[uploadedFiles.length - 1].name }}</p>
-            </div>
           </div>
+
+          <!-- 輸入jobName -->
+          <label>2. Input job name</label>
+          <div v-if="isFolderUploaded" class="form-group">
+            <input v-model="newJob.name" type="text" />
+          </div>
+
+          <!-- 檔案名條列壓縮 -->
+          <div v-if="uploadedFiles.length > 0" class="file-list">
+            <p v-for="(file, i) in uploadedFiles.slice(0, 3)" :key="i">{{ file.name }}</p>
+            <p v-if="uploadedFiles.length > 4">... ({{ uploadedFiles.length - 4 }} files hidden) ...</p>
+            <p v-if="uploadedFiles.length > 4">{{ uploadedFiles[uploadedFiles.length - 1].name }}</p>
+           </div>
 
           <!-- 進度條 -->
           <div class="form-group">
@@ -142,10 +139,18 @@ import { ref, computed } from 'vue'
 
 const router = useRouter()
 
+const searchQuery = ref('')
+
 // 控制上傳視窗顯示
 const showDialog = ref(false)
 
-// 新 Job 名稱
+// 偵測資料夾名稱
+const detectedFolderName = ref('')
+
+// 是否顯示job名稱輸入框
+const isFolderUploaded = ref(false)
+
+// 新Job名稱
 const newJob = ref({ name: '' })
 
 // 上傳的檔案清單
@@ -153,11 +158,6 @@ const uploadedFiles = ref([])
 
 // 上傳進度條
 const uploadProgress = ref(0)
-
-// 偵測資料夾名稱
-const detectedFolderName = ref('')
-
-const searchQuery = ref('')
 
 // 翻頁設定
 const page = ref(1)
@@ -227,10 +227,14 @@ const viewFile = (item) => {
 const handleFileUpload = (e) => {
   const files = Array.from(e.target.files)
   if (files.length === 0) return
+
   uploadedFiles.value = files
   const firstPath = files[0].webkitRelativePath || ''
   const folderName = firstPath.split('/')[0] || 'UnknownFolder'
   detectedFolderName.value = folderName
+
+  // 檔案上傳後顯示 job 名稱輸入框
+  isFolderUploaded.value = true
 }
 
 // 將資料夾內容加入列表
@@ -257,6 +261,34 @@ const submitUpload = () => {
 const retryUpload = () => {
   uploadProgress.value = 0
   alert('Retry upload triggered.')
+}
+
+// 根據狀態設置顏色的CSS類別
+const getStatusClass = (status) => {
+  switch (status) {
+    case 'Analyzed':
+      return '#2ecc71'; // 綠色
+    case 'Pending':
+      return '#ffffff'; // 白色
+    case 'Error':
+      return '#e74c3c'; // 紅色
+    default:
+      return '#ffffff'; // 默認白色
+  }
+}
+
+// 根據狀態設置文字顏色
+const getStatusStyle = (status) => {
+  switch (status) {
+    case 'Analyzed':
+      return { color: '#2ecc71' }; // 綠色文字
+    case 'Pending':
+      return { color: '#ffffff' }; // 白色文字
+    case 'Error':
+      return { color: '#e74c3c' }; // 紅色文字
+    default:
+      return { color: '#ffffff' }; // 默認白色文字
+  }
 }
 
 // 刪除job+更新頁面

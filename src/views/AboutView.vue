@@ -58,11 +58,6 @@
                   <img src="/reload.png" class="action-icon" />
                 </button>
               </div>
-              <div class="delete-button-container">
-                <button class="icon-button delete" @click="deleteCase(row.name)">
-                  <img src="/trash-bin.png" class="action-icon" />
-                </button>
-              </div>
             </td>
           </tr>
         </tbody>
@@ -177,14 +172,6 @@ const checkMark = (value) => {
   if (value === true) return '<span class="gray-cross">✔</span>'
   if (value === false) return '<span class="red-cross">✘</span>'
   return '<span class="gray-cross">--</span>'
-}
-
-// 刪除資料
-const deleteCase = (name) => {
-  if (confirm(`Are you sure you want to delete patient "${name}"?`)) {
-    caseData.value = caseData.value.filter(row => row.name !== name)
-    if (page.value > totalPages.value) page.value = totalPages.value || 1
-  }
 }
 </script>
 
@@ -313,11 +300,6 @@ const deleteCase = (name) => {
 .icon-button.delete:hover {
   background-color: #ff4d4f;
   border-radius : 4px;
-}
-.retry-cell {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 .action-icon {
   width: 14px;
