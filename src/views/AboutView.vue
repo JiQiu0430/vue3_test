@@ -6,16 +6,16 @@
       <!-- 返回鍵與資訊欄 -->
       <div class="toolbar">
         <div class="left-tools">
-          <button class="back-button" @click="goBackHome">Back to Job</button>
+          <button class="back-button" @click="goBackHome">返回</button>
           <div class="job-info">
-            <span><strong>Batch ID:</strong> {{ jobInfo.job || 'N/A' }}</span>
+            <span><strong>批次號:</strong> {{ jobInfo.job || 'N/A' }}</span>
             <span>|</span>
-            <span><strong>Upload Time:</strong> {{ jobInfo.time || 'N/A' }}</span>
+            <span><strong>上傳時間:</strong> {{ jobInfo.time || 'N/A' }}</span>
             <span>|</span>
-            <span><strong>Total Case:</strong> {{ caseData.length }}</span>
+            <span><strong>總檔案數:</strong> {{ caseData.length }}</span>
           </div>
         </div>
-        <button class="export-button" @click="exportCSV">Export CSV</button>
+        <button class="export-button" @click="exportCSV">導出CSV</button>
       </div>
 
       <!-- 列表 -->
@@ -179,12 +179,12 @@ const checkMark = (value) => {
   return '<span class="gray-cross">--</span>'
 }
 
-// 計算文字顏色
+// 文字顏色變化邏輯
 const getTextColor = (row) => {
   if (row.upload === false || row.mapping === false || row.postAI === false || row.postPACS === false) {
-    return '#e74c3c'; // 條件符合時變紅
+    return '#e74c3c';
   }
-  return '#ffffff'; // 默認顏色
+  return '#ffffff';
 }
 </script>
 
@@ -300,11 +300,6 @@ const getTextColor = (row) => {
 }
 .status-indicator.red {
   background-color: #e74c3c;
-}
-
-/* 文字顯示紅色 */
-.error-text {
-  color: #e74c3c;
 }
 
 /* icon按鈕 */

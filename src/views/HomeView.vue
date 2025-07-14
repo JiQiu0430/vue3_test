@@ -7,13 +7,13 @@
       <div class="toolbar">
 
         <!-- 上傳按鈕 -->
-        <button class="add-job-btn" @click="openUploadDialog">+ Job</button>
+        <button class="add-job-btn" @click="openUploadDialog">新增資料夾</button>
 
         <!-- 搜尋欄 -->
         <input
           v-model="searchQuery"
           type="text"
-          placeholder="Search jobs..."
+          placeholder="搜尋......"
           class="search-input"
         />
       </div>
@@ -23,12 +23,12 @@
         <thead>
           <tr>
             <th class="status-header"></th>
-            <th>Job</th>
-            <th>Upload Time</th>
-            <th>Name</th>
-            <th>Series Count</th>
-            <th>Status</th>
-            <th>Actions</th>
+            <th>批次名</th>
+            <th>上傳時間</th>
+            <th>批次資料來源</th>
+            <th>批次內檔案</th>
+            <th>批次狀態</th>
+            <th>工具列</th>
           </tr>
         </thead>
         <tbody>
@@ -75,11 +75,11 @@
       <!-- 上傳視窗 -->
       <div v-if="showDialog" class="modal-overlay">
         <div class="modal">
-          <h2 class="modal-title">Create Job</h2>
+          <h2 class="modal-title">新增批次</h2>
 
           <!-- 上傳資料夾 -->
           <div class="form-group">
-            <label>1. Select upload folder</label>
+            <label>1. 上傳資料夾</label>
             <label class="upload-box">
               <input
                 type="file"
@@ -89,12 +89,12 @@
                 hidden
                 @change="handleFileUpload"
               />
-              click to upload DICOM
+              點擊方框以上傳資料夾
             </label>
           </div>
 
           <!-- 輸入jobName -->
-          <label>2. Input job name</label>
+          <label>2. 輸入批次名</label>
           <div v-if="isFolderUploaded" class="form-group">
             <input v-model="newJob.name" type="text" />
           </div>
@@ -108,7 +108,7 @@
 
           <!-- 進度條 -->
           <div class="form-group">
-            <label>3. Upload</label>
+            <label>3. 上傳進度</label>
             <div class="progress-container">
               <div class="progress-bar">
                 <div class="progress" :style="{ width: uploadProgress + '%' }"></div>
@@ -121,8 +121,8 @@
 
           <!-- 上傳/取消按鈕 -->
           <div class="modal-actions">
-            <button class="submit-btn" @click="submitUpload">Upload</button>
-            <button @click="closeDialog" class="close-btn">Cancel</button>
+            <button class="submit-btn" @click="submitUpload">上傳</button>
+            <button @click="closeDialog" class="close-btn">取消</button>
           </div>
         </div>
       </div>
