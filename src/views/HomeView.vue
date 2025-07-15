@@ -180,7 +180,7 @@ const jobs = ref([
     job: 'test-002',
     time: '2024-07-7 12:30',
     name: '十三月',
-    series: 3,
+    series: 4,
     status: 'Error',
     files: [],
   },
@@ -267,13 +267,13 @@ const retryUpload = () => {
 const getStatusClass = (status) => {
   switch (status) {
     case 'Analyzed':
-      return '#2ecc71'; // 綠色
+      return '#2ecc71';
     case 'Pending':
-      return '#ffffff'; // 白色
+      return '#ffffff';
     case 'Error':
-      return '#e74c3c'; // 紅色
+      return '#e74c3c';
     default:
-      return '#ffffff'; // 默認白色
+      return '#ffffff';
   }
 }
 
@@ -281,13 +281,13 @@ const getStatusClass = (status) => {
 const getStatusStyle = (status) => {
   switch (status) {
     case 'Analyzed':
-      return { color: '#2ecc71' }; // 綠色文字
+      return { color: '#2ecc71' };
     case 'Pending':
-      return { color: '#ffffff' }; // 白色文字
+      return { color: '#ffffff' };
     case 'Error':
-      return { color: '#e74c3c' }; // 紅色文字
+      return { color: '#e74c3c' };
     default:
-      return { color: '#ffffff' }; // 默認白色文字
+      return { color: '#ffffff' };
   }
 }
 

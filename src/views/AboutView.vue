@@ -34,12 +34,21 @@
         </thead>
         <tbody>
           <tr v-for="(row, i) in paginatedData" :key="i">
-            <td :style="{ color: getTextColor(row) }">{{ row.serialNumber }}</td>
-            <td :style="{ color: getTextColor(row) }">{{ row.id }}</td>
-            <td :style="{ color: getTextColor(row) }">{{ row.name }}</td>
+            <td :style="{ color: isSameId(row) ? 'yellow' : getTextColor(row) }">{{ row.serialNumber }}</td>
+            <td :style="{ color: isSameId(row) ? 'yellow' : getTextColor(row) }">{{ row.id }}</td>
+            <td :style="{ color: isSameId(row) ? 'yellow' : getTextColor(row) }">{{ row.name }}</td>
             <td v-html="checkMark(row.upload)"></td>
-            <td :style="{ color: isMappingString(row.mapping) ? '#89CFF0' : '#e74c3c' }">{{ checkMark(row.mapping) }}</td>
-            <td v-html="checkMark(row.postAI)"></td>
+            <td :style="{ color: isSameId(row) ? 'yellow' : isMappingString(row.mapping) ? '#89CFF0' : '#e74c3c' }">{{ checkMark(row.mapping) }}
+              <!-- 圓圈選擇 -->
+              <div class="circle-select" v-if="isSameId(row)">
+                <input
+                  type="radio"
+                  :name="row.id"
+                  v-model="selectedMapping[row.id]"
+                  :value="row.mapping"
+                />
+              </div>
+            </td>
             <td v-html="checkMark(row.postAI)"></td>
             <td v-html="checkMark(row.postPACS)"></td>
             <td class="retry-cell">
@@ -96,18 +105,18 @@ const caseData = ref([
     series: 5,
     upload: true,
     mapping: 'ABC001',
-    postAI: true,
-    postPACS: true,
-    status: 'Analyzed'
+    postAI: null,
+    postPACS: null,
+    status: 'Pending'
   },
   {
     caseName: '0002#A123456789#王小明#M#02',
     series: 4,
     upload: true,
     mapping: 'ABC001',
-    postAI: false,
-    postPACS: false,
-    status: 'Error'
+    postAI: null,
+    postPACS: null,
+    status: 'Pending'
   },
   {
     caseName: '0003#B123456789#陳大明#F#01',
@@ -117,6 +126,15 @@ const caseData = ref([
     postAI: null,
     postPACS: null,
     status: 'Pending'
+  },
+  {
+    caseName: '0004#C123456789#林子涵#F#01',
+    series: 2,
+    upload: true,
+    mapping: 'ABC003',
+    postAI: true,
+    postPACS: true,
+    status: 'Analyzed'
   },
 ])
 
@@ -139,6 +157,12 @@ caseData.value = caseData.value.map(item => {
     ...parsedData,
   };
 })
+
+// 判斷是否為相同身份證字號
+const selectedMapping = ref({})
+const isSameId = (row) => {
+  return caseData.value.filter(item => item.id === row.id).length > 1;
+}
 
 // 導出資料
 const exportCSV = () => {
@@ -182,7 +206,7 @@ const checkMark = (value) => {
   return '<span class="gray-cross">--</span>'
 }
 
-// 文字顏色變化邏輯
+// Mapping顏色變化邏輯
 const getTextColor = (row) => {
   if (row.mapping === 'false') {
     return '#e74c3c'; // 紅色
@@ -294,6 +318,25 @@ const isMappingString = (value) => {
 .job-table thead {
   background-color: black;
   color: #ffffff;
+}
+
+/* Mapping選擇 */
+.circle-select {
+  display: inline-block;
+  position: relative;
+}
+.circle-label {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  cursor: pointer;
+  background-color: #fff;
+}
+input[type="radio"]:checked{
+  background-color: #0892D0;
+  border-color: #0892D0;
 }
 
 /* 狀態燈 */
