@@ -34,13 +34,14 @@
         </thead>
         <tbody>
           <tr v-for="(row, i) in paginatedData" :key="i">
-            <td :style="{ color: isSameId(row) ? 'yellow' : getTextColor(row) }">{{ row.serialNumber }}</td>
-            <td :style="{ color: isSameId(row) ? 'yellow' : getTextColor(row) }">{{ row.id }}</td>
-            <td :style="{ color: isSameId(row) ? 'yellow' : getTextColor(row) }">{{ row.name }}</td>
+            <td :style="getCellStyle(row, 'serialNumber')">{{ row.serialNumber }}</td>
+            <td :style="getCellStyle(row, 'id')">{{ row.id }}</td>
+            <td :style="getCellStyle(row, 'name')">{{ row.name }}</td>
             <td v-html="checkMark(row.upload)"></td>
-            <td :style="{ color: isSameId(row) ? 'yellow' : isMappingString(row.mapping) ? '#89CFF0' : '#e74c3c' }">{{ checkMark(row.mapping) }}
+            <td :style="getCellStyle(row, 'mapping')">
+              {{ checkMark(row.mapping) }}
               <!-- 圓圈選擇 -->
-              <div class="circle-select" v-if="isSameId(row)">
+              <div class="circle-select" v-if="canSelect(row)">
                 <input
                   type="radio"
                   :name="row.id"
@@ -158,32 +159,44 @@ caseData.value = caseData.value.map(item => {
   };
 })
 
-// 判斷是否為相同身份證字號
 const selectedMapping = ref({})
+
+// 判斷是否為相同身份證字號
 const isSameId = (row) => {
   return caseData.value.filter(item => item.id === row.id).length > 1;
 }
 
-// 導出資料
-const exportCSV = () => {
-  const headers = ['Case ID', 'Patient Name', 'Upload', 'Mapping', 'Post to AI', 'Post to PACS']
-  const rows = caseData.value.map(row => [
-    row.caseId,
-    row.name,
-    row.upload ? 'V' : 'X',
-    row.mapping ? 'V' : 'X',
-    row.postAI ? 'V' : 'X',
-    row.postPACS ? 'V' : 'X',
-  ])
-  const csvContent = [headers, ...rows]
-    .map(e => e.map(v => `"${v}"`).join(','))
-    .join('\n')
+// 判斷是否可以選擇圓圈（只有身份證字號相同的行才可選擇）
+const canSelect = (row) => {
+  return isSameId(row) && row.mapping !== 'false'; // 只有身份證字號相同且mapping有效的行可以選擇
+}
 
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-  const link = document.createElement('a')
-  link.href = URL.createObjectURL(blob)
-  link.setAttribute('download', 'case_data.csv')
-  link.click()
+// 顯示勾/叉
+const checkMark = (value) => {
+  if (value === true) return '<span class="gray-cross">✔</span>'
+  if (value === false) return '<span class="red-cross">✘</span>'
+  if (value === 'false') return '✘';
+  if (value) return value;
+  return '<span class="gray-cross">--</span>'
+}
+
+// 顯示單元格顏色的邏輯
+const getCellStyle = (row, field) => {
+  // 如果該行是可選擇並且選中了
+  if (canSelect(row) && selectedMapping.value[row.id] === row.mapping) {
+    if (field === 'mapping') {
+      return { color: '#1E90FF' }; // 藍色
+    }
+    return { color: '#ffffff' }; // 白色
+  }
+
+  // 如果沒有被選中，且該行是可選擇的
+  if (canSelect(row)) {
+    return { color: '#808080' }; // 灰色
+  }
+
+  // 沒有圓圈的行，保持灰色
+  return { color: '#808080' }; // 灰色
 }
 
 // 頁數計算
@@ -196,30 +209,6 @@ const paginatedData = computed(() =>
 const setPage = (p) => (page.value = p)
 const prevPage = () => { if (page.value > 1) page.value-- }
 const nextPage = () => { if (page.value < totalPages.value) page.value++ }
-
-// 顯示勾/叉
-const checkMark = (value) => {
-  if (value === true) return '<span class="gray-cross">✔</span>'
-  if (value === false) return '<span class="red-cross">✘</span>'
-  if (value === 'false') return '✘';
-  if (value) return value;
-  return '<span class="gray-cross">--</span>'
-}
-
-// Mapping顏色變化邏輯
-const getTextColor = (row) => {
-  if (row.mapping === 'false') {
-    return '#e74c3c'; // 紅色
-  }
-  if (row.upload === false || row.postAI === false || row.postPACS === false) {
-    return '#e74c3c';
-  }
-  return '#ffffff';
-}
-
-const isMappingString = (value) => {
-  return typeof value === 'string' && value !== 'false';
-}
 </script>
 
 <style scoped>
@@ -339,20 +328,10 @@ input[type="radio"]:checked{
   border-color: #0892D0;
 }
 
-/* 狀態燈 */
-.status-indicator {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-}
-.status-indicator.green {
-  background-color: #2ecc71;
-}
-.status-indicator.white {
-  background-color: #ffffff;
-}
-.status-indicator.red {
-  background-color: #e74c3c;
+/* 添加樣式，讓被選中的項目文字顯示為淺藍色 */
+.circle-select input[type="radio"]:checked {
+  background-color: #89CFF0;
+  border-color: #89CFF0;
 }
 
 /* icon按鈕 */
