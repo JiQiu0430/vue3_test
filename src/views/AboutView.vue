@@ -34,22 +34,20 @@
         </thead>
         <tbody>
           <tr v-for="(row, i) in paginatedData" :key="i">
-            <td :style="getCellStyle(row, 'serialNumber')">{{ row.serialNumber }}</td>
-            <td :style="getCellStyle(row, 'id')">{{ row.id }}</td>
-            <td :style="getCellStyle(row, 'name')">{{ row.name }}</td>
+            <td :style="{ color: isSameId(row) ? 'yellow' : getTextColor(row) }">{{ row.serialNumber }}</td>
+            <td :style="{ color: isSameId(row) ? 'yellow' : getTextColor(row) }">{{ row.id }}</td>
+            <td :style="{ color: isSameId(row) ? 'yellow' : getTextColor(row) }">{{ row.name }}</td>
             <td v-html="checkMark(row.upload)"></td>
-            <td :style="getCellStyle(row, 'mapping')">
-              {{ checkMark(row.mapping) }}
+            <td :style="{ color: isSameId(row) ? 'yellow' : isMappingString(row.mapping) ? '#89CFF0' : '#e74c3c' }">{{ checkMark(row.mapping) }}
               <!-- 圓圈選擇 -->
-              <div class="circle-select" v-if="canSelect(row)">
-                <input
-                  type="radio"
-                  :name="row.serialNumber"
-                  v-model="selectedMapping[row.serialNumber]"
-                  :value="row.mapping"
-                  @change="setSelectedMapping(row)"
-                />
-              </div>
+                <div class="circle-select" v-if="isSameId(row)">
+                  <input
+                    type="radio"
+                    :name="row.id"
+                    v-model="selectedMapping[row.id]"
+                    :value="row.mapping"
+                  />
+                </div>
             </td>
             <td v-html="checkMark(row.postAI)"></td>
             <td v-html="checkMark(row.postPACS)"></td>
@@ -138,6 +136,15 @@ const caseData = ref([
     postPACS: true,
     status: 'Analyzed'
   },
+  {
+    caseName: '0005#D123456789#汪杰#M#01',
+    series: 2,
+    upload: true,
+    mapping: 'ABC004',
+    postAI: true,
+    postPACS: false,
+    status: 'Error'
+  },
 ])
 
 // 解析 caseName
@@ -160,43 +167,32 @@ caseData.value = caseData.value.map(item => {
   };
 })
 
-const selectedMapping = ref({})
-const setSelectedMapping = (row) => {
-  selectedMapping.value[row.serialNumber] = row.mapping;
-}
-
 // 判斷是否為相同身份證字號
+const selectedMapping = ref({})
 const isSameId = (row) => {
   return caseData.value.filter(item => item.id === row.id).length > 1;
 }
 
-// 判斷是否可以選擇圓圈（只有身份證字號相同的行才可選擇）
-const canSelect = (row) => {
-  return isSameId(row) && row.mapping !== 'false'; // 只有身份證字號相同且mapping有效的行可以選擇
-}
+// 導出資料
+const exportCSV = () => {
+  const headers = ['Case ID', 'Patient Name', 'Upload', 'Mapping', 'Post to AI', 'Post to PACS']
+  const rows = caseData.value.map(row => [
+    row.caseId,
+    row.name,
+    row.upload ? 'V' : 'X',
+    row.mapping ? 'V' : 'X',
+    row.postAI ? 'V' : 'X',
+    row.postPACS ? 'V' : 'X',
+  ])
+  const csvContent = [headers, ...rows]
+    .map(e => e.map(v => `"${v}"`).join(','))
+    .join('\n')
 
-// 顯示勾/叉
-const checkMark = (value) => {
-  if (value === true) return '<span class="gray-cross">✔</span>'
-  if (value === false) return '<span class="red-cross">✘</span>'
-  if (value === 'false') return '✘';
-  if (value) return value;
-  return '<span class="gray-cross">--</span>'
-}
-
-// 顯示單元格顏色的邏輯
-const getCellStyle = (row, field) => {
-  if (canSelect(row) && selectedMapping.value[row.serialNumber] === row.mapping) {
-    if (field === 'mapping') {
-      return { color: '#89CFF0' };
-    }
-    return { color: '#ffffff' };
-  }
-
-  if (canSelect(row)) {
-    return { color: '#FFD700' }; // 黃色
-  }
-  return { color: '#ffffff' };
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.setAttribute('download', 'case_data.csv')
+  link.click()
 }
 
 // 頁數計算
@@ -209,6 +205,36 @@ const paginatedData = computed(() =>
 const setPage = (p) => (page.value = p)
 const prevPage = () => { if (page.value > 1) page.value-- }
 const nextPage = () => { if (page.value < totalPages.value) page.value++ }
+
+// 顯示勾/叉
+const checkMark = (value) => {
+  if (value === true) return '<span class="gray-cross">✔</span>'
+  if (value === false) return '<span class="red-cross">✘</span>'
+  if (value === 'false') return '✘';
+  if (value) return value;
+  return '<span class="gray-cross">--</span>'
+}
+
+// Mapping顏色變化邏輯
+const getTextColor = (row) => {
+  if (row.mapping === 'false') {
+    return '#e74c3c'; // 紅色
+  }
+  if (row.upload === false || row.postAI === false || row.postPACS === false) {
+    return '#e74c3c';
+  }
+  
+  // 根據是否選中來設置文字顏色
+  if (selectedMapping.value[row.id] === row.mapping) {
+    return '#ffffff !important';  // 被選中時文字顏色為白色
+  }
+  
+  return '#ffffff'; // 正常顯示白色
+}
+
+const isMappingString = (value) => {
+  return typeof value === 'string' && value !== 'false';
+}
 </script>
 
 <style scoped>
@@ -326,12 +352,6 @@ const nextPage = () => { if (page.value < totalPages.value) page.value++ }
 input[type="radio"]:checked{
   background-color: #0892D0;
   border-color: #0892D0;
-}
-
-/* 添加樣式，讓被選中的項目文字顯示為淺藍色 */
-.circle-select input[type="radio"]:checked {
-  background-color: #89CFF0;
-  border-color: #89CFF0;
 }
 
 /* icon按鈕 */
