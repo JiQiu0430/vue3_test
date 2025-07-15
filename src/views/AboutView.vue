@@ -44,9 +44,10 @@
               <div class="circle-select" v-if="canSelect(row)">
                 <input
                   type="radio"
-                  :name="row.id"
-                  v-model="selectedMapping[row.id]"
+                  :name="row.serialNumber"
+                  v-model="selectedMapping[row.serialNumber]"
                   :value="row.mapping"
+                  @change="setSelectedMapping(row)"
                 />
               </div>
             </td>
@@ -160,6 +161,9 @@ caseData.value = caseData.value.map(item => {
 })
 
 const selectedMapping = ref({})
+const setSelectedMapping = (row) => {
+  selectedMapping.value[row.serialNumber] = row.mapping;
+}
 
 // 判斷是否為相同身份證字號
 const isSameId = (row) => {
@@ -182,21 +186,17 @@ const checkMark = (value) => {
 
 // 顯示單元格顏色的邏輯
 const getCellStyle = (row, field) => {
-  // 如果該行是可選擇並且選中了
-  if (canSelect(row) && selectedMapping.value[row.id] === row.mapping) {
+  if (canSelect(row) && selectedMapping.value[row.serialNumber] === row.mapping) {
     if (field === 'mapping') {
-      return { color: '#1E90FF' }; // 藍色
+      return { color: '#89CFF0' };
     }
-    return { color: '#ffffff' }; // 白色
+    return { color: '#ffffff' };
   }
 
-  // 如果沒有被選中，且該行是可選擇的
   if (canSelect(row)) {
-    return { color: '#808080' }; // 灰色
+    return { color: '#FFD700' }; // 黃色
   }
-
-  // 沒有圓圈的行，保持灰色
-  return { color: '#808080' }; // 灰色
+  return { color: '#ffffff' };
 }
 
 // 頁數計算
