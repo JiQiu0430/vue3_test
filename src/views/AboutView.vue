@@ -33,19 +33,23 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(row, i) in paginatedData" :key="i">
-            <td :style="{ color: isSameId(row) ? 'yellow' : getTextColor(row) }">{{ row.serialNumber }}</td>
-            <td :style="{ color: isSameId(row) ? 'yellow' : getTextColor(row) }">{{ row.id }}</td>
-            <td :style="{ color: isSameId(row) ? 'yellow' : getTextColor(row) }">{{ row.name }}</td>
+          <tr
+            v-for="(row, i) in paginatedData"
+            :key="i"
+            :style="{ color: selectedSerialNumber === row.serialNumber ? '#89CFF0' : getTextColor(row) }"
+          >
+            <td :style="{ color: selectedSerialNumber === row.serialNumber ? '#FFD700' : getTextColor(row) }">{{ row.serialNumber }}</td>
+            <td :style="{ color: selectedSerialNumber === row.serialNumber ? '#FFD700' : getTextColor(row) }">{{ row.id }}</td>
+            <td :style="{ color: selectedSerialNumber === row.serialNumber ? '#FFD700' : getTextColor(row) }">{{ row.name }}</td>
             <td v-html="checkMark(row.upload)"></td>
-            <td :style="{ color: isSameId(row) ? 'yellow' : isMappingString(row.mapping) ? '#89CFF0' : '#e74c3c' }">{{ checkMark(row.mapping) }}
+            <td :style="{ color: selectedSerialNumber === row.serialNumber ? '#FFD700' : getTextColor(row) }">{{ checkMark(row.mapping) }}
               <!-- 圓圈選擇 -->
                 <div class="circle-select" v-if="isSameId(row)">
                   <input
                     type="radio"
                     :name="row.id"
-                    v-model="selectedMapping[row.id]"
-                    :value="row.mapping"
+                    v-model="selectedSerialNumber"
+                    :value="row.serialNumber"
                   />
                 </div>
             </td>
@@ -215,6 +219,7 @@ const checkMark = (value) => {
   return '<span class="gray-cross">--</span>'
 }
 
+const selectedSerialNumber = ref(null)
 // Mapping顏色變化邏輯
 const getTextColor = (row) => {
   if (row.mapping === 'false') {
@@ -232,9 +237,6 @@ const getTextColor = (row) => {
   return '#ffffff'; // 正常顯示白色
 }
 
-const isMappingString = (value) => {
-  return typeof value === 'string' && value !== 'false';
-}
 </script>
 
 <style scoped>
