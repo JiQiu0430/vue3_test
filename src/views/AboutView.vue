@@ -48,8 +48,9 @@
                   <input
                     type="radio"
                     :name="row.id"
-                    v-model="selectedSerialNumber"
                     :value="row.serialNumber"
+                    @click="handleRadioChange(row, $event)"
+                    v-model="selectedSerialNumber"
                   />
                 </div>
                 {{ checkMark(row.mapping) }}
@@ -58,7 +59,7 @@
             <td v-html="checkMark(row.postPACS)"></td>
             <td class="retry-cell">
               <div class="retry-buttons">
-                <button class="icon-button reload">
+                <button class="icon-button reload" @click="handleRetry(row, $event)">
                   <img src="/reload.png" class="action-icon" />
                 </button>
               </div>
@@ -187,14 +188,25 @@ const isSameId = (row) => {
   return caseData.value.filter(item => item.id === row.id).length > 1;
 }
 
+// 當選擇圓圈時，顯示確認提示
+const handleRadioChange = (row, event) => {
+  const isConfirmed = confirm(`您確定選擇 ${row.serialNumber} 嗎？`);
+  if (!isConfirmed) {
+    event.preventDefault();  // 阻止點擊選擇操作
+  } else {
+    selectedSerialNumber.value = row.serialNumber; // 更新選擇
+  }
+};
+
 // 導出資料
 const exportCSV = () => {
-  const headers = ['Case ID', 'Patient Name', 'Upload', 'Mapping', 'Post to AI', 'Post to PACS']
+  const headers = ['流水號', '身份證字號', '姓名', '檔案上傳', '對應工單號', '傳給AI', '傳給PACS']
   const rows = caseData.value.map(row => [
-    row.caseId,
+    row.serialNumber,
+    row.id,
     row.name,
     row.upload ? 'V' : 'X',
-    row.mapping ? 'V' : 'X',
+    formatMapping(row.mapping),
     row.postAI ? 'V' : 'X',
     row.postPACS ? 'V' : 'X',
   ])
@@ -208,6 +220,17 @@ const exportCSV = () => {
   link.setAttribute('download', 'case_data.csv')
   link.click()
 }
+
+// 根據 mapping 的新值來決定顯示的內容
+const formatMapping = (mapping) => {
+  if (mapping === 'false') {
+    return '✘'; // 如果是 'false' 顯示叉號
+  } 
+  if (mapping) {
+    return mapping; // 否則顯示 mapping 本身的文字
+  }
+  return '--'; // 沒有值時顯示 --
+};
 
 // 頁數計算
 const totalPages = computed(() =>
@@ -247,6 +270,16 @@ const getTextColor = (row) => {
   } 
   return '#ffffff'; // 正常顯示白色
 }
+
+// 當點擊 "重新嘗試" 時顯示確認提示
+const handleRetry = (row, event) => {
+  const isConfirmed = confirm(`您確定要重新嘗試流水號 ${row.serialNumber} 嗎？`);
+  if (!isConfirmed) {
+    event.preventDefault();  // 阻止重新嘗試的操作
+  } else {
+    alert(`重新嘗試流水號 ${row.serialNumber} 的操作已開始`);
+  }
+};
 </script>
 
 <style scoped>
