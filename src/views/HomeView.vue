@@ -22,29 +22,21 @@
       <table class="job-table">
         <thead>
           <tr>
-            <th class="status-header"></th>
             <th>批次名</th>
             <th>上傳時間</th>
             <th>批次資料來源</th>
-            <th>批次內檔案</th>
+            <th>批次檔案數量</th>
             <th>批次狀態</th>
             <th>工具列</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(item, index) in paginatedJobs" :key="index">
-            <td>
-              <span
-                class="status-indicator"
-                :class="getStatusClass(item.status)"
-                :style="{ backgroundColor: getStatusClass(item.status) }"
-              ></span>
-            </td>
             <td>{{ item.job }}</td>
             <td>{{ item.time }}</td>
             <td>{{ item.name }}</td>
             <td>{{ item.series }}</td>
-            <td :class="getStatusClass(item.status)" :style="getStatusStyle(item.status)">{{ item.status }}</td>
+            <td :style="getStatusStyle(item.status)">{{ item.status }}</td>
             <td>
 
               <!-- 個別檔案按鈕 -->
@@ -128,7 +120,7 @@
       </div>
 
       <!-- 單一檔案上傳 -->
-      <input type="file" ref="fileInput" hidden @change="handleSingleFileUpload" />
+      <input type="file" ref="fileInput" hidden @change="handleSingleFileUpload" accept=".dcm" />
     </main>
   </div>
 </template>
@@ -173,14 +165,14 @@ const jobs = ref([
     time: '2024-07-7 12:00',
     name: '七月',
     series: 5,
-    status: 'Analyzed',
+    status: 'Finish',
     files: [],
   },
   {
     job: 'test-002',
     time: '2024-07-7 12:30',
     name: '十三月',
-    series: 4,
+    series: 6,
     status: 'Error',
     files: [],
   },
@@ -228,7 +220,16 @@ const handleFileUpload = (e) => {
   const files = Array.from(e.target.files)
   if (files.length === 0) return
 
-  uploadedFiles.value = files
+  // 限制.dcm 檔案
+  const dicomFiles = files.filter(file => file.name.endsWith(".dcm"))
+
+  if (dicomFiles.length === 0) {
+    alert("請選擇 DICOM 檔案（.dcm）。");
+    return;
+  }
+
+  // 將過濾後的 DICOM 檔案加入上傳清單
+  uploadedFiles.value = dicomFiles
   const firstPath = files[0].webkitRelativePath || ''
   const folderName = firstPath.split('/')[0] || 'UnknownFolder'
   detectedFolderName.value = folderName
@@ -263,24 +264,10 @@ const retryUpload = () => {
   alert('Retry upload triggered.')
 }
 
-// 根據狀態設置顏色的CSS類別
-const getStatusClass = (status) => {
-  switch (status) {
-    case 'Analyzed':
-      return '#2ecc71';
-    case 'Pending':
-      return '#ffffff';
-    case 'Error':
-      return '#e74c3c';
-    default:
-      return '#ffffff';
-  }
-}
-
 // 根據狀態設置文字顏色
 const getStatusStyle = (status) => {
   switch (status) {
-    case 'Analyzed':
+    case 'Finish':
       return { color: '#2ecc71' };
     case 'Pending':
       return { color: '#ffffff' };
@@ -309,6 +296,12 @@ const selectFileForJob = (jobId) => {
 const handleSingleFileUpload = (e) => {
   const file = e.target.files[0]
   if (!file || !currentUploadJob.value) return
+
+  // 檢查檔案是否為 DICOM (.dcm)
+  if (file.type !== "application/dicom" && !file.name.endsWith(".dcm")) {
+    alert("請選擇 DICOM 檔案（.dcm）");
+    return;
+  }
 
   const job = jobs.value.find(j => j.job === currentUploadJob.value)
   if (job) {
@@ -543,25 +536,5 @@ const handleSingleFileUpload = (e) => {
 .pagination button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-/* 狀態燈 */
-.status-indicator {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-}
-.status-indicator.green {
-  background-color: #2ecc71;
-}
-.status-indicator.white {
-  background-color: #ffffff;
-}
-.status-indicator.red {
-  background-color: #e74c3c;
-}
-.status-header {
-  width: 24px;
-  padding: 0;
 }
 </style>

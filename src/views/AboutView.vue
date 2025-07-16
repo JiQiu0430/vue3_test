@@ -150,6 +150,15 @@ const caseData = ref([
     postPACS: false,
     status: 'Error'
   },
+  {
+    caseName: '0006#E123456789#卡厄斯#F#01',
+    series: 2,
+    upload: true,
+    mapping: 'ABC005',
+    postAI: true,
+    postPACS: null,
+    status: 'Pending'
+  },
 ])
 
 // 解析 caseName
