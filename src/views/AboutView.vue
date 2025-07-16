@@ -276,8 +276,6 @@ const handleRetry = (row, event) => {
   const isConfirmed = confirm(`您確定要重新嘗試流水號 ${row.serialNumber} 嗎？`);
   if (!isConfirmed) {
     event.preventDefault();  // 阻止重新嘗試的操作
-  } else {
-    alert(`重新嘗試流水號 ${row.serialNumber} 的操作已開始`);
   }
 };
 </script>
