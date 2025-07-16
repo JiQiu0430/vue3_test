@@ -36,13 +36,13 @@
           <tr
             v-for="(row, i) in paginatedData"
             :key="i"
-            :style="{ color: selectedSerialNumber === row.serialNumber ? '#89CFF0' : getTextColor(row) }"
+            :style="{ color: getTextColor(row) }"
           >
-            <td :style="{ color: selectedSerialNumber === row.serialNumber ? '#FFD700' : getTextColor(row) }">{{ row.serialNumber }}</td>
-            <td :style="{ color: selectedSerialNumber === row.serialNumber ? '#FFD700' : getTextColor(row) }">{{ row.id }}</td>
-            <td :style="{ color: selectedSerialNumber === row.serialNumber ? '#FFD700' : getTextColor(row) }">{{ row.name }}</td>
+            <td :style="{ color: getTextColor(row) }">{{ row.serialNumber }}</td>
+            <td :style="{ color: getTextColor(row) }">{{ row.id }}</td>
+            <td :style="{ color: getTextColor(row) }">{{ row.name }}</td>
             <td v-html="checkMark(row.upload)"></td>
-            <td :style="{ color: selectedSerialNumber === row.serialNumber ? '#FFD700' : getTextColor(row) }">{{ checkMark(row.mapping) }}
+            <td :style="{ color: getTextColor(row) }">
               <!-- 圓圈選擇 -->
                 <div class="circle-select" v-if="isSameId(row)">
                   <input
@@ -52,6 +52,7 @@
                     :value="row.serialNumber"
                   />
                 </div>
+                {{ checkMark(row.mapping) }}
             </td>
             <td v-html="checkMark(row.postAI)"></td>
             <td v-html="checkMark(row.postPACS)"></td>
@@ -228,15 +229,15 @@ const getTextColor = (row) => {
   if (row.upload === false || row.postAI === false || row.postPACS === false) {
     return '#e74c3c';
   }
-  
+  if (isSameId(row) && !selectedSerialNumber.value) {
+    return '#FFFF00'; // 黃色
+  }
   // 根據是否選中來設置文字顏色
   if (selectedMapping.value[row.id] === row.mapping) {
     return '#ffffff !important';  // 被選中時文字顏色為白色
-  }
-  
+  } 
   return '#ffffff'; // 正常顯示白色
 }
-
 </script>
 
 <style scoped>
