@@ -13,7 +13,7 @@
         <input
           v-model="searchQuery"
           type="text"
-          placeholder="搜尋......"
+          placeholder="搜尋批次名......"
           class="search-input"
         />
       </div>
@@ -180,15 +180,15 @@ const jobs = ref([
   },
 ])
 
-// 頁面計算
-const totalPages = computed(() => Math.ceil(jobs.value.length / pageSize))
-
 // 搜尋欄
 const paginatedJobs = computed(() =>
   jobs.value
     .filter(item => item.job.includes(searchQuery.value) || item.name.includes(searchQuery.value))
     .slice((page.value - 1) * pageSize, page.value * pageSize)
 )
+
+// 頁面計算
+const totalPages = computed(() => Math.ceil(jobs.value.length / pageSize))
 
 // 頁數切換
 const setPage = (p) => { page.value = p }

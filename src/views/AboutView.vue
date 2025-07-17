@@ -7,6 +7,13 @@
       <div class="toolbar">
         <div class="left-tools">
           <button class="back-button" @click="goBackHome">返回</button>
+          <!-- 搜尋欄 -->
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="搜尋流水號......"
+            class="search-input"
+          />
           <div class="job-info">
             <span><strong>批次號:</strong> {{ jobInfo.job || 'N/A' }}</span>
             <span>|</span>
@@ -182,6 +189,16 @@ caseData.value = caseData.value.map(item => {
   };
 })
 
+// 搜尋
+const searchQuery = ref('')
+const filteredData = computed(() => {
+  return caseData.value.filter(item => {
+    return item.serialNumber.toLowerCase().includes(searchQuery.value) ||
+           item.id.toLowerCase().includes(searchQuery.value) ||
+           item.name.toLowerCase().includes(searchQuery.value);
+  });
+});
+
 // 判斷是否為相同身份證字號
 const selectedMapping = ref({})
 const isSameId = (row) => {
@@ -234,10 +251,10 @@ const formatMapping = (mapping) => {
 
 // 頁數計算
 const totalPages = computed(() =>
-  Math.ceil(caseData.value.length / pageSize)
+  Math.ceil(filteredData.value.length / pageSize)
 )
 const paginatedData = computed(() =>
-  caseData.value.slice((page.value - 1) * pageSize, page.value * pageSize)
+  filteredData.value.slice((page.value - 1) * pageSize, page.value * pageSize)
 )
 const setPage = (p) => (page.value = p)
 const prevPage = () => { if (page.value > 1) page.value-- }
@@ -323,6 +340,14 @@ const handleRetry = (row, event) => {
   display: flex;
   align-items: center;
   gap: 16px;
+}
+.search-input {
+  width: 250px;
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid #666;
+  background: #111;
+  color: white;
 }
 .back-button,
 .export-button {
