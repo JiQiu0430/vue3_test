@@ -40,14 +40,16 @@
             <td>
 
               <!-- 個別檔案按鈕 -->
-              <button class="icon-button" @click="viewFile(item)">
+              <button class="icon-button" @click="viewFile(item)" title="點擊查看批次內容">
                 <img src="/eye.png" class="action-icon" alt="view" />
               </button>
-              <button class="icon-button" @click="selectFileForJob(item.job)">
+              <button class="icon-button" @click="selectFileForJob(item.job)" title="點擊上傳檔案">
                 <img src="/file.png" class="action-icon" alt="upload file" />
               </button>
-              <button class="icon-button"><img src="/download.png" class="action-icon" alt="download" /></button>
-              <button class="icon-button" @click="deleteJob(item.job)">
+              <button class="icon-button" title="點擊下載批次">
+                <img src="/download.png" class="action-icon" alt="download" />
+              </button>
+              <button class="icon-button" @click="deleteJob(item.job)" title="點擊刪除批次">
                 <img src="/trash-bin.png" class="action-icon" alt="delete" />
               </button>
             </td>
@@ -403,7 +405,7 @@ const handleSingleFileUpload = (e) => {
   background: none;
   border: none;
   padding: 2px;
-  margin-right: 2px;
+  margin-right: 10px;
   cursor: pointer;
 }
 .action-icon {
