@@ -243,7 +243,7 @@ const handleFileUpload = (e) => {
 // 將資料夾內容加入列表
 const submitUpload = () => {
   if (!newJob.value.name || uploadedFiles.value.length === 0) {
-    alert('Please enter job name and upload files.')
+    alert('請加入檔案夾及輸入批次名稱')
     return
   }
 
@@ -299,6 +299,13 @@ const handleSingleFileUpload = (e) => {
   const file = e.target.files[0]
   if (!file || !currentUploadJob.value) return
 
+  // 彈出確認提示
+  const isConfirmed = confirm(`您確定要上傳檔案 "${file.name}" 嗎？`)
+  if (!isConfirmed) {
+    e.target.value = ''  // 取消上傳，清空選擇的檔案
+    return
+  }
+
   // 檢查檔案是否為 DICOM (.dcm)
   if (file.type !== "application/dicom" && !file.name.endsWith(".dcm")) {
     alert("請選擇 DICOM 檔案（.dcm）");
@@ -310,7 +317,7 @@ const handleSingleFileUpload = (e) => {
     job.files.push(file)
     job.series += 1
     job.status = 'Pending'
-    alert(`File "${file.name}" uploaded to job "${job.job}". Status updated to Pending.`)
+    alert(`檔案 "${file.name}" 上傳至 "${job.job}".`)
   }
 
   e.target.value = ''
