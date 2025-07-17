@@ -53,7 +53,7 @@
                     v-model="selectedSerialNumber"
                   />
                 </div>
-                {{ checkMark(row.mapping) }}
+                <span v-html="checkMark(row.mapping)"></span>
             </td>
             <td v-html="checkMark(row.postAI)"></td>
             <td v-html="checkMark(row.postPACS)"></td>
@@ -155,8 +155,8 @@ const caseData = ref([
     caseName: '0006#E123456789#卡厄斯#F#01',
     series: 2,
     upload: true,
-    mapping: 'ABC005',
-    postAI: true,
+    mapping: '',
+    postAI: null,
     postPACS: null,
     status: 'Pending'
   },
@@ -221,7 +221,7 @@ const exportCSV = () => {
   link.click()
 }
 
-// 根據 mapping 的新值來決定顯示的內容
+// 根據 Mapping 的值來決定導出的內容
 const formatMapping = (mapping) => {
   if (mapping === 'false') {
     return '✘'; // 如果是 'false' 顯示叉號
@@ -253,7 +253,8 @@ const checkMark = (value) => {
 }
 
 const selectedSerialNumber = ref(null)
-// Mapping顏色變化邏輯
+
+// 顏色變化邏輯
 const getTextColor = (row) => {
   if (row.mapping === 'false') {
     return '#e74c3c'; // 紅色
