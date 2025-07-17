@@ -302,7 +302,7 @@ const handleSingleFileUpload = (e) => {
   // 彈出確認提示
   const isConfirmed = confirm(`您確定要上傳檔案 "${file.name}" 嗎？`)
   if (!isConfirmed) {
-    e.target.value = ''  // 取消上傳，清空選擇的檔案
+    e.target.value = ''
     return
   }
 
@@ -397,7 +397,38 @@ const handleSingleFileUpload = (e) => {
   padding: 10px 12px;
   text-align: left;
   border: none;
-  color: white;
+  color: #ffffff;
+  width: 150px;
+}
+/* 批次名 */
+.job-table th:nth-child(1),
+.job-table td:nth-child(1) {
+  width: 200px;
+}
+/* 上傳時間 */
+.job-table th:nth-child(2),
+.job-table td:nth-child(2) {
+  width: 150px;
+}
+/* 批次資料來源 */
+.job-table th:nth-child(3),
+.job-table td:nth-child(3) {
+  width: 200px;
+}
+/* 批次檔案數量 */
+.job-table th:nth-child(4),
+.job-table td:nth-child(4) {
+  width: 150px;
+}
+/* 批次狀態 */
+.job-table th:nth-child(5),
+.job-table td:nth-child(5) {
+  width: 150px;
+}
+/* 工具列 */
+.job-table th:nth-child(6),
+.job-table td:nth-child(6) {
+  width: 150px;
 }
 .job-table tbody tr + tr {
   border-top: 2px solid #003366;

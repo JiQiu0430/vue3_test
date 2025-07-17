@@ -362,6 +362,47 @@ const handleRetry = (row, event) => {
   padding: 10px 12px;
   text-align: left;
   color: #ffffff;
+  width: 150px;
+}
+/* 流水號 */
+.job-table th:nth-child(1),
+.job-table td:nth-child(1) {
+  width: 100px;
+}
+/* 身份證字號 */
+.job-table th:nth-child(2),
+.job-table td:nth-child(2) {
+  width: 150px;
+}
+/* 姓名 */
+.job-table th:nth-child(3),
+.job-table td:nth-child(3) {
+  width: 200px;
+}
+/* 檔案上傳 */
+.job-table th:nth-child(4),
+.job-table td:nth-child(4) {
+  width: 150px;
+}
+/* 對應工單號 */
+.job-table th:nth-child(5),
+.job-table td:nth-child(5) {
+  width: 200px;
+}
+/* 傳給 AI */
+.job-table th:nth-child(6),
+.job-table td:nth-child(6) {
+  width: 150px;
+}
+/* 傳給 PACS */
+.job-table th:nth-child(7),
+.job-table td:nth-child(7) {
+  width: 150px;
+}
+/* 重新嘗試 */
+.job-table th:nth-child(8),
+.job-table td:nth-child(8) {
+  width: 100px;
 }
 .job-table tbody tr + tr {
   border-top: 2px solid #003366;
