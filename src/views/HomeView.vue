@@ -87,18 +87,18 @@
             </label>
           </div>
 
-          <!-- 輸入jobName -->
-          <label>2. 輸入批次名</label>
-          <div v-if="isFolderUploaded" class="form-group">
-            <input v-model="newJob.name" type="text" />
-          </div>
-
           <!-- 檔案名條列壓縮 -->
           <div v-if="uploadedFiles.length > 0" class="file-list">
             <p v-for="(file, i) in uploadedFiles.slice(0, 3)" :key="i">{{ file.name }}</p>
             <p v-if="uploadedFiles.length > 4">... ({{ uploadedFiles.length - 4 }} files hidden) ...</p>
             <p v-if="uploadedFiles.length > 4">{{ uploadedFiles[uploadedFiles.length - 1].name }}</p>
            </div>
+
+          <!-- 輸入jobName -->
+          <label>2. 輸入批次名</label>
+          <div v-if="isFolderUploaded" class="form-group">
+            <input v-model="newJob.name" type="text" />
+          </div>
 
           <!-- 進度條 -->
           <div class="form-group">
@@ -206,6 +206,7 @@ const closeDialog = () => {
   newJob.value.name = ''
   uploadedFiles.value = []
   uploadProgress.value = 0
+  isFolderUploaded.value = false
 }
 
 // 跳轉頁面
