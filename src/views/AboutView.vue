@@ -11,7 +11,7 @@
           <input
             v-model="searchQuery"
             type="text"
-            placeholder="搜尋流水號......"
+            placeholder="搜尋檔案......"
             class="search-input"
           />
           <div class="job-info">

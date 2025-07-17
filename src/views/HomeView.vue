@@ -13,7 +13,7 @@
         <input
           v-model="searchQuery"
           type="text"
-          placeholder="搜尋批次名......"
+          placeholder="搜尋批次......"
           class="search-input"
         />
       </div>
@@ -133,8 +133,6 @@ import { ref, computed } from 'vue'
 
 const router = useRouter()
 
-const searchQuery = ref('')
-
 // 控制上傳視窗顯示
 const showDialog = ref(false)
 
@@ -164,7 +162,7 @@ const currentUploadJob = ref(null)
 const jobs = ref([
   {
     job: 'test-001',
-    time: '2024-07-7 12:00',
+    time: '2025/07/07-12:00:00',
     name: '七月',
     series: 5,
     status: 'Finish',
@@ -172,7 +170,7 @@ const jobs = ref([
   },
   {
     job: 'test-002',
-    time: '2024-07-7 12:30',
+    time: '2025/07/08-12:30:45',
     name: '十三月',
     series: 6,
     status: 'Error',
@@ -181,9 +179,15 @@ const jobs = ref([
 ])
 
 // 搜尋欄
+const searchQuery = ref('')
 const paginatedJobs = computed(() =>
   jobs.value
-    .filter(item => item.job.includes(searchQuery.value) || item.name.includes(searchQuery.value))
+    .filter(item => {
+      const dateMatches = item.time.includes(searchQuery.value);
+      const jobMatches = item.job.includes(searchQuery.value);
+      const nameMatches = item.name.includes(searchQuery.value);
+      return jobMatches || nameMatches || dateMatches;
+    })
     .slice((page.value - 1) * pageSize, page.value * pageSize)
 )
 
@@ -247,10 +251,21 @@ const submitUpload = () => {
     return
   }
 
+ // 取得當前時間，並格式化為 yyyy/MM/DD-hh:mm:ss
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const month = (currentDate.getMonth() + 1).toString().padStart(2, '0'); // 月份從0開始，需加1
+  const day = currentDate.getDate().toString().padStart(2, '0');
+  const hours = currentDate.getHours().toString().padStart(2, '0');
+  const minutes = currentDate.getMinutes().toString().padStart(2, '0');
+  const seconds = currentDate.getSeconds().toString().padStart(2, '0');
+  // 格式化時間字串
+  const currentTime = `${year}/${month}/${day}-${hours}:${minutes}:${seconds}`;
+
   uploadProgress.value = 100
   jobs.value.push({
     job: newJob.value.name,
-    time: new Date().toLocaleString(),
+    time: currentTime,
     name: detectedFolderName.value,
     series: uploadedFiles.value.length,
     status: 'Pending',
