@@ -285,19 +285,19 @@ const retryUpload = () => {
 const getStatusStyle = (status) => {
   switch (status) {
     case 'Finish':
-      return { color: '#2ecc71' };
+      return { color: '#2ecc71', fontWeight: 'bold' };
     case 'Pending':
-      return { color: '#ffffff' };
+      return { color: '#ffffff', fontWeight: 'bold' };
     case 'Error':
-      return { color: '#e74c3c' };
+      return { color: '#e74c3c', fontWeight: 'bold' };
     default:
-      return { color: '#ffffff' };
+      return { color: '#ffffff', fontWeight: 'bold' };
   }
 }
 
 // 刪除job+更新頁面
 const deleteJob = (jobId) => {
-  if (confirm(`Are you sure you want to delete job "${jobId}"?`)) {
+  if (confirm(`你確定要刪除批次 ${jobId}?`)) {
     jobs.value = jobs.value.filter(job => job.job !== jobId)
     if (page.value > totalPages.value) {
       page.value = totalPages.value
@@ -423,7 +423,7 @@ const handleSingleFileUpload = (e) => {
 /* 上傳時間 */
 .job-table th:nth-child(2),
 .job-table td:nth-child(2) {
-  width: 150px;
+  width: 200px;
 }
 /* 批次資料來源 */
 .job-table th:nth-child(3),
@@ -433,12 +433,12 @@ const handleSingleFileUpload = (e) => {
 /* 批次檔案數量 */
 .job-table th:nth-child(4),
 .job-table td:nth-child(4) {
-  width: 150px;
+  width: 100px;
 }
 /* 批次狀態 */
 .job-table th:nth-child(5),
 .job-table td:nth-child(5) {
-  width: 150px;
+  width: 100px;
 }
 /* 工具列 */
 .job-table th:nth-child(6),
