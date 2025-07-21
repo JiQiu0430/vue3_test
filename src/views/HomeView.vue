@@ -25,20 +25,30 @@
           <tr>
             <th>批次名</th>
             <th>上傳時間
-              <select v-model="uploadTimeFilter" @change="applyFilters">
-                <option value="asc">時間升序</option>
-                <option value="desc">時間降序</option>
-              </select>
+              <button @click="toggleUploadTimeFilter" class="filter-button">
+                <img src="/filter.png" alt="filter" class="filter-icon"/>
+              </button>
+              <div v-if="showUploadTimeFilter" class="filter-dropdown">
+                <div @click="setUploadTimeFilter('asc')">時間升序</div>
+                <div class="divider"></div>
+                <div @click="setUploadTimeFilter('desc')">時間降序</div>
+              </div>
             </th>
             <th>批次資料來源</th>
             <th>批次檔案數量</th>
             <th>批次狀態
-              <select v-model="statusFilter" @change="applyFilters">
-                <option value="">''</option>
-                <option value="Finish">Finish</option>
-                <option value="Error">Error</option>
-                <option value="Pending">Pending</option>
-              </select>
+              <button @click="toggleStatusFilter" class="filter-button">
+                <img src="/filter.png" alt="filter" class="filter-icon"/>
+              </button>
+              <div v-if="showStatusFilter" class="filter-dropdown">
+                <div @click="setStatusFilter('')">All</div>
+                <div class="divider"></div>
+                <div @click="setStatusFilter('Finish')">Finish</div>
+                <div class="divider"></div>
+                <div @click="setStatusFilter('Error')">Error</div>
+                <div class="divider"></div>
+                <div @click="setStatusFilter('Pending')">Pending</div>
+              </div>
             </th>
             <th>工具列</th>
           </tr>
@@ -193,44 +203,56 @@ const jobs = ref([
 
 // 搜尋欄
 const searchQuery = ref('')
-const uploadTimeFilter = ref(''); // 升序/降序篩選
-const statusFilter = ref(''); // 批次狀態篩選
+// 升降序篩選
+const uploadTimeFilter = ref('');
+// 批次狀態篩選
+const statusFilter = ref('');
+
+// 控制篩選選單顯示
+const showUploadTimeFilter = ref(false)
+const showStatusFilter = ref(false)
 
 // 計算過濾後的 jobs 列表
 const filteredJobs = computed(() => {
   let filtered = jobs.value;
 
-  // 根據搜尋條件過濾
   if (searchQuery.value) {
-    filtered = filtered.filter(item => {
-      const dateMatches = item.time.includes(searchQuery.value);
-      const jobMatches = item.job.includes(searchQuery.value);
-      const nameMatches = item.name.includes(searchQuery.value);
-      return jobMatches || nameMatches || dateMatches;
-    });
+    filtered = filtered.filter(item => item.job.includes(searchQuery.value));
   }
-
-  // 根據批次狀態篩選
   if (statusFilter.value) {
-    filtered = filtered.filter(job => job.status === statusFilter.value);
+    filtered = filtered.filter(item => item.status === statusFilter.value);
   }
-
-  // 根據上傳時間篩選
   if (uploadTimeFilter.value) {
-    filtered = filtered.sort((a, b) => {
-      const timeA = new Date(a.time);
-      const timeB = new Date(b.time);
-      return uploadTimeFilter.value === 'asc' ? timeA - timeB : timeB - timeA;
-    });
+    filtered = filtered.sort((a, b) => (uploadTimeFilter.value === 'asc' ? new Date(a.time) - new Date(b.time) : new Date(b.time) - new Date(a.time)));
   }
-
-  // 分頁處理
-  return filtered.slice((page.value - 1) * pageSize, page.value * pageSize);
+  return filtered;
 });
+
+// 控制篩選選單顯示
+const toggleUploadTimeFilter = () => {
+  showUploadTimeFilter.value = !showUploadTimeFilter.value;
+  showStatusFilter.value = false;
+};
+const toggleStatusFilter = () => {
+  showStatusFilter.value = !showStatusFilter.value;
+  showUploadTimeFilter.value = false;
+};
+
+// 設置篩選條件
+const setUploadTimeFilter = (order) => {
+  uploadTimeFilter.value = order;
+  applyFilters();
+  showUploadTimeFilter.value = false;
+};
+const setStatusFilter = (status) => {
+  statusFilter.value = status;
+  applyFilters();
+  showStatusFilter.value = false;
+};
 
 // 重新應用篩選條件
 const applyFilters = () => {
-  page.value = 1; // 篩選後重新從第 1 頁開始
+  page.value = 1;
 }
 
 // 頁面計算
@@ -503,6 +525,34 @@ const handleSingleFileUpload = (e) => {
 .job-table thead {
   background-color: black;
   color: white;
+}
+
+/* 篩選選單 */
+.filter-dropdown {
+  position: absolute;
+  background: #333;
+  padding: 10px;
+  border-radius: 4px;
+  z-index: 10;
+}
+.filter-button {
+  background-color: black;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+}
+.filter-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+}
+.filter-dropdown div {
+  padding: 1px;
+  cursor: pointer;
+}
+.divider {
+  border-top: 1px solid #666;
+  margin: 4px 0;
 }
 
 /* icon工具列 */
