@@ -29,7 +29,19 @@
       <table class="job-table">
         <thead>
           <tr>
-            <th>流水號</th>
+            <th class="sortable-column">
+              <span>流水號</span>
+              <img
+                src="/filter.png"
+                class="filter-icon"
+                @click="toggleSortMenu"
+              />
+              <div v-if="showSortMenu" class="sort-menu">
+                <span @click="sortData('asc')">流水號升序</span>
+                <div class="divider"></div>
+                <span @click="sortData('desc')">流水號降序</span>
+              </div>
+            </th>
             <th>身份證字號</th>
             <th>姓名</th>
             <th>檔案上傳</th>
@@ -189,7 +201,7 @@ caseData.value = caseData.value.map(item => {
   };
 })
 
-// 搜尋
+// 搜尋框
 const searchQuery = ref('')
 const filteredData = computed(() => {
   return caseData.value.filter(item => {
@@ -214,6 +226,25 @@ const handleRadioChange = (row, event) => {
     selectedSerialNumber.value = row.serialNumber; // 更新選擇
   }
 };
+
+// 排序功能
+const sortOrder = ref('asc')
+const showSortMenu = ref(false)
+const toggleSortMenu = () => {
+  showSortMenu.value = !showSortMenu.value
+}
+const sortData = (order) => {
+  sortOrder.value = order
+  caseData.value.sort((a, b) => {
+    const aSerialNumber = a.serialNumber
+    const bSerialNumber = b.serialNumber
+    const compareResult = order === 'asc'
+      ? aSerialNumber.localeCompare(bSerialNumber)
+      : bSerialNumber.localeCompare(aSerialNumber)
+    showSortMenu.value = false;
+    return compareResult;
+  })
+}
 
 // 導出資料
 const exportCSV = () => {
@@ -393,6 +424,37 @@ const handleRetry = (row, event) => {
 .job-table th:nth-child(1),
 .job-table td:nth-child(1) {
   width: 100px;
+}
+.sortable-column {
+  position: relative;
+}
+.filter-icon {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  margin-left: 8px;
+}
+.filter-text {
+  color: #0892D0;
+  cursor: pointer;
+  margin-left: 8px;
+}
+.sort-menu {
+  background: #333;
+  padding: 10px;
+  border-radius: 6px;
+  position: absolute;
+  top: 38px;
+  left: 0;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+.divider {
+  border-top: 1px solid #666;
+  margin: 4px 0;
 }
 /* 身份證字號 */
 .job-table th:nth-child(2),

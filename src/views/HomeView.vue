@@ -324,6 +324,7 @@ const submitUpload = () => {
   const hours = currentDate.getHours().toString().padStart(2, '0');
   const minutes = currentDate.getMinutes().toString().padStart(2, '0');
   const seconds = currentDate.getSeconds().toString().padStart(2, '0');
+
   // 格式化時間字串
   const currentTime = `${year}/${month}/${day}-${hours}:${minutes}:${seconds}`;
 
