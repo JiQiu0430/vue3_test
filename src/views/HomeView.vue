@@ -7,7 +7,7 @@
       <div class="toolbar">
 
         <!-- 上傳按鈕 -->
-        <button class="add-job-btn" @click="openUploadDialog">新增資料夾</button>
+        <button class="add-job-btn" @click="openUploadDialog">新增批次</button>
 
         <!-- 搜尋欄 -->
         <input
@@ -15,6 +15,7 @@
           type="text"
           placeholder="搜尋批次......"
           class="search-input"
+          @input="applyFilters"
         />
       </div>
 
@@ -23,15 +24,27 @@
         <thead>
           <tr>
             <th>批次名</th>
-            <th>上傳時間</th>
+            <th>上傳時間
+              <select v-model="uploadTimeFilter" @change="applyFilters">
+                <option value="asc">時間升序</option>
+                <option value="desc">時間降序</option>
+              </select>
+            </th>
             <th>批次資料來源</th>
             <th>批次檔案數量</th>
-            <th>批次狀態</th>
+            <th>批次狀態
+              <select v-model="statusFilter" @change="applyFilters">
+                <option value="">''</option>
+                <option value="Finish">Finish</option>
+                <option value="Error">Error</option>
+                <option value="Pending">Pending</option>
+              </select>
+            </th>
             <th>工具列</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(item, index) in paginatedJobs" :key="index">
+          <tr v-for="(item, index) in filteredJobs" :key="index">
             <td>{{ item.job }}</td>
             <td>{{ item.time }}</td>
             <td>{{ item.name }}</td>
@@ -73,7 +86,7 @@
 
           <!-- 上傳資料夾 -->
           <div class="form-group">
-            <label>1. 上傳資料夾</label>
+            <label>1. 選擇資料夾</label>
             <label class="upload-box">
               <input
                 type="file"
@@ -83,7 +96,7 @@
                 hidden
                 @change="handleFileUpload"
               />
-              點擊方框以上傳資料夾
+              點擊方框選擇資料夾
             </label>
           </div>
 
@@ -180,16 +193,45 @@ const jobs = ref([
 
 // 搜尋欄
 const searchQuery = ref('')
-const paginatedJobs = computed(() =>
-  jobs.value
-    .filter(item => {
+const uploadTimeFilter = ref(''); // 升序/降序篩選
+const statusFilter = ref(''); // 批次狀態篩選
+
+// 計算過濾後的 jobs 列表
+const filteredJobs = computed(() => {
+  let filtered = jobs.value;
+
+  // 根據搜尋條件過濾
+  if (searchQuery.value) {
+    filtered = filtered.filter(item => {
       const dateMatches = item.time.includes(searchQuery.value);
       const jobMatches = item.job.includes(searchQuery.value);
       const nameMatches = item.name.includes(searchQuery.value);
       return jobMatches || nameMatches || dateMatches;
-    })
-    .slice((page.value - 1) * pageSize, page.value * pageSize)
-)
+    });
+  }
+
+  // 根據批次狀態篩選
+  if (statusFilter.value) {
+    filtered = filtered.filter(job => job.status === statusFilter.value);
+  }
+
+  // 根據上傳時間篩選
+  if (uploadTimeFilter.value) {
+    filtered = filtered.sort((a, b) => {
+      const timeA = new Date(a.time);
+      const timeB = new Date(b.time);
+      return uploadTimeFilter.value === 'asc' ? timeA - timeB : timeB - timeA;
+    });
+  }
+
+  // 分頁處理
+  return filtered.slice((page.value - 1) * pageSize, page.value * pageSize);
+});
+
+// 重新應用篩選條件
+const applyFilters = () => {
+  page.value = 1; // 篩選後重新從第 1 頁開始
+}
 
 // 頁面計算
 const totalPages = computed(() => Math.ceil(jobs.value.length / pageSize))
@@ -248,7 +290,7 @@ const handleFileUpload = (e) => {
 // 將資料夾內容加入列表
 const submitUpload = () => {
   if (!newJob.value.name || uploadedFiles.value.length === 0) {
-    alert('請加入檔案夾及輸入批次名稱')
+    alert('請加入資料夾及輸入批次名稱')
     return
   }
 
@@ -286,7 +328,7 @@ const retryUpload = () => {
 const getStatusStyle = (status) => {
   switch (status) {
     case 'Finish':
-      return { color: '#2ecc71', fontWeight: 'bold' };
+      return { color: '#34B539', fontWeight: 'bold' };
     case 'Pending':
       return { color: '#ffffff', fontWeight: 'bold' };
     case 'Error':
@@ -357,7 +399,7 @@ const handleSingleFileUpload = (e) => {
   padding: 20px;
   flex: 1;
   overflow-y: auto;
-  font-size: 13px;
+  font-size: 16px;
 }
 
 /* 標題 */
@@ -441,6 +483,15 @@ const handleSingleFileUpload = (e) => {
 .job-table td:nth-child(5) {
   width: 100px;
 }
+.filter-input {
+  margin-left: 10px;
+  padding: 4px;
+  border-radius: 4px;
+  background: #333;
+  color: white;
+  border: 1px solid #555;
+  font-size: 12px;
+}
 /* 工具列 */
 .job-table th:nth-child(6),
 .job-table td:nth-child(6) {
@@ -463,8 +514,8 @@ const handleSingleFileUpload = (e) => {
   cursor: pointer;
 }
 .action-icon {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   object-fit: contain;
 }
 

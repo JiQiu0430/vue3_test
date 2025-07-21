@@ -314,7 +314,7 @@ const handleRetry = (row, event) => {
   padding: 20px;
   flex: 1;
   overflow-y: auto;
-  font-size: 13px;
+  font-size: 16px;
 }
 
 /* 標題 */
@@ -473,8 +473,8 @@ input[type="radio"]:checked{
   cursor: pointer;
 }
 .action-icon {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   object-fit: contain;
 }
 
