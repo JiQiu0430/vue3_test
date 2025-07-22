@@ -22,7 +22,10 @@
             <span><strong>總檔案數:</strong> {{ caseData.length }}</span>
           </div>
         </div>
-        <button class="export-button" @click="exportCSV">導出CSV</button>
+        <div class="action-buttons">
+          <button class="retry-all-button" @click="retryAll">一鍵重試</button>
+          <button class="export-button" @click="exportCSV">導出CSV</button>
+        </div>
       </div>
 
       <!-- 列表 -->
@@ -308,6 +311,23 @@ const toggleFilterMenu = (field) => {
   showFilterMenu.value[field] = !showFilterMenu.value[field]
 }
 
+const retryAll = () => {
+  const filesToRetry = caseData.value.filter(row => {
+    return row.postAI === false || row.postPACS === false || row.mapping === 'false';
+  });
+
+  if (filesToRetry.length === 0) {
+    alert('沒有需要重試的檔案！');
+    return;
+  }
+
+  const confirmRetry = confirm(`有 ${filesToRetry.length} 檔案需要重試，確定要繼續嗎？`);
+  if (confirmRetry) {
+    // 空區塊是故意的
+  }
+};
+
+
 // 導出資料
 const exportCSV = () => {
   const headers = ['流水號', '身份證字號', '姓名', '檔案上傳', '對應工單號', '傳給AI', '傳給PACS']
@@ -384,7 +404,7 @@ const getTextColor = (row) => {
 const handleRetry = (row, event) => {
   const isConfirmed = confirm(`您確定要重新嘗試流水號 ${row.serialNumber} 嗎？`);
   if (!isConfirmed) {
-    event.preventDefault();  // 阻止重新嘗試的操作
+    event.preventDefault();
   }
 };
 </script>
@@ -440,8 +460,7 @@ const handleRetry = (row, event) => {
   background: #111;
   color: white;
 }
-.back-button,
-.export-button {
+.back-button {
   background: #2c2c2c;
   color: #ffffff;
   border: 1px solid #ffffff;
@@ -453,10 +472,6 @@ const handleRetry = (row, event) => {
   background: #0892D0;
   border-color: #0892D0;
 }
-.export-button:hover {
-  background: #28a745;
-  border-color: #28a745;
-}
 .job-info {
   display: flex;
   gap: 20px;
@@ -465,6 +480,37 @@ const handleRetry = (row, event) => {
 }
 .job-info span {
   white-space: nowrap;
+}
+
+/* 右邊按鈕 */
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-start;
+}
+.export-button {
+  background: #2c2c2c;
+  color: #ffffff;
+  border: 1px solid #ffffff;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.export-button:hover {
+  background: #28a745;
+  border-color: #28a745;
+}
+.retry-all-button {
+  background: #2c2c2c;
+  color: #ffffff;
+  border: 1px solid #ffffff;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.retry-all-button:hover {
+  background: #e19214;
+  border-color: #e19214;
 }
 
 /* 列表 */

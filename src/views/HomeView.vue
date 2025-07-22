@@ -67,7 +67,7 @@
                 <img src="/eye.png" class="action-icon" alt="view" />
               </button>
               <button class="icon-button" @click="selectFileForJob(item.job)" title="點擊上傳檔案">
-                <img src="/file.png" class="action-icon" alt="upload file" />
+                <img src="/upload.png" class="action-icon" alt="upload file" />
               </button>
               <button class="icon-button" title="點擊下載批次">
                 <img src="/download.png" class="action-icon" alt="download" />
@@ -184,7 +184,8 @@ const currentUploadJob = ref(null)
 // 模擬資料
 const jobs = ref([
   {
-    job: 'test-001',
+    job: '測試-001',
+    id: 1,
     time: '2025/07/07-12:00:00',
     name: '七月',
     series: 5,
@@ -192,7 +193,8 @@ const jobs = ref([
     files: [],
   },
   {
-    job: 'test-002',
+    job: '測試-002',
+    id: 2,
     time: '2025/07/08-12:30:45',
     name: '十三月',
     series: 6,
@@ -277,9 +279,10 @@ const closeDialog = () => {
 const viewFile = (item) => {
   router.push({
     name: 'FilePage',
-    params: { id: item.job },
+    params: { id: item.id },
     query: {
       job: item.job,
+      id: item.id,
       time: item.time,
       series: item.series
     }
