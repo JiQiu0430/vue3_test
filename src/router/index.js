@@ -9,8 +9,8 @@ const routes = [
     component: HomeView, // 選單和內容區域
   },
   {
-    path: '/file/:id',
-    name: 'FilePage',
+    path: '/about/:id',
+    name: 'About',
     component: AboutView, // 檔案內容
     props: true, // 使路由參數作為 props 傳遞
   },

@@ -152,7 +152,6 @@ const goBackHome = () => router.push({ name: 'Home' })
 const jobInfo = computed(() => ({
   job: route.query.job,
   time: route.query.time,
-  series: route.query.series
 }))
 
 const page = ref(1)
@@ -256,9 +255,9 @@ const isSameId = (row) => {
 const handleRadioChange = (row, event) => {
   const isConfirmed = confirm(`您確定選擇 ${row.serialNumber} 嗎？`);
   if (!isConfirmed) {
-    event.preventDefault();  // 阻止點擊選擇操作
+    event.preventDefault();
   } else {
-    selectedSerialNumber.value = row.serialNumber; // 更新選擇
+    selectedSerialNumber.value = row.serialNumber;
   }
 };
 
@@ -354,12 +353,12 @@ const exportCSV = () => {
 // 根據 Mapping 的值來決定導出的內容
 const formatMapping = (mapping) => {
   if (mapping === 'false') {
-    return '✘'; // 如果是 'false' 顯示叉號
+    return '✘';
   } 
   if (mapping) {
-    return mapping; // 否則顯示 mapping 本身的文字
+    return mapping;
   }
-  return '--'; // 沒有值時顯示 --
+  return '--';
 };
 
 // 頁數計算
@@ -385,19 +384,19 @@ const selectedSerialNumber = ref(null)
 // 顏色變化邏輯
 const getTextColor = (row) => {
   if (row.mapping === 'false') {
-    return '#e74c3c'; // 紅色
+    return '#e74c3c';
   }
   if (row.upload === false || row.postAI === false || row.postPACS === false) {
     return '#e74c3c';
   }
   if (isSameId(row) && !selectedSerialNumber.value) {
-    return '#FFFF00'; // 黃色
+    return '#FFFF00';
   }
   // 根據是否選中來設置文字顏色
   if (selectedMapping.value[row.id] === row.mapping) {
-    return '#ffffff !important';  // 被選中時文字顏色為白色
+    return '#ffffff !important';
   } 
-  return '#ffffff'; // 正常顯示白色
+  return '#ffffff';
 }
 
 // 當點擊 "重新嘗試" 時顯示確認提示

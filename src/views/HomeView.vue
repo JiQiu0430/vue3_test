@@ -278,13 +278,11 @@ const closeDialog = () => {
 // 跳轉頁面
 const viewFile = (item) => {
   router.push({
-    name: 'FilePage',
+    name: 'About',
     params: { id: item.id },
     query: {
       job: item.job,
-      id: item.id,
       time: item.time,
-      series: item.series
     }
   })
 }
@@ -319,16 +317,16 @@ const submitUpload = () => {
     return
   }
 
- // 取得當前時間，並格式化為 yyyy/MM/DD-hh:mm:ss
+ // 取得當前時間格式化為 yyyy/MM/DD-hh:mm:ss
   const currentDate = new Date();
   const year = currentDate.getFullYear();
-  const month = (currentDate.getMonth() + 1).toString().padStart(2, '0'); // 月份從0開始，需加1
+  const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
   const day = currentDate.getDate().toString().padStart(2, '0');
   const hours = currentDate.getHours().toString().padStart(2, '0');
   const minutes = currentDate.getMinutes().toString().padStart(2, '0');
   const seconds = currentDate.getSeconds().toString().padStart(2, '0');
 
-  // 格式化時間字串
+  // 格式化字串
   const currentTime = `${year}/${month}/${day}-${hours}:${minutes}:${seconds}`;
 
   uploadProgress.value = 100
