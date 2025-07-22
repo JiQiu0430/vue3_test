@@ -46,8 +46,40 @@
             <th>姓名</th>
             <th>檔案上傳</th>
             <th>對應工單號</th>
-            <th>傳給AI</th>
-            <th>傳給PACS</th>
+            <th>
+              <span>傳給AI</span>
+              <img
+                src="/filter.png"
+                class="filter-icon"
+                @click="toggleFilterMenu('ai')"
+              />
+              <div v-if="showFilterMenu.ai" class="filter-menu">
+                <span @click="filterData('ai', 'all')">全部</span>
+                <div class="divider"></div>
+                <span @click="filterData('ai', true)">True</span>
+                <div class="divider"></div>
+                <span @click="filterData('ai', false)">False</span>
+                <div class="divider"></div>
+                <span @click="filterData('ai', null)">Null</span>
+              </div>
+            </th>
+            <th>
+              <span>傳給PACS</span>
+              <img
+                src="/filter.png"
+                class="filter-icon"
+                @click="toggleFilterMenu('pacs')"
+              />
+              <div v-if="showFilterMenu.pacs" class="filter-menu">
+                <span @click="filterData('pacs', 'all')">全部</span>
+                <div class="divider"></div>
+                <span @click="filterData('pacs', true)">True</span>
+                <div class="divider"></div>
+                <span @click="filterData('pacs', false)">False</span>
+                <div class="divider"></div>
+                <span @click="filterData('pacs', null)">Null</span>
+              </div>
+            </th>
             <th>重新嘗試</th>
           </tr>
         </thead>
@@ -246,6 +278,36 @@ const sortData = (order) => {
   })
 }
 
+// 篩選條件
+const filterConditions = ref({
+  ai: 'all',
+  pacs: 'all',
+});
+
+// 篩選功能
+const showFilterMenu = ref({ ai: false, pacs: false })
+
+const filterData = (field, value) => {
+  filterConditions.value[field] = value;
+  showFilterMenu.value[field] = false;
+}
+
+// 篩選的結果
+const paginatedData = computed(() => {
+  let data = filteredData.value;
+  if (filterConditions.value.ai !== 'all') {
+    data = data.filter(item => item.postAI === filterConditions.value.ai);
+  }
+  if (filterConditions.value.pacs !== 'all') {
+    data = data.filter(item => item.postPACS === filterConditions.value.pacs);
+  }
+  return data.slice((page.value - 1) * pageSize, page.value * pageSize);
+});
+
+const toggleFilterMenu = (field) => {
+  showFilterMenu.value[field] = !showFilterMenu.value[field]
+}
+
 // 導出資料
 const exportCSV = () => {
   const headers = ['流水號', '身份證字號', '姓名', '檔案上傳', '對應工單號', '傳給AI', '傳給PACS']
@@ -284,9 +346,7 @@ const formatMapping = (mapping) => {
 const totalPages = computed(() =>
   Math.ceil(filteredData.value.length / pageSize)
 )
-const paginatedData = computed(() =>
-  filteredData.value.slice((page.value - 1) * pageSize, page.value * pageSize)
-)
+
 const setPage = (p) => (page.value = p)
 const prevPage = () => { if (page.value > 1) page.value-- }
 const nextPage = () => { if (page.value < totalPages.value) page.value++ }
@@ -485,6 +545,28 @@ const handleRetry = (row, event) => {
 .job-table th:nth-child(7),
 .job-table td:nth-child(7) {
   width: 150px;
+}
+/* 加入篩選選單的樣式 */
+.filter-menu {
+  background: #333;
+  padding: 10px;
+  border-radius: 6px;
+  position: absolute;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+.filter-icon {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  margin-left: 8px;
+}
+.divider {
+  border-top: 1px solid #666;
+  margin: 4px 0;
 }
 /* 重新嘗試 */
 .job-table th:nth-child(8),
