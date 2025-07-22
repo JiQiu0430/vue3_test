@@ -137,7 +137,7 @@
         <!-- 頁數方塊 -->
         <div class="pagination">
           <button @click="prevPage" :disabled="page === 1">«</button>
-          <button v-for="p in totalPages" :key="p" @click="setPage(p)" :class="{ active: page === p }">
+          <button v-for="p in pageNumbers" :key="p" @click="setPage(p)" :class="{ active: page === p }">
             {{ p }}
           </button>
           <button @click="nextPage" :disabled="page === totalPages">»</button>
@@ -166,7 +166,6 @@ const jobInfo = computed(() => ({
 const caseData = ref([
   {
     caseName: '0001#A123456789#王小明#M#01',
-    series: 5,
     upload: true,
     mapping: 'ABC001',
     postAI: null,
@@ -175,7 +174,6 @@ const caseData = ref([
   },
   {
     caseName: '0002#A123456789#王小明#M#02',
-    series: 4,
     upload: true,
     mapping: 'ABC001',
     postAI: null,
@@ -184,7 +182,6 @@ const caseData = ref([
   },
   {
     caseName: '0003#B123456789#陳大明#F#01',
-    series: 2,
     upload: true,
     mapping: 'false',
     postAI: null,
@@ -193,7 +190,6 @@ const caseData = ref([
   },
   {
     caseName: '0004#C123456789#林子涵#F#01',
-    series: 2,
     upload: true,
     mapping: 'ABC003',
     postAI: true,
@@ -202,7 +198,6 @@ const caseData = ref([
   },
   {
     caseName: '0005#D123456789#汪杰#M#01',
-    series: 2,
     upload: true,
     mapping: 'ABC004',
     postAI: true,
@@ -211,7 +206,6 @@ const caseData = ref([
   },
   {
     caseName: '0006#E123456789#卡厄斯#F#01',
-    series: 2,
     upload: true,
     mapping: '',
     postAI: null,
@@ -331,7 +325,6 @@ const retryAll = () => {
   }
 };
 
-
 // 導出資料
 const exportCSV = () => {
   const headers = ['流水號', '身份證字號', '姓名', '檔案上傳', '對應工單號', '傳給AI', '傳給PACS']
@@ -370,9 +363,22 @@ const formatMapping = (mapping) => {
 const page = ref(1)
 const pageSize = ref(10);
 
-const totalPages = computed(() =>
-  Math.ceil(filteredData.value.length / pageSize.value)
-)
+const totalPages = computed(() => Math.ceil(filteredData.value.length / pageSize.value))
+
+// 根據頁數計算需要顯示的頁碼（最多顯示3個頁碼）
+const pageNumbers = computed(() => {
+  if (totalPages.value <= 3) {
+    return Array.from({ length: totalPages.value }, (_, i) => i + 1);
+  } else {
+    if (page.value === 1) {
+      return [1, 2, totalPages.value];
+    } else if (page.value === totalPages.value) {
+      return [1, totalPages.value - 1, totalPages.value];
+    } else {
+      return [1, page.value, totalPages.value];
+    }
+  }
+});
 
 const setPage = (p) => (page.value = p)
 const prevPage = () => { if (page.value > 1) page.value-- }

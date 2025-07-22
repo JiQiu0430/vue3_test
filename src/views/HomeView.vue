@@ -95,7 +95,7 @@
         <!-- 頁數方塊 -->
         <div class="pagination">
           <button @click="prevPage" :disabled="page === 1">«</button>
-          <button v-for="p in totalPages" :key="p" @click="setPage(p)" :class="{ active: page === p }">
+          <button v-for="p in pageNumbers" :key="p" @click="setPage(p)" :class="{ active: page === p }">
             {{ p }}
           </button>
           <button @click="nextPage" :disabled="page === totalPages">»</button>
@@ -128,17 +128,17 @@
             <p v-for="(file, i) in uploadedFiles.slice(0, 3)" :key="i">{{ file.name }}</p>
             <p v-if="uploadedFiles.length > 4">... ({{ uploadedFiles.length - 4 }} files hidden) ...</p>
             <p v-if="uploadedFiles.length > 4">{{ uploadedFiles[uploadedFiles.length - 1].name }}</p>
-           </div>
+          </div>
 
           <!-- 輸入jobName -->
           <label>2. 輸入批次名</label>
-          <div v-if="isFolderUploaded" class="form-group">
+          <div class="form-group">
             <input v-model="newJob.name" type="text" />
           </div>
 
           <!-- 進度條 -->
           <div class="form-group">
-            <label>3. 上傳進度</label>
+            <label>上傳進度</label>
             <div class="progress-container">
               <div class="progress-bar">
                 <div class="progress" :style="{ width: uploadProgress + '%' }"></div>
@@ -174,9 +174,6 @@ const showDialog = ref(false)
 
 // 偵測資料夾名稱
 const detectedFolderName = ref('')
-
-// 是否顯示job名稱輸入框
-const isFolderUploaded = ref(false)
 
 // 新Job名稱
 const newJob = ref({ name: '' })
@@ -273,19 +270,34 @@ const pageSize = ref(10);
 // 頁面計算
 const totalPages = computed(() => Math.ceil(filteredJobs.value.length / pageSize.value));
 
+const pageNumbers = computed(() => {
+  if (totalPages.value <= 3) {
+    return Array.from({ length: totalPages.value }, (_, i) => i + 1);
+  } else {
+    if (page.value === 1) {
+      return [1, 2, totalPages.value];
+    } else if (page.value === totalPages.value) {
+      return [1, totalPages.value - 1, totalPages.value];
+    } else {
+      return [1, page.value, totalPages.value];
+    }
+  }
+});
+
 // 頁數切換
 const setPage = (p) => { page.value = p }
 const prevPage = () => { if (page.value > 1) page.value-- }
 const nextPage = () => { if (page.value < totalPages.value) page.value++ }
 
 // 開關上傳視窗
-const openUploadDialog = () => { showDialog.value = true }
+const openUploadDialog = () => { 
+  showDialog.value = true;
+};
 const closeDialog = () => {
   showDialog.value = false
   newJob.value.name = ''
   uploadedFiles.value = []
   uploadProgress.value = 0
-  isFolderUploaded.value = false
 }
 
 // 跳轉頁面
@@ -318,10 +330,9 @@ const handleFileUpload = (e) => {
   const firstPath = files[0].webkitRelativePath || ''
   const folderName = firstPath.split('/')[0] || 'UnknownFolder'
   detectedFolderName.value = folderName
-
-  // 檔案上傳後顯示 job 名稱輸入框
-  isFolderUploaded.value = true
 }
+
+
 
 // 將資料夾內容加入列表
 const submitUpload = () => {
