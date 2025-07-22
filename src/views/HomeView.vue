@@ -80,13 +80,26 @@
         </tbody>
       </table>
 
-      <!-- 頁面方塊 -->
-      <div class="pagination">
-        <button @click="prevPage" :disabled="page === 1">«</button>
-        <button v-for="p in totalPages" :key="p" @click="setPage(p)" :class="{ active: page === p }">
-          {{ p }}
-        </button>
-        <button @click="nextPage" :disabled="page === totalPages">»</button>
+      <!-- 頁數和顯示數量選擇的容器 -->
+      <div class="pagination-container">
+        <!-- 顯示數量選擇 -->
+        <div class="items-per-page">
+          <label for="itemsPerPage">每頁顯示：</label>
+          <select id="itemsPerPage" v-model="pageSize" @change="applyFilters">
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+          </select>
+        </div>
+
+        <!-- 頁數方塊 -->
+        <div class="pagination">
+          <button @click="prevPage" :disabled="page === 1">«</button>
+          <button v-for="p in totalPages" :key="p" @click="setPage(p)" :class="{ active: page === p }">
+            {{ p }}
+          </button>
+          <button @click="nextPage" :disabled="page === totalPages">»</button>
+        </div>
       </div>
 
       <!-- 上傳視窗 -->
@@ -174,10 +187,6 @@ const uploadedFiles = ref([])
 // 上傳進度條
 const uploadProgress = ref(0)
 
-// 翻頁設定
-const page = ref(1)
-const pageSize = 10
-
 const fileInput = ref(null)
 const currentUploadJob = ref(null)
 
@@ -257,8 +266,12 @@ const applyFilters = () => {
   page.value = 1;
 }
 
+// 翻頁設定
+const page = ref(1)
+const pageSize = ref(10);
+
 // 頁面計算
-const totalPages = computed(() => Math.ceil(jobs.value.length / pageSize))
+const totalPages = computed(() => Math.ceil(filteredJobs.value.length / pageSize.value));
 
 // 頁數切換
 const setPage = (p) => { page.value = p }
@@ -669,6 +682,31 @@ const handleSingleFileUpload = (e) => {
 }
 
 /* 分頁 */
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: #000000;
+  border-radius: 6px;
+  position: fixed;
+  bottom: 65px;
+  right: 20px;
+  z-index: 1000;
+}
+.items-per-page {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.items-per-page select {
+  background: #333;
+  color: white;
+  padding: 6px;
+  border: 1px solid #555;
+  border-radius: 4px;
+  font-size: 14px;
+}
 .pagination {
   position: fixed;
   bottom: 20px;

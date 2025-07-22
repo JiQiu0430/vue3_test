@@ -122,18 +122,26 @@
         </tbody>
       </table>
 
-      <!-- 頁數方塊 -->
-      <div class="pagination">
-        <button @click="prevPage" :disabled="page === 1">«</button>
-        <button
-          v-for="p in totalPages"
-          :key="p"
-          @click="setPage(p)"
-          :class="{ active: page === p }"
-        >
-          {{ p }}
-        </button>
-        <button @click="nextPage" :disabled="page === totalPages">»</button>
+      <!-- 頁數和顯示數量選擇的容器 -->
+      <div class="pagination-container">
+        <!-- 顯示數量選擇 -->
+        <div class="items-per-page">
+          <label for="itemsPerPage">每頁顯示：</label>
+          <select id="itemsPerPage" v-model="pageSize" @change="applyFilters">
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+          </select>
+        </div>
+
+        <!-- 頁數方塊 -->
+        <div class="pagination">
+          <button @click="prevPage" :disabled="page === 1">«</button>
+          <button v-for="p in totalPages" :key="p" @click="setPage(p)" :class="{ active: page === p }">
+            {{ p }}
+          </button>
+          <button @click="nextPage" :disabled="page === totalPages">»</button>
+        </div>
       </div>
     </main>
   </div>
@@ -153,9 +161,6 @@ const jobInfo = computed(() => ({
   job: route.query.job,
   time: route.query.time,
 }))
-
-const page = ref(1)
-const pageSize = 10
 
 // 模擬資料
 const caseData = ref([
@@ -303,7 +308,7 @@ const paginatedData = computed(() => {
   if (filterConditions.value.pacs !== 'all') {
     data = data.filter(item => item.postPACS === filterConditions.value.pacs);
   }
-  return data.slice((page.value - 1) * pageSize, page.value * pageSize);
+  return data.slice((page.value - 1) * pageSize.value, page.value * pageSize.value);
 });
 
 const toggleFilterMenu = (field) => {
@@ -322,7 +327,7 @@ const retryAll = () => {
 
   const confirmRetry = confirm(`有 ${filesToRetry.length} 檔案需要重試，確定要繼續嗎？`);
   if (confirmRetry) {
-    // 空區塊是故意的
+    // 空區塊
   }
 };
 
@@ -362,8 +367,11 @@ const formatMapping = (mapping) => {
 };
 
 // 頁數計算
+const page = ref(1)
+const pageSize = ref(10);
+
 const totalPages = computed(() =>
-  Math.ceil(filteredData.value.length / pageSize)
+  Math.ceil(filteredData.value.length / pageSize.value)
 )
 
 const setPage = (p) => (page.value = p)
@@ -668,6 +676,31 @@ input[type="radio"]:checked{
 }
 
 /* 分頁 */
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: #000000;
+  border-radius: 6px;
+  position: fixed;
+  bottom: 65px;
+  right: 20px;
+  z-index: 1000;
+}
+.items-per-page {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.items-per-page select {
+  background: #333;
+  color: white;
+  padding: 6px;
+  border: 1px solid #555;
+  border-radius: 4px;
+  font-size: 14px;
+}
 .pagination {
   position: fixed;
   bottom: 20px;
