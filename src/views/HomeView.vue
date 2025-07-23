@@ -166,8 +166,27 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { ref, computed } from 'vue'
+import { onMounted } from 'vue'
+import axios from 'axios'
 
 const router = useRouter()
+
+onMounted(async () => {
+  try {
+    // 清空 jobs 資料，避免重複顯示
+    jobs.value = [];
+    
+    // 從後端獲取資料
+    const response = await axios.get('http://localhost:8082/jobs');
+    
+    // 確保資料唯一，不重複
+    if (response.data && Array.isArray(response.data)) {
+      jobs.value = response.data;
+    }
+  } catch (error) {
+    console.error("無法加載 jobs 資料", error);
+  }
+});
 
 // 控制上傳視窗顯示
 const showDialog = ref(false)
@@ -184,30 +203,11 @@ const uploadedFiles = ref([])
 // 上傳進度條
 const uploadProgress = ref(0)
 
+// 資料
+const jobs = ref([])
+
 const fileInput = ref(null)
 const currentUploadJob = ref(null)
-
-// 模擬資料
-const jobs = ref([
-  {
-    job: '測試-001',
-    id: 1,
-    time: '2025/07/07-12:00:00',
-    name: '七月',
-    series: 5,
-    status: 'Finish',
-    files: [],
-  },
-  {
-    job: '測試-002',
-    id: 2,
-    time: '2025/07/08-12:30:45',
-    name: '十三月',
-    series: 6,
-    status: 'Error',
-    files: [],
-  },
-])
 
 // 搜尋欄
 const searchQuery = ref('')
@@ -332,13 +332,18 @@ const handleFileUpload = (e) => {
   detectedFolderName.value = folderName
 }
 
-
-
 // 將資料夾內容加入列表
-const submitUpload = () => {
+const submitUpload = async () => {
   if (!newJob.value.name || uploadedFiles.value.length === 0) {
     alert('請加入資料夾及輸入批次名稱')
     return
+  }
+
+  // 檢查是否已經存在相同的 job 名稱
+  const jobExists = jobs.value.some(job => job.job === newJob.value.name);
+  if (jobExists) {
+    alert('這個批次名稱已經存在');
+    return;
   }
 
  // 取得當前時間格式化為 yyyy/MM/DD-hh:mm:ss
@@ -352,16 +357,34 @@ const submitUpload = () => {
 
   // 格式化字串
   const currentTime = `${year}/${month}/${day}-${hours}:${minutes}:${seconds}`;
+  const generateUniqueId = `${year}${month}${day}${hours}${minutes}${seconds}`;
 
   uploadProgress.value = 100
-  jobs.value.push({
+  const jobId = generateUniqueId;
+  // 傳送新增的 Job 到後端
+  const newJobData = {
     job: newJob.value.name,
+    id: jobId,
     time: currentTime,
     name: detectedFolderName.value,
     series: uploadedFiles.value.length,
     status: 'Pending',
     files: [...uploadedFiles.value],
-  })
+  };
+
+  try {
+    // 發送 POST 請求到後端
+    const response = await axios.post('http://localhost:8082/jobs', newJobData);
+
+    // 確保後端回傳成功後再加入 job 資料
+    if (response.status === 201) {
+      jobs.value.push(response.data);  // 使用從後端返回的資料
+    }
+
+    closeDialog();
+  } catch (error) {
+    console.error("無法新增 job", error);
+  }
 
   closeDialog()
 }
@@ -387,14 +410,21 @@ const getStatusStyle = (status) => {
 }
 
 // 刪除job+更新頁面
-const deleteJob = (jobId) => {
+const deleteJob = async (jobId) => {
   if (confirm(`你確定要刪除批次 ${jobId}?`)) {
-    jobs.value = jobs.value.filter(job => job.job !== jobId)
-    if (page.value > totalPages.value) {
-      page.value = totalPages.value
+    try {
+      const response = await axios.delete(`http://localhost:8082/jobs/${jobId}`);
+      
+      if (response.status === 200) {
+        jobs.value = jobs.value.filter(job => job.id !== jobId);
+        alert(`Job with ID ${jobId} has been deleted`);
+      }
+    } catch (error) {
+      console.error('刪除失敗', error);
+      alert('刪除過程中出現錯誤');
     }
   }
-}
+};
 
 // 新增指定job單一檔案
 const selectFileForJob = (jobId) => {
