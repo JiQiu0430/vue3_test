@@ -98,16 +98,24 @@
             <td v-html="checkMark(row.upload)"></td>
             <td :style="{ color: getTextColor(row) }">
               <!-- 圓圈選擇 -->
-                <div class="circle-select" v-if="isSameId(row)">
-                  <input
-                    type="radio"
-                    :name="row.id"
-                    :value="row.serialNumber"
-                    @click="handleRadioChange(row, $event)"
-                    v-model="selectedSerialNumber"
-                  />
-                </div>
-                <span v-html="checkMark(row.mapping)"></span>
+              <div class="circle-select" v-if="isSameId(row)">
+                <input
+                  type="radio"
+                  :name="row.id"
+                  :value="row.serialNumber"
+                  @click="handleRadioChange(row, $event)"
+                  v-model="selectedSerialNumber"
+                />
+              </div>
+              <!-- 顯示查看 DICOM 按鈕 -->
+              <button
+                v-if="isSameId(row)"
+                class="icon-button dicom-view"
+                @click="showDicomViewer"
+              >
+                <img src="/eye.png" class="action-icon" title="點擊查看此檔案Dicom" />
+              </button>
+              <span v-html="checkMark(row.mapping)"></span>
             </td>
             <td v-html="checkMark(row.postAI)"></td>
             <td v-html="checkMark(row.postPACS)"></td>
@@ -121,6 +129,18 @@
           </tr>
         </tbody>
       </table>
+
+      <!-- 顯示 DICOM 的彈出視窗 -->
+      <div v-if="dicomVisible" class="dicom-modal" @click="closeDicomViewer">
+        <div class="dicom-modal-content" @click.stop>
+          <h2>DICOM 影像</h2>
+          <div class="dicom-viewer">
+            <!-- 使用 ref 來獲取 DICOM 顯示區域 -->
+            <div ref="dicomCanvas" class="dicom-canvas"></div>
+          </div>
+          <button @click="closeDicomViewer">關閉</button>
+        </div>
+      </div>
 
       <!-- 頁數和顯示數量選擇的容器 -->
       <div class="pagination-container">
@@ -149,7 +169,9 @@
 
 <script setup>
 import { useRoute, useRouter } from 'vue-router'
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick, onMounted } from 'vue'
+import * as cornerstone from "cornerstone-core";
+import * as cornerstoneWADOImageLoader from "cornerstone-wado-image-loader";
 
 const route = useRoute()
 const router = useRouter()
@@ -259,6 +281,62 @@ const handleRadioChange = (row, event) => {
     selectedSerialNumber.value = row.serialNumber;
   }
 };
+
+// 彈出 DICOM 視窗
+const dicomVisible = ref(false)
+const showDicomViewer = () => {
+  dicomVisible.value = true
+  nextTick(() => {
+    loadDicomFile()  // 確保 DOM 元素渲染後再載入 DICOM 影像
+  })
+}
+
+const closeDicomViewer = () => {
+  dicomVisible.value = false
+}
+
+// 使用 Vue 3 的 ref 來獲取 DOM 引用
+const dicomCanvas = ref(null)
+
+onMounted(() => {
+  // 配置 cornerstoneWADOImageLoader，並啟用 Web Workers
+  cornerstoneWADOImageLoader.external.cornerstone = cornerstone
+  cornerstoneWADOImageLoader.configure({
+    useWebWorkers: true, // 使用 Web Worker 加速影像處理
+  })
+})
+
+// 載入 DICOM 檔案
+const loadDicomFile = () => {
+  const dicomFilePath = '/1-040.dcm' // 放在 public 資料夾中的 DICOM 檔案路徑
+
+  // 取得顯示區域
+  const element = dicomCanvas.value // 使用 ref 獲取 DOM 元素
+  cornerstone.enable(element) // 啟用 Cornerstone 來顯示影像
+
+  // 使用 fetch 來讀取檔案並將其轉換為 Blob
+  fetch(dicomFilePath)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to fetch DICOM file')
+      }
+      return response.blob()  // 轉換為 Blob
+    })
+    .then(blob => {
+      // 創建 URL
+      const imageId = cornerstoneWADOImageLoader.wadouri.fileManager.add(blob)
+
+      // 載入影像並顯示
+      cornerstone.loadImage(imageId).then((image) => {
+        cornerstone.displayImage(element, image)
+      }).catch((err) => {
+        console.error("DICOM 影像載入錯誤:", err)
+      })
+    })
+    .catch((err) => {
+      console.error("無法載入 DICOM 檔案:", err)
+    })
+}
 
 // 排序功能
 const sortOrder = ref('asc')
@@ -665,6 +743,49 @@ const handleRetry = (row, event) => {
 input[type="radio"]:checked{
   background-color: #0892D0;
   border-color: #0892D0;
+}
+
+/* 彈出視窗的樣式 */
+.dicom-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.dicom-modal-content {
+  background: #444;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+.dicom-viewer .dicom-canvas {
+  width: 150%;
+  height: 150%; /* 設置顯示區域的大小 */
+  border: 1px solid black;
+}
+.dicom-viewer img {
+  max-width: 100%;
+  max-height: 400px;
+}
+.dicom-modal-content button {
+  background-color: #444;
+  color: white;
+  border: 1px solid white;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+.dicom-modal-content button:hover {
+  background-color: #0892D0;
+  color: white;
+  border: 1px solid #0892D0;
 }
 
 /* icon按鈕 */

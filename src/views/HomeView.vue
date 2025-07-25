@@ -109,7 +109,7 @@
 
           <!-- 上傳資料夾 -->
           <div class="form-group">
-            <label>1. 選擇資料夾</label>
+            <label>選擇資料夾</label>
             <label class="upload-box">
               <input
                 type="file"
@@ -131,7 +131,7 @@
           </div>
 
           <!-- 輸入jobName -->
-          <label>2. 輸入批次名</label>
+          <label>輸入批次名</label>
           <div class="form-group">
             <input v-model="newJob.name" type="text" />
           </div>
