@@ -48,7 +48,25 @@
             <th>身份證字號</th>
             <th>姓名</th>
             <th>檔案上傳</th>
-            <th>對應工單號</th>
+            <th>
+              <span>對應工單號</span>
+              <img
+              src="/filter.png"
+              class="filter-icon"
+              @click="toggleFilterMenu('mapping')"
+            />
+            <div v-if="showFilterMenu.mapping" class="filter-menu">
+              <span @click="filterData('mapping', 'all')">全部</span>
+              <div class="divider"></div>
+              <span @click="filterData('mapping', 'hasValue')">正常</span>
+              <div class="divider"></div>
+              <span @click="filterData('mapping', 'false')">錯誤</span>
+              <div class="divider"></div>
+              <span @click="filterData('mapping', null)">沒有工單號</span>
+              <div class="divider"></div>
+              <span @click="filterData('mapping', 'sameId')">相同身份證字號</span>
+            </div>
+            </th>
             <th>
               <span>傳給AI</span>
               <img
@@ -59,11 +77,11 @@
               <div v-if="showFilterMenu.ai" class="filter-menu">
                 <span @click="filterData('ai', 'all')">全部</span>
                 <div class="divider"></div>
-                <span @click="filterData('ai', true)">True</span>
+                <span @click="filterData('ai', true)">正常傳送</span>
                 <div class="divider"></div>
-                <span @click="filterData('ai', false)">False</span>
+                <span @click="filterData('ai', false)">錯誤</span>
                 <div class="divider"></div>
-                <span @click="filterData('ai', null)">Null</span>
+                <span @click="filterData('ai', null)">尚未傳送</span>
               </div>
             </th>
             <th>
@@ -76,11 +94,11 @@
               <div v-if="showFilterMenu.pacs" class="filter-menu">
                 <span @click="filterData('pacs', 'all')">全部</span>
                 <div class="divider"></div>
-                <span @click="filterData('pacs', true)">True</span>
+                <span @click="filterData('pacs', true)">正常傳送</span>
                 <div class="divider"></div>
-                <span @click="filterData('pacs', false)">False</span>
+                <span @click="filterData('pacs', false)">錯誤</span>
                 <div class="divider"></div>
-                <span @click="filterData('pacs', null)">Null</span>
+                <span @click="filterData('pacs', null)">尚未傳送</span>
               </div>
             </th>
             <th>重新嘗試</th>
@@ -290,14 +308,11 @@ const showDicomViewer = () => {
     loadDicomFile()  // 確保 DOM 元素渲染後再載入 DICOM 影像
   })
 }
-
 const closeDicomViewer = () => {
   dicomVisible.value = false
 }
-
-// 使用 Vue 3 的 ref 來獲取 DOM 引用
+// 使用 Vue3 的 ref 來獲取 DOM 引用
 const dicomCanvas = ref(null)
-
 onMounted(() => {
   // 配置 cornerstoneWADOImageLoader，並啟用 Web Workers
   cornerstoneWADOImageLoader.external.cornerstone = cornerstone
@@ -305,7 +320,6 @@ onMounted(() => {
     useWebWorkers: true, // 使用 Web Worker 加速影像處理
   })
 })
-
 // 載入 DICOM 檔案
 const loadDicomFile = () => {
   const dicomFilePath = '/1-040.dcm' // 放在 public 資料夾中的 DICOM 檔案路徑
@@ -361,10 +375,11 @@ const sortData = (order) => {
 const filterConditions = ref({
   ai: 'all',
   pacs: 'all',
+  mapping: 'all',
 });
 
 // 篩選功能
-const showFilterMenu = ref({ ai: false, pacs: false })
+const showFilterMenu = ref({ ai: false, pacs: false, mapping: false })
 
 const filterData = (field, value) => {
   filterConditions.value[field] = value;
@@ -374,12 +389,35 @@ const filterData = (field, value) => {
 // 篩選的結果
 const paginatedData = computed(() => {
   let data = filteredData.value;
+
+  // 篩選條件：根據 ai、pacs 和 mapping 進行過濾
   if (filterConditions.value.ai !== 'all') {
     data = data.filter(item => item.postAI === filterConditions.value.ai);
   }
   if (filterConditions.value.pacs !== 'all') {
     data = data.filter(item => item.postPACS === filterConditions.value.pacs);
   }
+
+  // 新增 "全部" 選項的篩選邏輯
+  if (filterConditions.value.mapping === 'false') {
+    data = data.filter(item => item.mapping === 'false');
+  } else if (filterConditions.value.mapping === 'hasValue') {
+    data = data.filter(item => item.mapping && item.mapping !== '');
+  } else if (filterConditions.value.mapping === null) {
+    data = data.filter(item => !item.mapping);
+  } else if (filterConditions.value.mapping === 'sameId') {
+    // 篩選出相同身份證字號的工單號
+    data = data.filter(item => {
+      return caseData.value.filter(subItem => subItem.id === item.id).length > 1;
+    });
+  }
+
+  // 當選擇 "全部" 時，返回未過濾的資料
+  if (filterConditions.value.mapping === 'all') {
+    // 不進行過濾，顯示所有資料
+    data = filteredData.value;
+  }
+
   return data.slice((page.value - 1) * pageSize.value, page.value * pageSize.value);
 });
 
@@ -694,6 +732,7 @@ const handleRetry = (row, event) => {
   flex-direction: column;
   gap: 2px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  z-index: 9999;
 }
 .filter-icon {
   width: 14px;
@@ -730,6 +769,7 @@ const handleRetry = (row, event) => {
 .circle-select {
   display: inline-block;
   position: relative;
+  z-index: 1;
 }
 .circle-label {
   display: inline-block;
