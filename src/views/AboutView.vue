@@ -233,7 +233,7 @@ const caseData = ref([
     status: 'Pending'
   },
   {
-    caseName: '0003#B123456789#陳大明#F#01',
+    caseName: '0004#C123456789#陳大明#F#01',
     upload: true,
     mapping: 'false',
     postAI: null,
@@ -241,7 +241,7 @@ const caseData = ref([
     status: 'Pending'
   },
   {
-    caseName: '0004#C123456789#林子涵#F#01',
+    caseName: '0003#B123456789#林子涵#F#01',
     upload: true,
     mapping: 'ABC003',
     postAI: true,
