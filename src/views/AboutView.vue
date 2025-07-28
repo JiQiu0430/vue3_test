@@ -1,4 +1,3 @@
-你說：
 <template>
   <div class="app-container">
     <main class="main-content">
