@@ -25,8 +25,9 @@
           <tr>
             <th>批次名</th>
             <th>上傳時間
-              <button @click="toggleUploadTimeFilter" class="filter-button">
-                <img src="/filter.png" alt="filter" class="filter-icon"/>
+              <button @click="toggleArrowAndSort" class="filter-button">
+                <!-- 根據狀態顯示不同的箭頭圖片 -->
+                <img :src="arrowImage" alt="filter" class="filter-icon"/>
               </button>
               <div v-if="showUploadTimeFilter" class="filter-dropdown">
                 <div @click="setUploadTimeFilter('asc')">時間升序</div>
@@ -182,6 +183,7 @@ onMounted(async () => {
     // 確保資料唯一，不重複
     if (response.data && Array.isArray(response.data)) {
       jobs.value = response.data;
+      originalJobs.value = [...response.data];
     }
   } catch (error) {
     console.error("無法加載 jobs 資料", error);
@@ -211,8 +213,7 @@ const currentUploadJob = ref(null)
 
 // 搜尋欄
 const searchQuery = ref('')
-// 升降序篩選
-const uploadTimeFilter = ref('');
+
 // 批次狀態篩選
 const statusFilter = ref('');
 
@@ -220,27 +221,69 @@ const statusFilter = ref('');
 const showUploadTimeFilter = ref(false)
 const showStatusFilter = ref(false)
 
-// 計算過濾後的 jobs 列表
+// 控制篩選選單顯示
+const arrowState = ref('both'); // 'both', 'down', 'up'
+const uploadTimeFilter = ref('asc'); 
+
+// 根據箭頭狀態更新顯示的圖片
+const arrowImage = computed(() => {
+  if (arrowState.value === 'down') {
+    return '/arrowDown.png';
+  } else if (arrowState.value === 'up') {
+    return '/arrowUp.png';
+  } else {
+    return '/arrowBoth.png'; // 上下箭頭圖片
+  }
+});
+
+// 切換箭頭狀態
+const toggleArrowAndSort = () => {
+  if (arrowState.value === 'both') {
+    arrowState.value = 'down'; // 顯示向下箭頭
+    uploadTimeFilter.value = 'asc'; // 時間升序
+  } else if (arrowState.value === 'down') {
+    arrowState.value = 'up'; // 顯示向上箭頭
+    uploadTimeFilter.value = 'desc'; // 時間降序
+  } else {
+    arrowState.value = 'both'; // 顯示上下箭頭
+    uploadTimeFilter.value = ''; // 清除排序
+    resetJobOrder();
+  }
+
+  // 根據新的排序狀態重新排序
+  applySorting();
+};
+
+// 恢復原始順序
+const resetJobOrder = () => {
+  jobs.value = [...originalJobs.value];
+};
+const originalJobs = ref([]);
+
+// 排序方法
+const applySorting = () => {
+  if (uploadTimeFilter.value === 'asc') {
+    jobs.value.sort((a, b) => new Date(a.time) - new Date(b.time));
+  } else if (uploadTimeFilter.value === 'desc') {
+    jobs.value.sort((a, b) => new Date(b.time) - new Date(a.time));
+  } else {
+    // 如果沒有排序條件，保留原來的順序或按需處理
+    jobs.value = [...jobs.value];
+  }
+};
+
 const filteredJobs = computed(() => {
   let filtered = jobs.value;
 
   if (searchQuery.value) {
     filtered = filtered.filter(item => item.job.includes(searchQuery.value));
   }
-  if (statusFilter.value) {
-    filtered = filtered.filter(item => item.status === statusFilter.value);
-  }
   if (uploadTimeFilter.value) {
-    filtered = filtered.sort((a, b) => (uploadTimeFilter.value === 'asc' ? new Date(a.time) - new Date(b.time) : new Date(b.time) - new Date(a.time)));
+    applySorting();
   }
   return filtered;
 });
 
-// 控制篩選選單顯示
-const toggleUploadTimeFilter = () => {
-  showUploadTimeFilter.value = !showUploadTimeFilter.value;
-  showStatusFilter.value = false;
-};
 const toggleStatusFilter = () => {
   showStatusFilter.value = !showStatusFilter.value;
   showUploadTimeFilter.value = false;

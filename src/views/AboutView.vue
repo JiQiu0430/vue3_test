@@ -35,17 +35,29 @@
             <th class="sortable-column">
               <span>流水號</span>
               <img
-                src="/filter.png"
+                :src="getArrowIcon('serialNumber')"
                 class="filter-icon"
-                @click="toggleSortMenu"
+                @click="toggleSort('serialNumber')"
               />
               <div v-if="showSortMenu" class="sort-menu">
-                <span @click="sortData('asc')">流水號升序</span>
+                <span @click="sortData('serialNumber', 'asc')">流水號升序</span>
                 <div class="divider"></div>
-                <span @click="sortData('desc')">流水號降序</span>
+                <span @click="sortData('serialNumber', 'desc')">流水號降序</span>
               </div>
             </th>
-            <th>身份證字號</th>
+            <th class="sortable-column">
+              <span>身份證字號</span>
+              <img
+                :src="getArrowIcon('id')"
+                class="filter-icon"
+                @click="toggleSort('id')"
+              />
+              <div v-if="showSortMenu" class="sort-menu">
+                <span @click="sortData('id', 'asc')">身份證字號升序</span>
+                <div class="divider"></div>
+                <span @click="sortData('id', 'desc')">身份證字號降序</span>
+              </div>
+            </th>
             <th>姓名</th>
             <th>檔案上傳</th>
             <th>
@@ -353,23 +365,51 @@ const loadDicomFile = () => {
 }
 
 // 排序功能
-const sortOrder = ref('asc')
-const showSortMenu = ref(false)
-const toggleSortMenu = () => {
-  showSortMenu.value = !showSortMenu.value
-}
-const sortData = (order) => {
-  sortOrder.value = order
-  caseData.value.sort((a, b) => {
-    const aSerialNumber = a.serialNumber
-    const bSerialNumber = b.serialNumber
-    const compareResult = order === 'asc'
-      ? aSerialNumber.localeCompare(bSerialNumber)
-      : bSerialNumber.localeCompare(aSerialNumber)
-    showSortMenu.value = false;
-    return compareResult;
-  })
-}
+const sortState = ref({
+  serialNumber: 'none',
+  id: 'none'
+});
+const showSortMenu = ref(false);
+const originalCaseData = ref([...caseData.value]);
+// 控制箭頭圖標
+const getArrowIcon = (field) => {
+  if (sortState.value[field] === 'asc') {
+    return '/arrowDown.png'; // 向下箭頭
+  } else if (sortState.value[field] === 'desc') {
+    return '/arrowUp.png'; // 向上箭頭
+  } else {
+    return '/arrowBoth.png'; // 上下箭頭圖標
+  }
+};
+const toggleSort = (field) => {
+  // 依據目前的排序狀態切換
+  if (sortState.value[field] === 'none') {
+    sortState.value[field] = 'asc'; // 初次點擊升序
+  } else if (sortState.value[field] === 'asc') {
+    sortState.value[field] = 'desc'; // 第二次點擊降序
+  } else {
+    sortState.value[field] = 'none'; // 第三次點擊恢復原樣
+    caseData.value = [...originalCaseData.value]; // 恢復原始資料順序
+  }
+  sortData(field, sortState.value[field]); // 根據當前排序狀態進行排序
+};
+const sortData = (field, order) => {
+  if (order === 'asc') {
+    caseData.value.sort((a, b) => {
+      if (field === 'serialNumber') {
+        return a.caseName.localeCompare(b.caseName); // 按流水號排序
+      }
+      return a.id.localeCompare(b.id); // 按身份證字號排序
+    });
+  } else if (order === 'desc') {
+    caseData.value.sort((a, b) => {
+      if (field === 'serialNumber') {
+        return b.caseName.localeCompare(a.caseName); // 按流水號降序
+      }
+      return b.id.localeCompare(a.id); // 按身份證字號降序
+    });
+  }
+};
 
 // 篩選功能
 const showFilterMenu = ref({ ai: false, pacs: false, mapping: false });
