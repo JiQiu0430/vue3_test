@@ -1,3 +1,4 @@
+你說：
 <template>
   <div class="app-container">
     <main class="main-content">
@@ -371,20 +372,14 @@ const sortData = (order) => {
   })
 }
 
-// 篩選條件
-const filterConditions = ref({
-  ai: 'all',
-  pacs: 'all',
-  mapping: 'all',
-});
-
 // 篩選功能
-const showFilterMenu = ref({ ai: false, pacs: false, mapping: false })
+const showFilterMenu = ref({ ai: false, pacs: false, mapping: false });
+const filterConditions = ref({ ai: 'all', pacs: 'all', mapping: 'all' });
 
 const filterData = (field, value) => {
   filterConditions.value[field] = value;
-  showFilterMenu.value[field] = false;
-}
+  showFilterMenu.value[field] = false; // 點擊選擇篩選後，隱藏對應選單
+};
 
 // 篩選的結果
 const paginatedData = computed(() => {
@@ -398,13 +393,16 @@ const paginatedData = computed(() => {
     data = data.filter(item => item.postPACS === filterConditions.value.pacs);
   }
 
-  // 新增 "全部" 選項的篩選邏輯
+  // 處理篩選選項
   if (filterConditions.value.mapping === 'false') {
+    // 顯示 mapping 為字串 'false' 的資料
     data = data.filter(item => item.mapping === 'false');
   } else if (filterConditions.value.mapping === 'hasValue') {
-    data = data.filter(item => item.mapping && item.mapping !== '');
+    // 顯示所有正常工單號的資料
+    data = data.filter(item => item.mapping && item.mapping !== '' && item.mapping !== 'false');
   } else if (filterConditions.value.mapping === null) {
-    data = data.filter(item => !item.mapping);
+    // 篩選出 mapping 為 null 或空字串的資料
+    data = data.filter(item => item.mapping === null || item.mapping === '');
   } else if (filterConditions.value.mapping === 'sameId') {
     // 篩選出相同身份證字號的工單號
     data = data.filter(item => {
@@ -412,10 +410,10 @@ const paginatedData = computed(() => {
     });
   }
 
-  // 當選擇 "全部" 時，返回未過濾的資料
+  // 如果選擇 "全部"，不進行過濾，顯示所有資料
   if (filterConditions.value.mapping === 'all') {
-    // 不進行過濾，顯示所有資料
-    data = filteredData.value;
+    // 保持篩選後的資料，不覆蓋
+    // 如果是 "全部"，應該將之前的篩選條件保留，並不重新設定為篩選前的資料
   }
 
   return data.slice((page.value - 1) * pageSize.value, page.value * pageSize.value);
