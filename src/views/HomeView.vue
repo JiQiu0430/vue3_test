@@ -276,7 +276,12 @@ const filteredJobs = computed(() => {
   let filtered = jobs.value;
 
   if (searchQuery.value) {
-    filtered = filtered.filter(item => item.job.includes(searchQuery.value));
+    filtered = filtered.filter(item => {
+      return (
+        item.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+        item.time.toLowerCase().includes(searchQuery.value.toLowerCase())
+      );
+    });
   }
   if (statusFilter.value) {
     // 根據 statusFilter 進行篩選
