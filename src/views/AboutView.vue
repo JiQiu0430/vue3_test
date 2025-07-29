@@ -20,9 +20,14 @@
             <span><strong>上傳時間:</strong> {{ jobInfo.time || 'N/A' }}</span>
             <span>|</span>
             <span><strong>總檔案數:</strong> {{ caseData.length }}</span>
+            <span>|</span>
+            <span>
+              <strong @click="filterErrorFiles" style="cursor: pointer; text-decoration: underline;">錯誤檔案數:</strong> {{ errorFilesCount }}
+            </span>
           </div>
         </div>
         <div class="action-buttons">
+          <button class="clear-filters-button" @click="clearFilters">取消篩選</button>
           <button class="retry-all-button" @click="retryAll">一鍵重試</button>
           <button class="export-button" @click="exportCSV">導出CSV</button>
         </div>
@@ -266,6 +271,29 @@ const caseData = ref([
   },
 ])
 
+const errorFilesCount = computed(() => {
+  return caseData.value.filter(row => row.postAI === false || row.postPACS === false || row.mapping === 'false').length;
+});
+
+const errorFilterEnabled = ref(false);
+// 篩選錯誤檔案
+const filterErrorFiles = () => {
+  errorFilterEnabled.value = true;
+  filterConditions.value.ai = false;
+  filterConditions.value.pacs = false;
+  filterConditions.value.mapping = 'false';
+  showFilterMenu.value = { ai: false, pacs: false, mapping: false };
+  page.value = 1;
+};
+
+// 清除篩選條件
+const clearFilters = () => {
+  filterConditions.value = { ai: 'all', pacs: 'all', mapping: 'all' };
+  errorFilterEnabled.value = false;
+  page.value = 1;
+  showFilterMenu.value = { ai: false, pacs: false, mapping: false };
+};
+
 // 解析 caseName
 const parseCaseName = (caseName) => {
   const regex = /^(\d+)#([A-Za-z0-9]+)#([\u4e00-\u9fa5]+)#(M|F)#(\d{2})$/;
@@ -371,6 +399,7 @@ const sortState = ref({
 });
 const showSortMenu = ref(false);
 const originalCaseData = ref([...caseData.value]);
+
 // 控制箭頭圖標
 const getArrowIcon = (field) => {
   if (sortState.value[field] === 'asc') {
@@ -381,6 +410,7 @@ const getArrowIcon = (field) => {
     return '/arrowBoth.png'; // 上下箭頭圖標
   }
 };
+
 const toggleSort = (field) => {
   // 依據目前的排序狀態切換
   if (sortState.value[field] === 'none') {
@@ -393,6 +423,7 @@ const toggleSort = (field) => {
   }
   sortData(field, sortState.value[field]); // 根據當前排序狀態進行排序
 };
+
 const sortData = (field, order) => {
   if (order === 'asc') {
     caseData.value.sort((a, b) => {
@@ -424,37 +455,40 @@ const filterData = (field, value) => {
 const paginatedData = computed(() => {
   let data = filteredData.value;
 
-  // 篩選條件：根據 ai、pacs 和 mapping 進行過濾
-  if (filterConditions.value.ai !== 'all') {
-    data = data.filter(item => item.postAI === filterConditions.value.ai);
-  }
-  if (filterConditions.value.pacs !== 'all') {
-    data = data.filter(item => item.postPACS === filterConditions.value.pacs);
-  }
+  if (errorFilterEnabled.value) {
+    data = data.filter(item => 
+      item.postAI === false || item.postPACS === false || item.mapping === 'false'
+    );
+  } else{
+    // 篩選條件：根據 ai、pacs 和 mapping 進行過濾
+    if (filterConditions.value.ai !== 'all') {
+      data = data.filter(item => item.postAI === filterConditions.value.ai);
+    }
+    if (filterConditions.value.pacs !== 'all') {
+      data = data.filter(item => item.postPACS === filterConditions.value.pacs);
+    }
 
-  // 處理篩選選項
-  if (filterConditions.value.mapping === 'false') {
-    // 顯示 mapping 為字串 'false' 的資料
-    data = data.filter(item => item.mapping === 'false');
-  } else if (filterConditions.value.mapping === 'hasValue') {
-    // 顯示所有正常工單號的資料
-    data = data.filter(item => item.mapping && item.mapping !== '' && item.mapping !== 'false');
-  } else if (filterConditions.value.mapping === null) {
-    // 篩選出 mapping 為 null 或空字串的資料
-    data = data.filter(item => item.mapping === null || item.mapping === '');
-  } else if (filterConditions.value.mapping === 'sameId') {
-    // 篩選出相同身份證字號的工單號
-    data = data.filter(item => {
-      return caseData.value.filter(subItem => subItem.id === item.id).length > 1;
-    });
+    // 處理篩選選項
+    if (filterConditions.value.mapping === 'false') {
+      // 顯示 mapping 為字串 'false' 的資料
+      data = data.filter(item => item.mapping === 'false');
+    } else if (filterConditions.value.mapping === 'hasValue') {
+      // 顯示所有正常工單號的資料
+      data = data.filter(item => item.mapping && item.mapping !== '' && item.mapping !== 'false');
+    } else if (filterConditions.value.mapping === null) {
+      // 篩選出 mapping 為 null 或空字串的資料
+      data = data.filter(item => item.mapping === null || item.mapping === '');
+    } else if (filterConditions.value.mapping === 'sameId') {
+      // 篩選出相同身份證字號的工單號
+      data = data.filter(item => {
+        return caseData.value.filter(subItem => subItem.id === item.id).length > 1;
+      });
+    }
   }
-
   // 如果選擇 "全部"，不進行過濾，顯示所有資料
   if (filterConditions.value.mapping === 'all') {
     // 保持篩選後的資料，不覆蓋
-    // 如果是 "全部"，應該將之前的篩選條件保留，並不重新設定為篩選前的資料
   }
-
   return data.slice((page.value - 1) * pageSize.value, page.value * pageSize.value);
 });
 
@@ -675,6 +709,18 @@ const handleRetry = (row, event) => {
   cursor: pointer;
 }
 .retry-all-button:hover {
+  background: #e19214;
+  border-color: #e19214;
+  }
+.clear-filters-button {
+  background: #2c2c2c;
+  color: #ffffff;
+  border: 1px solid #ffffff;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.clear-filters-button:hover {
   background: #e19214;
   border-color: #e19214;
 }
