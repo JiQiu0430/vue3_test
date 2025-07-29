@@ -373,6 +373,7 @@ const handleFileUpload = (e) => {
   const firstPath = files[0].webkitRelativePath || ''
   const folderName = firstPath.split('/')[0] || 'UnknownFolder'
   detectedFolderName.value = folderName
+  newJob.value.name = folderName
 }
 
 // 將資料夾內容加入列表
