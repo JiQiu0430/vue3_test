@@ -278,6 +278,10 @@ const filteredJobs = computed(() => {
   if (searchQuery.value) {
     filtered = filtered.filter(item => item.job.includes(searchQuery.value));
   }
+  if (statusFilter.value) {
+    // 根據 statusFilter 進行篩選
+    filtered = filtered.filter(item => item.status === statusFilter.value);
+  }
   if (uploadTimeFilter.value) {
     applySorting();
   }
