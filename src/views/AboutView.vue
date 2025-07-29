@@ -22,7 +22,15 @@
             <span><strong>總檔案數:</strong> {{ caseData.length }}</span>
             <span>|</span>
             <span>
-              <strong @click="filterErrorFiles" style="cursor: pointer; text-decoration: underline;">錯誤檔案數:</strong> {{ errorFilesCount }}
+              <strong @click="filterErrorFiles"
+              style="cursor: pointer; text-decoration: underline;"
+              :style="{ color: errorFilesCount > 0 ? '#d36a5f' : '#bbb' }"
+              >
+              錯誤檔案數:
+              </strong> 
+              <span :style="{ color: errorFilesCount > 0 ? '#d36a5f' : '#bbb', textDecoration: 'underline' }">
+                {{ errorFilesCount }}
+              </span>
             </span>
           </div>
         </div>
