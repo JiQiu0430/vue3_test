@@ -988,6 +988,7 @@ input[type="radio"]:checked{
   display: flex;
   align-items: center;
   gap: 8px;
+  font-size: 12px;
 }
 .items-per-page select {
   background: #333;
@@ -995,13 +996,13 @@ input[type="radio"]:checked{
   padding: 6px;
   border: 1px solid #555;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 12px;
 }
 .pagination {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background: black;
+  background: rgba(17, 17, 17, 0.6);
   padding: 6px 10px;
   border-radius: 6px;
   display: flex;

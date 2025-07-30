@@ -301,7 +301,6 @@ const filteredJobs = computed(() => {
     });
   }
   if (statusFilter.value) {
-    // 根據 statusFilter 進行篩選
     filtered = filtered.filter(item => item.status === statusFilter.value);
   }
   return filtered;
@@ -336,7 +335,7 @@ const pageSize = ref(10);
 const paginatedJobs = computed(() => {
   const startIndex = (page.value - 1) * pageSize.value;
   const endIndex = startIndex + pageSize.value;
-  return jobs.value.slice(startIndex, endIndex);
+  return filteredJobs.value.slice(startIndex, endIndex);
 });
 
 // 頁面計算
