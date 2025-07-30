@@ -81,15 +81,30 @@
               @click="toggleFilterMenu('mapping')"
             />
             <div v-if="showFilterMenu.mapping" class="filter-menu">
-              <span @click="filterData('mapping', 'all')">全部</span>
+              <span
+              @click="filterData('mapping', 'all')"
+              :class="{selected : filterConditions.mapping === 'all'}"
+              >全部</span>
               <div class="divider"></div>
-              <span @click="filterData('mapping', 'hasValue')">正常</span>
+              <span
+              @click="filterData('mapping', 'hasValue')"
+              :class="{ selected : filterConditions.mapping === 'hasValue'}"
+              >正常</span>
               <div class="divider"></div>
-              <span @click="filterData('mapping', 'false')">錯誤</span>
+              <span
+              @click="filterData('mapping', 'false')"
+              :class="{ selected : filterConditions.mapping === 'false'}"
+              >錯誤</span>
               <div class="divider"></div>
-              <span @click="filterData('mapping', null)">沒有工單號</span>
+              <span
+              @click="filterData('mapping', null)"
+              :class="{ selected : filterConditions.mapping === null}"
+              >沒有工單號</span>
               <div class="divider"></div>
-              <span @click="filterData('mapping', 'sameId')">相同身份證字號</span>
+              <span
+              @click="filterData('mapping', 'sameId')"
+              :class="{ selected : filterConditions.mapping === 'sameId'}"
+              >相同身份證字號</span>
             </div>
             </th>
             <th>
@@ -100,13 +115,25 @@
                 @click="toggleFilterMenu('ai')"
               />
               <div v-if="showFilterMenu.ai" class="filter-menu">
-                <span @click="filterData('ai', 'all')">全部</span>
+                <span
+                @click="filterData('ai', 'all')"
+                :class="{ selected: filterConditions.ai === 'all' }"
+                >全部</span>
                 <div class="divider"></div>
-                <span @click="filterData('ai', true)">正常傳送</span>
+                <span
+                @click="filterData('ai', true)"
+                :class="{ selected: filterConditions.ai === true }"
+                >正常傳送</span>
                 <div class="divider"></div>
-                <span @click="filterData('ai', false)">錯誤</span>
+                <span
+                @click="filterData('ai', false)"
+                :class="{ selected: filterConditions.ai === false }"
+                >錯誤</span>
                 <div class="divider"></div>
-                <span @click="filterData('ai', null)">尚未傳送</span>
+                <span
+                @click="filterData('ai', null)"
+                :class="{ selected: filterConditions.ai === null }"
+                >尚未傳送</span>
               </div>
             </th>
             <th>
@@ -117,13 +144,25 @@
                 @click="toggleFilterMenu('pacs')"
               />
               <div v-if="showFilterMenu.pacs" class="filter-menu">
-                <span @click="filterData('pacs', 'all')">全部</span>
+                <span
+                @click="filterData('pacs', 'all')"
+                :class="{ selected: filterConditions.pacs === 'all' }"
+                >全部</span>
                 <div class="divider"></div>
-                <span @click="filterData('pacs', true)">正常傳送</span>
+                <span
+                @click="filterData('pacs', true)"
+                :class="{ selected: filterConditions.pacs === true }"
+                >正常傳送</span>
                 <div class="divider"></div>
-                <span @click="filterData('pacs', false)">錯誤</span>
+                <span
+                @click="filterData('pacs', false)"
+                :class="{ selected: filterConditions.pacs === false }"
+                >錯誤</span>
                 <div class="divider"></div>
-                <span @click="filterData('pacs', null)">尚未傳送</span>
+                <span
+                @click="filterData('pacs', null)"
+                :class="{ selected: filterConditions.pacs === null }"
+                >尚未傳送</span>
               </div>
             </th>
             <th>重新嘗試</th>
@@ -778,10 +817,6 @@ const handleRetry = (row, event) => {
   gap: 2px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
-.divider {
-  border-top: 1px solid #666;
-  margin: 4px 0;
-}
 /* 身份證字號 */
 .job-table th:nth-child(2),
 .job-table td:nth-child(2) {
@@ -834,6 +869,9 @@ const handleRetry = (row, event) => {
 .divider {
   border-top: 1px solid #666;
   margin: 4px 0;
+}
+.selected {
+  color: #34B539;
 }
 /* 重新嘗試 */
 .job-table th:nth-child(8),

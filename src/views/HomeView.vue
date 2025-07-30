@@ -42,13 +42,25 @@
                 <img src="/filter.png" alt="filter" class="filter-icon"/>
               </button>
               <div v-if="showStatusFilter" class="filter-dropdown">
-                <div @click="setStatusFilter('')">All</div>
+                <div
+                  @click="setStatusFilter('')"
+                  :class="{ selected: statusFilter === '' }"
+                >All</div>
                 <div class="divider"></div>
-                <div @click="setStatusFilter('Finish')">Finish</div>
+                <div
+                  @click="setStatusFilter('Finish')"
+                  :class="{ selected: statusFilter === 'Finish' }"
+                >Finish</div>
                 <div class="divider"></div>
-                <div @click="setStatusFilter('Error')">Error</div>
+                <div
+                  @click="setStatusFilter('Error')"
+                  :class="{ selected: statusFilter === 'Error' }"
+                >Error</div>
                 <div class="divider"></div>
-                <div @click="setStatusFilter('Pending')">Pending</div>
+                <div
+                  @click="setStatusFilter('Pending')"
+                  :class="{ selected: statusFilter === 'Pending' }"
+                >Pending</div>
               </div>
             </th>
             <th>工具列</th>
@@ -276,10 +288,12 @@ const filteredJobs = computed(() => {
   let filtered = jobs.value;
 
   if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase();
     filtered = filtered.filter(item => {
       return (
-        item.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-        item.time.toLowerCase().includes(searchQuery.value.toLowerCase())
+        item.job.toLowerCase().includes(query) ||
+        item.name.toLowerCase().includes(query) ||
+        item.time.toLowerCase().includes(query)
       );
     });
   }
@@ -662,6 +676,9 @@ const handleSingleFileUpload = (e) => {
 .divider {
   border-top: 1px solid #666;
   margin: 4px 0;
+}
+.selected {
+  color: #34B539;
 }
 
 /* icon工具列 */
