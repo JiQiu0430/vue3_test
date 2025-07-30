@@ -67,7 +67,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(item, index) in filteredJobs" :key="index">
+          <tr v-for="(item, index) in paginatedJobs" :key="index">
             <td>{{ item.job }}</td>
             <td>{{ item.time }}</td>
             <td>{{ item.name }}</td>
@@ -261,9 +261,8 @@ const toggleArrowAndSort = () => {
     uploadTimeFilter.value = ''; // 清除排序
     resetJobOrder();
   }
-
-  // 根據新的排序狀態重新排序
   applySorting();
+  page.value = 1;
 };
 
 // 恢復原始順序
@@ -276,18 +275,20 @@ const originalJobs = ref([]);
 
 // 排序方法
 const applySorting = () => {
+  let sorted = [...filteredJobs.value];
   if (uploadTimeFilter.value === 'asc') {
-    jobs.value.sort((a, b) => new Date(a.time) - new Date(b.time));
+    sorted.sort((a, b) => new Date(a.time) - new Date(b.time));
   } else if (uploadTimeFilter.value === 'desc') {
-    jobs.value.sort((a, b) => new Date(b.time) - new Date(a.time));
+    sorted.sort((a, b) => new Date(b.time) - new Date(a.time));
   } else {
     // 如果沒有排序條件，保留原來的順序或按需處理
-    jobs.value = [...originalJobs.value];
+    jobs.value = sorted;
   }
+  jobs.value = sorted;
 };
 
 const filteredJobs = computed(() => {
-  let filtered = jobs.value;
+  let filtered = [...jobs.value];
 
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase();
@@ -303,9 +304,7 @@ const filteredJobs = computed(() => {
     // 根據 statusFilter 進行篩選
     filtered = filtered.filter(item => item.status === statusFilter.value);
   }
-  const startIndex = (page.value - 1) * pageSize.value;
-  const endIndex = startIndex + pageSize.value;
-  return filtered.slice(startIndex, endIndex);
+  return filtered;
 });
 
 const toggleStatusFilter = () => {
@@ -328,36 +327,21 @@ const setStatusFilter = (status) => {
 // 重新應用篩選條件
 const applyFilters = () => {
   page.value = 1;
-}
+};
 
 // 翻頁設定
 const page = ref(1)
 const pageSize = ref(10);
 
+const paginatedJobs = computed(() => {
+  const startIndex = (page.value - 1) * pageSize.value;
+  const endIndex = startIndex + pageSize.value;
+  return jobs.value.slice(startIndex, endIndex);
+});
+
 // 頁面計算
 const totalPages = computed(() => {
-  let filtered = jobs.value;
-
-  // 依照搜尋條件篩選資料
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase();
-    filtered = filtered.filter(item => {
-      return (
-        item.job.toLowerCase().includes(query) ||
-        item.name.toLowerCase().includes(query) ||
-        item.time.toLowerCase().includes(query)
-      );
-    });
-  }
-
-  // 根據狀態篩選
-  if (statusFilter.value) {
-    filtered = filtered.filter(item => item.status === statusFilter.value);
-  }
-
-  // 排序後計算總頁數
-  applySorting();
-  return Math.ceil(filtered.length / pageSize.value);  // 根據篩選後資料計算總頁數
+  return Math.ceil(filteredJobs.value.length / pageSize.value);
 });
 
 const pageNumbers = computed(() => {
@@ -379,7 +363,6 @@ const pageNumbers = computed(() => {
       pages.push(1, page.value, totalPageCount);
     }
   }
-  
   return pages;
 });
 
