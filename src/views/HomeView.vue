@@ -303,8 +303,9 @@ const filteredJobs = computed(() => {
     // 根據 statusFilter 進行篩選
     filtered = filtered.filter(item => item.status === statusFilter.value);
   }
-  applySorting();
-  return filtered;
+  const startIndex = (page.value - 1) * pageSize.value;
+  const endIndex = startIndex + pageSize.value;
+  return filtered.slice(startIndex, endIndex);
 });
 
 const toggleStatusFilter = () => {
@@ -334,20 +335,52 @@ const page = ref(1)
 const pageSize = ref(10);
 
 // 頁面計算
-const totalPages = computed(() => Math.ceil(filteredJobs.value.length / pageSize.value));
+const totalPages = computed(() => {
+  let filtered = jobs.value;
+
+  // 依照搜尋條件篩選資料
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase();
+    filtered = filtered.filter(item => {
+      return (
+        item.job.toLowerCase().includes(query) ||
+        item.name.toLowerCase().includes(query) ||
+        item.time.toLowerCase().includes(query)
+      );
+    });
+  }
+
+  // 根據狀態篩選
+  if (statusFilter.value) {
+    filtered = filtered.filter(item => item.status === statusFilter.value);
+  }
+
+  // 排序後計算總頁數
+  applySorting();
+  return Math.ceil(filtered.length / pageSize.value);  // 根據篩選後資料計算總頁數
+});
 
 const pageNumbers = computed(() => {
-  if (totalPages.value <= 3) {
-    return Array.from({ length: totalPages.value }, (_, i) => i + 1);
+  const totalPageCount = totalPages.value;
+  const pages = [];
+
+  if (totalPageCount <= 3) {
+    // 若頁數小於等於3，顯示所有頁數
+    for (let i = 1; i <= totalPageCount; i++) {
+      pages.push(i);
+    }
   } else {
+    // 顯示前三頁，當前頁，和最後一頁
     if (page.value === 1) {
-      return [1, 2, totalPages.value];
-    } else if (page.value === totalPages.value) {
-      return [1, totalPages.value - 1, totalPages.value];
+      pages.push(1, 2, totalPageCount);
+    } else if (page.value === totalPageCount) {
+      pages.push(1, totalPageCount - 1, totalPageCount);
     } else {
-      return [1, page.value, totalPages.value];
+      pages.push(1, page.value, totalPageCount);
     }
   }
+  
+  return pages;
 });
 
 // 頁數切換
@@ -800,7 +833,7 @@ const handleSingleFileUpload = (e) => {
   justify-content: space-between;
   align-items: center;
   padding: 10px;
-  background: #000000;
+  background: rgba(17, 17, 17, 0.6);
   border-radius: 6px;
   position: fixed;
   bottom: 65px;
@@ -811,6 +844,7 @@ const handleSingleFileUpload = (e) => {
   display: flex;
   align-items: center;
   gap: 8px;
+  font-size: 12px;
 }
 .items-per-page select {
   background: #333;
@@ -818,13 +852,13 @@ const handleSingleFileUpload = (e) => {
   padding: 6px;
   border: 1px solid #555;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 12px;
 }
 .pagination {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background: black;
+  background: rgba(17, 17, 17, 0.6);
   padding: 6px 10px;
   border-radius: 6px;
   display: flex;
