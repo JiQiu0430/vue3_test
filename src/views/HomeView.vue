@@ -269,6 +269,8 @@ const toggleArrowAndSort = () => {
 // 恢復原始順序
 const resetJobOrder = () => {
   jobs.value = [...originalJobs.value];
+  applySorting();
+  applyFilters();
 };
 const originalJobs = ref([]);
 
@@ -280,7 +282,7 @@ const applySorting = () => {
     jobs.value.sort((a, b) => new Date(b.time) - new Date(a.time));
   } else {
     // 如果沒有排序條件，保留原來的順序或按需處理
-    jobs.value = [...jobs.value];
+    jobs.value = [...originalJobs.value];
   }
 };
 
@@ -301,9 +303,7 @@ const filteredJobs = computed(() => {
     // 根據 statusFilter 進行篩選
     filtered = filtered.filter(item => item.status === statusFilter.value);
   }
-  if (uploadTimeFilter.value) {
-    applySorting();
-  }
+  applySorting();
   return filtered;
 });
 
@@ -446,8 +446,10 @@ const submitUpload = async () => {
     // 確保後端回傳成功後再加入 job 資料
     if (response.status === 201) {
       jobs.value.push(response.data);  // 使用從後端返回的資料
+      originalJobs.value = [...jobs.value];
+      applySorting();
+      applyFilters();
     }
-
     closeDialog();
   } catch (error) {
     console.error("無法新增 job", error);
