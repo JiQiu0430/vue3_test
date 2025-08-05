@@ -382,9 +382,18 @@ const handleRadioChange = (row, event) => {
   const isConfirmed = confirm(`您確定選擇 ${row.serialNumber} 嗎？`);
   if (!isConfirmed) {
     event.preventDefault();
-  } else {
-    selectedSerialNumber.value = row.serialNumber;
+    return; // 如果第一次確認失敗，終止操作
   }
+
+  // 第二次確認
+  const isDoubleConfirmed = confirm(`您十分確定真的肯定選擇 ${row.serialNumber} 嗎？`);
+  if (!isDoubleConfirmed) {
+    event.preventDefault();
+    return; // 如果第二次確認失敗，終止操作
+  }
+
+  // 若兩次確認都成功，進行選擇
+  selectedSerialNumber.value = row.serialNumber;
 };
 
 // 彈出 DICOM 視窗

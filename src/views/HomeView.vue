@@ -184,18 +184,31 @@ import axios from 'axios'
 
 const router = useRouter()
 
+const formatDate = (isoDate) => {
+  const date = new Date(isoDate);
+
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const seconds = date.getSeconds().toString().padStart(2, '0');
+
+  return `${year}/${month}/${day}-${hours}:${minutes}:${seconds}`;
+};
+
 onMounted(async () => {
   try {
-    // 清空 jobs 資料，避免重複顯示
-    jobs.value = [];
-    
     // 從後端獲取資料
-    const response = await axios.get('http://localhost:8082/jobs');
+    const response = await axios.get('http://localhost:8081/tourCar');
     
-    // 確保資料唯一，不重複
-    if (response.data && Array.isArray(response.data)) {
-      jobs.value = response.data;
-      originalJobs.value = [...response.data];
+    // 格式化 time 欄位
+    if (response.data && Array.isArray(response.data.result)) {
+      jobs.value = response.data.result.map(item => {
+        item.time = formatDate(item.time); // 格式化 time 欄位
+        return item;
+      });
+      originalJobs.value = [...jobs.value];
     }
   } catch (error) {
     console.error("無法加載 jobs 資料", error);
@@ -456,7 +469,7 @@ const submitUpload = async () => {
 
   try {
     // 發送 POST 請求到後端
-    const response = await axios.post('http://localhost:8082/jobs', newJobData);
+    const response = await axios.post('http://localhost:8081/tourCar', newJobData);
 
     // 確保後端回傳成功後再加入 job 資料
     if (response.status === 201) {
@@ -497,7 +510,7 @@ const getStatusStyle = (status) => {
 const deleteJob = async (jobId) => {
   if (confirm(`你確定要刪除批次 ${jobId}?`)) {
     try {
-      const response = await axios.delete(`http://localhost:8082/jobs/${jobId}`);
+      const response = await axios.delete(`http://localhost:8081/tourCar/${jobId}`);
       
       if (response.status === 200) {
         jobs.value = jobs.value.filter(job => job.id !== jobId);
