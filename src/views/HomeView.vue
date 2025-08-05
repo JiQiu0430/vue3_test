@@ -468,22 +468,24 @@ const submitUpload = async () => {
   };
 
   try {
-    // 發送 POST 請求到後端
     const response = await axios.post('http://localhost:8081/tourCar', newJobData);
-
-    // 確保後端回傳成功後再加入 job 資料
-    if (response.status === 201) {
-      jobs.value.push(response.data);  // 使用從後端返回的資料
-      originalJobs.value = [...jobs.value];
-      applySorting();
-      applyFilters();
+    if (response.status === 200 || response.status === 201) {
+      const fetchResponse = await axios.get('http://localhost:8081/tourCar');
+      if (fetchResponse.status === 200 && Array.isArray(fetchResponse.data.result)) {
+        jobs.value = fetchResponse.data.result.map(item => {
+          item.time = formatDate(item.time);
+          return item;
+        });
+        originalJobs.value = [...jobs.value];
+        applySorting();
+        applyFilters();
+      }
     }
     closeDialog();
   } catch (error) {
     console.error("無法新增 job", error);
   }
-
-  closeDialog()
+  closeDialog();
 }
 
 // 重試上傳
@@ -507,14 +509,19 @@ const getStatusStyle = (status) => {
 }
 
 // 刪除job+更新頁面
-const deleteJob = async (jobId) => {
-  if (confirm(`你確定要刪除批次 ${jobId}?`)) {
+const deleteJob = async (jobName) => {
+  if (confirm(`你確定要刪除批次 ${jobName}?`)) {
     try {
-      const response = await axios.delete(`http://localhost:8081/tourCar/${jobId}`);
-      
+      // 發送 DELETE 請求，傳送 job 名稱作為請求體的一部分
+      const response = await axios.delete('http://localhost:8081/tourCar', {
+        data: { job: jobName },  // 傳送 job 名稱
+      });
+
       if (response.status === 200) {
-        jobs.value = jobs.value.filter(job => job.id !== jobId);
-        alert(`Job with ID ${jobId} has been deleted`);
+        console.log('刪除成功:', jobName);  // 調試: 確保 job 名稱正確
+        // 篩選出不包含該 jobName 的項目
+        jobs.value = jobs.value.filter(job => job.job !== jobName);
+        alert(`批次 ${jobName} 已經被刪除`);
       }
     } catch (error) {
       console.error('刪除失敗', error);
