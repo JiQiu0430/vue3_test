@@ -430,8 +430,8 @@ const handleFileUpload = (e) => {
 // 將資料夾內容加入列表
 const submitUpload = async () => {
   if (!newJob.value.name || uploadedFiles.value.length === 0) {
-    alert('請加入資料夾及輸入批次名稱')
-    return
+    alert('請加入資料夾及輸入批次名稱');
+    return;
   }
 
   // 檢查是否已經存在相同的 job 名稱
@@ -441,7 +441,7 @@ const submitUpload = async () => {
     return;
   }
 
- // 取得當前時間格式化為 yyyy/MM/DD-hh:mm:ss
+  // 取得當前時間格式化為 yyyy/MM/DD-hh:mm:ss
   const currentDate = new Date();
   const year = currentDate.getFullYear();
   const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
@@ -454,24 +454,57 @@ const submitUpload = async () => {
   const currentTime = `${year}/${month}/${day}-${hours}:${minutes}:${seconds}`;
   const generateUniqueId = `${year}${month}${day}${hours}${minutes}${seconds}`;
 
-  uploadProgress.value = 100
+  uploadProgress.value = 100;
   const jobId = generateUniqueId;
-  // 傳送新增的 Job 到後端
-  const newJobData = {
-    job: newJob.value.name,
-    id: jobId,
-    time: currentTime,
-    name: detectedFolderName.value,
-    series: uploadedFiles.value.length,
-    status: 'Pending',
-    files: [...uploadedFiles.value],
-  };
 
+  // 先上傳 DICOM 檔案到 Orthanc
   try {
+    const dicomUploadPromises = uploadedFiles.value.map(files => {
+      const formData = new FormData();
+      formData.append('files', files);
+
+      const authHeader = 'Basic ' + btoa('orthanc:orthanc');
+
+      console.log('Uploading files:', files);
+
+      return axios.post('/instances', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data; boundary=<calculated when request is sent>',
+          'Authorization': authHeader
+        }
+      });
+    });
+
+    // 等待所有 DICOM 檔案上傳成功
+    const dicomUploadResults = await Promise.all(dicomUploadPromises);
+    
+    // 檢查上傳結果，處理錯誤或成功
+    dicomUploadResults.forEach((result, index) => {
+      if (result.status !== 200 && result.status !== 201) {
+        console.error(`檔案 ${uploadedFiles.value[index].name} 上傳失敗`, result);
+        alert(`檔案 ${uploadedFiles.value[index].name} 上傳失敗`);
+      } else {
+        console.log(`檔案 ${uploadedFiles.value[index].name} 上傳成功`);
+      }
+    });
+
+    // 上傳 DICOM 成功後，傳送資料到 MySQL
+    const newJobData = {
+      job: newJob.value.name,
+      id: jobId,
+      time: currentTime,
+      name: detectedFolderName.value,
+      series: uploadedFiles.value.length,
+      status: 'Pending',
+      files: uploadedFiles.value.map(file => file.name),
+    };
+
     const response = await axios.post('http://localhost:8081/tourCar', newJobData);
+
     if (response.status === 200 || response.status === 201) {
       const fetchResponse = await axios.get('http://localhost:8081/tourCar');
       if (fetchResponse.status === 200 && Array.isArray(fetchResponse.data.result)) {
+        // 更新 jobs 並確保響應式系統能觸發更新
         jobs.value = fetchResponse.data.result.map(item => {
           item.time = formatDate(item.time);
           return item;
@@ -483,7 +516,8 @@ const submitUpload = async () => {
     }
     closeDialog();
   } catch (error) {
-    console.error("無法新增 job", error);
+    console.error("無法上傳 DICOM 檔案或儲存資料:", error);
+    alert("上傳 DICOM 檔案或儲存資料時發生錯誤: " + error.message);
   }
   closeDialog();
 }

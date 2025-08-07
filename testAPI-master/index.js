@@ -10,10 +10,14 @@ const http = require("http");
 const socket_1 = require("./socket");
 const cors = require('cors');
 const { createConnection } = require("typeorm");
+const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const app = express();
 const corsOptions = {
   origin: 'http://localhost:8080',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 };
 app.use(cors(corsOptions));
 
@@ -61,6 +65,22 @@ createConnection({
       }
     });
   });
+
+  app.use('/instances', createProxyMiddleware({
+  target: 'http://127.0.0.1:8042',
+  changeOrigin: true,
+  pathRewrite: { '^/instances': '/instances' },
+  proxyReqOptDecorator: function (proxyReqOpts, srcReq) {
+    proxyReqOpts.headers['Authorization'] = 'Basic ' + Buffer.from('orthanc:orthanc').toString('base64');
+    return proxyReqOpts;
+  },
+  onProxyReq: (proxyReq, req, res) => {
+    proxyReq.setHeader('Access-Control-Allow-Origin', '*');
+    proxyReq.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    proxyReq.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    console.log('代理請求：', req.method, req.url);
+  }
+}));
 
   server.listen(8081, () => {
     logger.info(`Express server has started on port 8081.`);
