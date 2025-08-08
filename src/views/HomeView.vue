@@ -181,6 +181,7 @@ import { useRouter } from 'vue-router'
 import { ref, computed } from 'vue'
 import { onMounted } from 'vue'
 import axios from 'axios'
+import * as dicomParser from "dicom-parser";
 
 const router = useRouter()
 
@@ -476,14 +477,18 @@ const submitUpload = async () => {
     });
     const dicomUploadResults = await Promise.all(dicomUploadPromises);
 
+    const array = [];
     dicomUploadResults.forEach((result, index) => {
       if (result.status !== 200 && result.status !== 201) {
         console.error(`檔案 ${uploadedFiles.value[index].name} 上傳失敗`, result);
         alert(`檔案 ${uploadedFiles.value[index].name} 上傳失敗`);
       } else {
         console.log(`檔案 ${uploadedFiles.value[index].name} 上傳成功`);
+        array.push(dicomReader(uploadedFiles.value[index]))
       }
     });
+  const mi = await Promise.all(array);
+  console.log(mi)
 
     // const caseData = uploadedFiles.value.map(file => {
     //   const fileName = file.name.replace('.dcm', '');
@@ -507,6 +512,7 @@ const submitUpload = async () => {
     // }).filter(file => file !== null);  // 過濾掉格式錯誤的檔案
 
     // 上傳批次資料
+    // 為了我最愛的芭樂，特此留下她的到此一遊痕跡，以紀念我對她的愛(?) const guava = uploadedFiles.value.map(file => { return { caseName: file.name } });
     const newJobData = {
       job: newJob.value.name,
       id: jobId,
@@ -514,7 +520,7 @@ const submitUpload = async () => {
       name: detectedFolderName.value,
       series: uploadedFiles.value.length,
       status: 'Pending',
-      files: uploadedFiles.value.map(file => { return { caseName: file.name } }),
+      files: mi
     };
     console.log("New Job Data to be saved:", newJobData);
 
@@ -547,6 +553,35 @@ const submitUpload = async () => {
   }
   closeDialog();
 };
+
+const dicomReader = async(files) => {
+    // const dicomUploadResults = await Promise.all(dicomUploadPromises);
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.readAsArrayBuffer(files);
+    reader.onload = function () {
+      const arrayBuffers = reader.result;
+      const byteArray = new Uint8Array(arrayBuffers);
+      const options = { TransferSyntaxUID: "1.2.840.10008.1.2" };
+      const dataSet = dicomParser.parseDicom(byteArray, options);
+      const s_id_Text = dataSet.string("x0020000e") || "";
+      const patient_id = dataSet.string("x00100020");
+      const studyId = dataSet.string("x0020000d");
+      const instancesId = dataSet.string("x00080018") || "";
+
+      const uploadData = {
+          seriesId: s_id_Text,
+          patientId: patient_id,
+          studyId,
+          instancesId,
+          caseName: files.name,
+          upload: true
+      };
+        resolve(uploadData)
+        console.log(uploadData);
+    };
+  });
+}
 
 // 重試上傳
 const retryUpload = () => {
@@ -587,6 +622,16 @@ const deleteJob = async (jobName) => {
       console.error('刪除失敗', error);
       alert('刪除過程中出現錯誤');
     }
+    const fetchResponse = await axios.get('http://localhost:8081/tourCar');
+      if (fetchResponse.status === 200 && Array.isArray(fetchResponse.data.result)) {
+        jobs.value = fetchResponse.data.result.map(item => {
+          item.time = formatDate(item.time);
+          return item;
+        });
+        originalJobs.value = [...jobs.value];
+        applySorting();
+        applyFilters();
+      }
   }
 };
 
@@ -623,6 +668,7 @@ const handleSingleFileUpload = (e) => {
   e.target.value = ''
   currentUploadJob.value = null
 }
+
 </script>
 
 <style scoped>

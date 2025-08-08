@@ -108,35 +108,6 @@
             </div>
             </th>
             <th>
-              <span>傳給AI</span>
-              <img
-                src="/filter.png"
-                class="filter-icon"
-                @click="toggleFilterMenu('ai')"
-              />
-              <div v-if="showFilterMenu.ai" class="filter-menu">
-                <span
-                @click="filterData('ai', 'all')"
-                :class="{ selected: filterConditions.ai === 'all' }"
-                >全部</span>
-                <div class="divider"></div>
-                <span
-                @click="filterData('ai', 2)"
-                :class="{ selected: filterConditions.ai === 2 }"
-                >正常傳送</span>
-                <div class="divider"></div>
-                <span
-                @click="filterData('ai', 0)"
-                :class="{ selected: filterConditions.ai === 0 }"
-                >錯誤</span>
-                <div class="divider"></div>
-                <span
-                @click="filterData('ai', 1)"
-                :class="{ selected: filterConditions.ai === 1 }"
-                >尚未傳送</span>
-              </div>
-            </th>
-            <th>
               <span>傳給PACS</span>
               <img
                 src="/filter.png"
@@ -162,6 +133,35 @@
                 <span
                 @click="filterData('pacs', 1)"
                 :class="{ selected: filterConditions.pacs === 1 }"
+                >尚未傳送</span>
+              </div>
+            </th>
+            <th>
+              <span>傳給AI</span>
+              <img
+                src="/filter.png"
+                class="filter-icon"
+                @click="toggleFilterMenu('ai')"
+              />
+              <div v-if="showFilterMenu.ai" class="filter-menu">
+                <span
+                @click="filterData('ai', 'all')"
+                :class="{ selected: filterConditions.ai === 'all' }"
+                >全部</span>
+                <div class="divider"></div>
+                <span
+                @click="filterData('ai', 2)"
+                :class="{ selected: filterConditions.ai === 2 }"
+                >正常傳送</span>
+                <div class="divider"></div>
+                <span
+                @click="filterData('ai', 0)"
+                :class="{ selected: filterConditions.ai === 0 }"
+                >錯誤</span>
+                <div class="divider"></div>
+                <span
+                @click="filterData('ai', 1)"
+                :class="{ selected: filterConditions.ai === 1 }"
                 >尚未傳送</span>
               </div>
             </th>
@@ -271,7 +271,7 @@ const caseData = ref([])
 
 const fetchCaseData = async () => {
   try {
-    const response = await axios.get('http://localhost:8081/tourCarCase/test_dicom_1')
+    const response = await axios.get(`http://localhost:8081/tourCarCase/test_dicom_1`)
     console.log('7:', response);
 
     if (Array.isArray(response.data.result)) {
