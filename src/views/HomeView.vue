@@ -425,7 +425,7 @@ const handleFileUpload = (e) => {
   const folderName = firstPath.split('/')[0] || 'UnknownFolder'
   detectedFolderName.value = folderName
   newJob.value.name = folderName
-}
+};
 
 // 將資料夾內容加入列表
 const submitUpload = async () => {
@@ -457,8 +457,8 @@ const submitUpload = async () => {
   uploadProgress.value = 100;
   const jobId = generateUniqueId;
 
-  // 先上傳 DICOM 檔案到 Orthanc
   try {
+    // 上傳 DICOM 檔案到 Orthanc
     const dicomUploadPromises = uploadedFiles.value.map(files => {
       const formData = new FormData();
       formData.append('files', files);
@@ -474,11 +474,8 @@ const submitUpload = async () => {
         }
       });
     });
-
-    // 等待所有 DICOM 檔案上傳成功
     const dicomUploadResults = await Promise.all(dicomUploadPromises);
-    
-    // 檢查上傳結果，處理錯誤或成功
+
     dicomUploadResults.forEach((result, index) => {
       if (result.status !== 200 && result.status !== 201) {
         console.error(`檔案 ${uploadedFiles.value[index].name} 上傳失敗`, result);
@@ -488,7 +485,28 @@ const submitUpload = async () => {
       }
     });
 
-    // 上傳 DICOM 成功後，傳送資料到 MySQL
+    // const caseData = uploadedFiles.value.map(file => {
+    //   const fileName = file.name.replace('.dcm', '');
+    //   const fileParts = fileName.split('#');
+
+    //   if (fileParts.length === 5) {
+    //     const [serialNumber, patientId, name, gender, seriesIndex] = fileParts;
+
+    //     console.log('Extracted Data:', { serialNumber, patientId, name, gender, seriesIndex });
+
+    //     return {
+    //       caseName: fileName,
+    //       patientId: patientId,
+    //       seriesId: seriesIndex,
+    //       upload: true,
+    //     };
+    //   } else {
+    //     console.error(`Invalid file name format for ${file.name}`);
+    //     return null;
+    //   }
+    // }).filter(file => file !== null);  // 過濾掉格式錯誤的檔案
+
+    // 上傳批次資料
     const newJobData = {
       job: newJob.value.name,
       id: jobId,
@@ -496,15 +514,23 @@ const submitUpload = async () => {
       name: detectedFolderName.value,
       series: uploadedFiles.value.length,
       status: 'Pending',
-      files: uploadedFiles.value.map(file => file.name),
+      files: uploadedFiles.value.map(file => { return { caseName: file.name } }),
     };
+    console.log("New Job Data to be saved:", newJobData);
 
     const response = await axios.post('http://localhost:8081/tourCar', newJobData);
 
     if (response.status === 200 || response.status === 201) {
+      // // 上傳到 tourCarCase/job
+      // const jobResponse = await axios.post(`http://localhost:8081/tourCarCase`, caseData);
+      // if (jobResponse.status === 200 || jobResponse.status === 201) {
+      //   console.log('TourCarCase successfully created');
+      //   console.log(caseData)
+      // } else {
+      //   console.error('Failed to create TourCarCase');
+      // }
       const fetchResponse = await axios.get('http://localhost:8081/tourCar');
       if (fetchResponse.status === 200 && Array.isArray(fetchResponse.data.result)) {
-        // 更新 jobs 並確保響應式系統能觸發更新
         jobs.value = fetchResponse.data.result.map(item => {
           item.time = formatDate(item.time);
           return item;
@@ -520,7 +546,7 @@ const submitUpload = async () => {
     alert("上傳 DICOM 檔案或儲存資料時發生錯誤: " + error.message);
   }
   closeDialog();
-}
+};
 
 // 重試上傳
 const retryUpload = () => {

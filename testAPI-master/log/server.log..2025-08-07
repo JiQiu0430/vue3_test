@@ -1,0 +1,9 @@
+2025-08-07 17:27:27.399 [INFO] Express server has started on port 8081.
+2025-08-07 17:40:57.046 [INFO] Express server has started on port 8081.
+2025-08-07 19:30:55.845 [INFO] Express server has started on port 8081.
+2025-08-07 19:38:58.824 [INFO] Express server has started on port 8081.
+2025-08-07 19:39:06.476 [ERROR] TourCar Delete catch error: TypeError: _this.deleteItemsFromOrthanc is not a function.
+2025-08-07 19:41:48.675 [INFO] Express server has started on port 8081.
+2025-08-07 19:42:08.947 [ERROR] TourCar Delete catch error: TypeError: _this.deleteItemsFromOrthanc is not a function.
+2025-08-07 19:48:33.199 [INFO] Express server has started on port 8081.
+2025-08-07 20:10:57.778 [INFO] Express server has started on port 8081.

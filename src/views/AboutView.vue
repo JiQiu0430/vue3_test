@@ -121,18 +121,18 @@
                 >全部</span>
                 <div class="divider"></div>
                 <span
-                @click="filterData('ai', true)"
-                :class="{ selected: filterConditions.ai === true }"
+                @click="filterData('ai', 2)"
+                :class="{ selected: filterConditions.ai === 2 }"
                 >正常傳送</span>
                 <div class="divider"></div>
                 <span
-                @click="filterData('ai', false)"
-                :class="{ selected: filterConditions.ai === false }"
+                @click="filterData('ai', 0)"
+                :class="{ selected: filterConditions.ai === 0 }"
                 >錯誤</span>
                 <div class="divider"></div>
                 <span
-                @click="filterData('ai', null)"
-                :class="{ selected: filterConditions.ai === null }"
+                @click="filterData('ai', 1)"
+                :class="{ selected: filterConditions.ai === 1 }"
                 >尚未傳送</span>
               </div>
             </th>
@@ -150,18 +150,18 @@
                 >全部</span>
                 <div class="divider"></div>
                 <span
-                @click="filterData('pacs', true)"
-                :class="{ selected: filterConditions.pacs === true }"
+                @click="filterData('pacs', 2)"
+                :class="{ selected: filterConditions.pacs === 2 }"
                 >正常傳送</span>
                 <div class="divider"></div>
                 <span
-                @click="filterData('pacs', false)"
-                :class="{ selected: filterConditions.pacs === false }"
+                @click="filterData('pacs', 0)"
+                :class="{ selected: filterConditions.pacs === 0 }"
                 >錯誤</span>
                 <div class="divider"></div>
                 <span
-                @click="filterData('pacs', null)"
-                :class="{ selected: filterConditions.pacs === null }"
+                @click="filterData('pacs', 1)"
+                :class="{ selected: filterConditions.pacs === 1 }"
                 >尚未傳送</span>
               </div>
             </th>
@@ -252,6 +252,7 @@
 <script setup>
 import { useRoute, useRouter } from 'vue-router'
 import { ref, computed, nextTick, onMounted } from 'vue'
+import axios from 'axios'
 import * as cornerstone from "cornerstone-core";
 import * as cornerstoneWADOImageLoader from "cornerstone-wado-image-loader";
 
@@ -266,68 +267,47 @@ const jobInfo = computed(() => ({
   time: route.query.time,
 }))
 
-// 模擬資料
-const caseData = ref([
-  {
-    caseName: '0001#A123456789#王小明#M#01',
-    upload: true,
-    mapping: 'ABC001',
-    postAI: null,
-    postPACS: null,
-    status: 'Pending'
-  },
-  {
-    caseName: '0002#A123456789#王小明#M#02',
-    upload: true,
-    mapping: 'ABC001',
-    postAI: null,
-    postPACS: null,
-    status: 'Pending'
-  },
-  {
-    caseName: '0004#C123456789#陳大明#F#01',
-    upload: true,
-    mapping: 'false',
-    postAI: null,
-    postPACS: null,
-    status: 'Pending'
-  },
-  {
-    caseName: '0003#B123456789#林子涵#F#01',
-    upload: true,
-    mapping: 'ABC003',
-    postAI: true,
-    postPACS: true,
-    status: 'Analyzed'
-  },
-  {
-    caseName: '0005#D123456789#汪杰#M#01',
-    upload: true,
-    mapping: 'ABC004',
-    postAI: true,
-    postPACS: false,
-    status: 'Error'
-  },
-  {
-    caseName: '0006#E123456789#卡厄斯#F#01',
-    upload: true,
-    mapping: '',
-    postAI: null,
-    postPACS: null,
-    status: 'Pending'
-  },
-])
+const caseData = ref([])
+
+const fetchCaseData = async () => {
+  try {
+    const response = await axios.get('http://localhost:8081/tourCarCase/test_dicom_1')
+    console.log('7:', response);
+
+    if (Array.isArray(response.data.result)) {
+      caseData.value = response.data.result;
+      caseData.value = response.data.result.map(item => {
+        console.log(item);
+      const parsedData = parseCaseName(item.caseName);
+      return {
+        ...item,
+        ...parsedData,
+      };
+    })
+    } else {
+      console.error('返回的資料不是陣列:', response.data.result);
+      caseData.value = [];
+    }
+  } catch (error) {
+    console.error('無法取得資料', error);
+    caseData.value = [];
+  }
+}
+
+onMounted(() => {
+  fetchCaseData()
+})
 
 const errorFilesCount = computed(() => {
-  return caseData.value.filter(row => row.postAI === false || row.postPACS === false || row.mapping === 'false').length;
+  return caseData.value.filter(row => row.upload === 0 || row.postAI === false || row.postPACS === false || row.mapping === 'false').length;
 });
 
 const errorFilterEnabled = ref(false);
 // 篩選錯誤檔案
 const filterErrorFiles = () => {
   errorFilterEnabled.value = true;
-  filterConditions.value.ai = false;
-  filterConditions.value.pacs = false;
+  filterConditions.value.ai = 0;
+  filterConditions.value.pacs = 0;
   filterConditions.value.mapping = 'false';
   showFilterMenu.value = { ai: false, pacs: false, mapping: false };
   page.value = 1;
@@ -343,31 +323,33 @@ const clearFilters = () => {
 
 // 解析 caseName
 const parseCaseName = (caseName) => {
-  const regex = /^(\d+)#([A-Za-z0-9]+)#([\u4e00-\u9fa5]+)#(M|F)#(\d{2})$/;
-  const match = caseName.match(regex);
-  if (match) {
-    const [, serialNumber, id, name, gender, caseNumber] = match;
+  console.log(caseName)
+  const fileName = caseName.replace('.dcm', '');
+  const fileParts = fileName.split('#');
+  console.log(fileParts)
+  if (fileParts) {
+    const [serialNumber, id, name, gender, caseNumber] = fileParts;
     return { serialNumber, id, name, gender, caseNumber };
   }
   return {};
 };
 
-// 解析資料並加入到 caseData 中
-caseData.value = caseData.value.map(item => {
-  const parsedData = parseCaseName(item.caseName);
-  return {
-    ...item,
-    ...parsedData,
-  };
-})
+// // 解析資料並加入到 caseData 中
+// caseData.value = caseData.value.map(item => {
+//   const parsedData = parseCaseName(item.caseName);
+//   return {
+//     ...item,
+//     ...parsedData,
+//   };
+// })
 
 // 搜尋框
 const searchQuery = ref('')
 const filteredData = computed(() => {
   return caseData.value.filter(item => {
-    return item.serialNumber.toLowerCase().includes(searchQuery.value) ||
-           item.id.toLowerCase().includes(searchQuery.value) ||
-           item.name.toLowerCase().includes(searchQuery.value);
+    return item?.serialNumber?.toLowerCase()?.includes(searchQuery.value) ||
+           item?.id?.toLowerCase()?.includes(searchQuery.value) ||
+           item?.name?.toLowerCase()?.includes(searchQuery.value);
   });
 });
 
@@ -382,17 +364,15 @@ const handleRadioChange = (row, event) => {
   const isConfirmed = confirm(`您確定選擇 ${row.serialNumber} 嗎？`);
   if (!isConfirmed) {
     event.preventDefault();
-    return; // 如果第一次確認失敗，終止操作
+    return;
   }
 
   // 第二次確認
   const isDoubleConfirmed = confirm(`您十分確定真的肯定選擇 ${row.serialNumber} 嗎？`);
   if (!isDoubleConfirmed) {
     event.preventDefault();
-    return; // 如果第二次確認失敗，終止操作
+    return;
   }
-
-  // 若兩次確認都成功，進行選擇
   selectedSerialNumber.value = row.serialNumber;
 };
 
@@ -416,6 +396,7 @@ onMounted(() => {
     useWebWorkers: true, // 使用 Web Worker 加速影像處理
   })
 })
+
 // 載入 DICOM 檔案
 const loadDicomFile = () => {
   const dicomFilePath = '/1-040.dcm' // 放在 public 資料夾中的 DICOM 檔案路徑
@@ -513,7 +494,7 @@ const paginatedData = computed(() => {
 
   if (errorFilterEnabled.value) {
     data = data.filter(item => 
-      item.postAI === false || item.postPACS === false || item.mapping === 'false'
+      item.postAI === 0 || item.postPACS === 0 || item.mapping === 'false'
     );
   } else{
     // 篩選條件：根據 ai、pacs 和 mapping 進行過濾
@@ -554,7 +535,7 @@ const toggleFilterMenu = (field) => {
 
 const retryAll = () => {
   const filesToRetry = caseData.value.filter(row => {
-    return row.postAI === false || row.postPACS === false || row.mapping === 'false';
+    return row.postAI === 0 || row.postPACS === 0 || row.mapping === 'false';
   });
 
   if (filesToRetry.length === 0) {
@@ -629,8 +610,9 @@ const nextPage = () => { if (page.value < totalPages.value) page.value++ }
 
 // 顯示勾/叉
 const checkMark = (value) => {
-  if (value === true) return '<span class="gray-cross">✔</span>'
-  if (value === false) return '<span class="red-cross">✘</span>'
+  if (value === 2) return '<span class="gray-cross">✔</span>'
+  if (value === 0) return '<span class="red-cross">✘</span>'
+  if (value === 1) return '<span class="gray-cross">--</span>'
   if (value === 'false') return '✘';
   if (value) return value;
   return '<span class="gray-cross">--</span>'
@@ -643,7 +625,7 @@ const getTextColor = (row) => {
   if (row.mapping === 'false') {
     return '#e74c3c';
   }
-  if (row.upload === false || row.postAI === false || row.postPACS === false) {
+  if (row.upload === false || row.postAI === 0 || row.postPACS === 0) {
     return '#e74c3c';
   }
   if (isSameId(row) && !selectedSerialNumber.value) {
