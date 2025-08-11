@@ -271,7 +271,7 @@ const caseData = ref([])
 
 const fetchCaseData = async () => {
   try {
-    const response = await axios.get(`http://localhost:8081/tourCarCase/test_dicom_1`)
+    const response = await axios.get(`http://localhost:8081/tourCarCase/${jobInfo.value.job}`)
     console.log('7:', response);
 
     if (Array.isArray(response.data.result)) {

@@ -206,7 +206,7 @@ onMounted(async () => {
     // 格式化 time 欄位
     if (response.data && Array.isArray(response.data.result)) {
       jobs.value = response.data.result.map(item => {
-        item.time = formatDate(item.time); // 格式化 time 欄位
+        item.time = formatDate(item.time);
         return item;
       });
       originalJobs.value = [...jobs.value];
@@ -248,7 +248,7 @@ const showUploadTimeFilter = ref(false)
 const showStatusFilter = ref(false)
 
 // 控制篩選選單顯示
-const arrowState = ref('both'); // 'both', 'down', 'up'
+const arrowState = ref('both');
 const uploadTimeFilter = ref('asc'); 
 
 // 根據箭頭狀態更新顯示的圖片
@@ -258,21 +258,21 @@ const arrowImage = computed(() => {
   } else if (arrowState.value === 'up') {
     return '/arrowUp.png';
   } else {
-    return '/arrowBoth.png'; // 上下箭頭圖片
+    return '/arrowBoth.png';
   }
 });
 
 // 切換箭頭狀態
 const toggleArrowAndSort = () => {
   if (arrowState.value === 'both') {
-    arrowState.value = 'down'; // 顯示向下箭頭
-    uploadTimeFilter.value = 'asc'; // 時間升序
+    arrowState.value = 'down';
+    uploadTimeFilter.value = 'asc';
   } else if (arrowState.value === 'down') {
-    arrowState.value = 'up'; // 顯示向上箭頭
-    uploadTimeFilter.value = 'desc'; // 時間降序
+    arrowState.value = 'up';
+    uploadTimeFilter.value = 'desc';
   } else {
-    arrowState.value = 'both'; // 顯示上下箭頭
-    uploadTimeFilter.value = ''; // 清除排序
+    arrowState.value = 'both';
+    uploadTimeFilter.value = '';
     resetJobOrder();
   }
   applySorting();
@@ -607,14 +607,12 @@ const getStatusStyle = (status) => {
 const deleteJob = async (jobName) => {
   if (confirm(`你確定要刪除批次 ${jobName}?`)) {
     try {
-      // 發送 DELETE 請求，傳送 job 名稱作為請求體的一部分
       const response = await axios.delete('http://localhost:8081/tourCar', {
-        data: { job: jobName },  // 傳送 job 名稱
+        data: { job: jobName },
       });
 
       if (response.status === 200) {
-        console.log('刪除成功:', jobName);  // 調試: 確保 job 名稱正確
-        // 篩選出不包含該 jobName 的項目
+        console.log('刪除成功:', jobName);
         jobs.value = jobs.value.filter(job => job.job !== jobName);
         alert(`批次 ${jobName} 已經被刪除`);
       }
@@ -640,35 +638,71 @@ const selectFileForJob = (jobId) => {
   currentUploadJob.value = jobId
   fileInput.value?.click()
 }
-const handleSingleFileUpload = (e) => {
-  const file = e.target.files[0]
-  if (!file || !currentUploadJob.value) return
+const handleSingleFileUpload = async (e) => {
+  const file = e.target.files[0];
+  if (!file || !currentUploadJob.value) return;
 
-  // 彈出確認提示
-  const isConfirmed = confirm(`您確定要上傳檔案 "${file.name}" 嗎？`)
+  const isConfirmed = confirm(`您確定要上傳檔案 "${file.name}" 嗎？`);
   if (!isConfirmed) {
-    e.target.value = ''
-    return
+    e.target.value = '';
+    return;
   }
 
-  // 檢查檔案是否為 DICOM (.dcm)
   if (file.type !== "application/dicom" && !file.name.endsWith(".dcm")) {
     alert("請選擇 DICOM 檔案（.dcm）");
     return;
   }
 
-  const job = jobs.value.find(j => j.job === currentUploadJob.value)
-  if (job) {
-    job.files.push(file)
-    job.series += 1
-    job.status = 'Pending'
-    alert(`檔案 "${file.name}" 上傳至 "${job.job}".`)
+  try {
+    const formData = new FormData();
+    formData.append('files', file);
+    const authHeader = 'Basic ' + btoa('orthanc:orthanc');
+    const uploadResult = await axios.post('/instances', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'Authorization': authHeader
+      }
+    });
+
+    if (uploadResult.status !== 200 && uploadResult.status !== 201) {
+      alert(`檔案 ${file.name} 上傳 Orthanc 失敗`);
+      return;
+    }
+
+    const dicomData = await dicomReader(file);
+
+    const payload = {
+      caseName: dicomData.caseName,
+      patientId: dicomData.patientId || '',
+      studyId: dicomData.studyId || '',
+      seriesId: dicomData.seriesId || '',
+      series: "6", // 固定值
+      upload: 1    // 固定值
+    };
+
+    const res = await axios.post(`http://localhost:8081/tourCarCase/${currentUploadJob.value}`,payload);
+
+    if (res.status === 200 || res.status === 201) {
+      alert(`檔案 "${file.name}" 已成功上傳到批次 "${currentUploadJob.value}"`);
+    }
+
+    const fetchResponse = await axios.get('http://localhost:8081/tourCar');
+    if (fetchResponse.status === 200 && Array.isArray(fetchResponse.data.result)) {
+      jobs.value = fetchResponse.data.result.map(item => {
+        item.time = formatDate(item.time);
+        return item;
+      });
+      originalJobs.value = [...jobs.value];
+      applySorting();
+      applyFilters();
+    }
+  } catch (err) {
+    console.error("單檔上傳錯誤：", err);
+    alert("單檔上傳時發生錯誤：" + err.message);
   }
-
-  e.target.value = ''
-  currentUploadJob.value = null
-}
-
+  e.target.value = '';
+  currentUploadJob.value = null;
+};
 </script>
 
 <style scoped>
