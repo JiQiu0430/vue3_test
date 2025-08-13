@@ -1,0 +1,68 @@
+2025-08-12 10:10:31.890 [INFO] Express server has started on port undefined. 
+2025-08-12 10:13:30.297 [INFO] Express server has started on port 8081. 
+2025-08-12 10:18:36.354 [INFO] socket is connection!
+2025-08-12 10:19:07.789 [INFO] socket closed!!
+2025-08-12 10:22:56.839 [INFO] Express server has started on port 8081. 
+2025-08-12 10:25:25.176 [INFO] Express server has started on port 8081. 
+2025-08-12 10:26:42.468 [INFO] Express server has started on port 8081. 
+2025-08-12 10:59:36.888 [INFO] Express server has started on port 8081. 
+2025-08-12 13:57:28.138 [INFO] Express server has started on port 8081. 
+2025-08-12 14:01:13.302 [INFO] Express server has started on port 8081. 
+2025-08-12 14:05:06.184 [INFO] Express server has started on port 8081. 
+2025-08-12 14:07:29.615 [INFO] Express server has started on port 8081. 
+2025-08-12 15:17:25.692 [INFO] Express server has started on port 8081.
+2025-08-12 15:18:51.492 [INFO] Delete UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b
+2025-08-12 15:18:51.498 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 15:18:51.505 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 15:18:51.525 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 15:18:51.529 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 15:18:51.534 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 15:20:32.358 [INFO] Delete UUID: 98b318c0-f9681cf2-cb69c21b-832ac0f0-cfa7c0c8
+2025-08-12 15:20:32.363 [INFO] Delete UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b
+2025-08-12 15:21:53.529 [INFO] Delete UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b
+2025-08-12 15:21:53.534 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 15:21:53.537 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 15:21:53.541 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 15:21:53.544 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 15:21:53.546 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 15:21:56.406 [INFO] Delete UUID: 98b318c0-f9681cf2-cb69c21b-832ac0f0-cfa7c0c8
+2025-08-12 20:31:14.190 [INFO] Delete UUID: 98b318c0-f9681cf2-cb69c21b-832ac0f0-cfa7c0c8
+2025-08-12 20:36:12.592 [INFO] Delete UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b
+2025-08-12 20:36:12.633 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 20:36:12.643 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 20:36:12.677 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 20:36:12.680 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 20:36:12.684 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 20:36:15.357 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 20:36:15.378 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 20:36:15.382 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 20:36:15.386 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 20:36:15.400 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 20:36:15.403 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 20:36:15.406 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 20:38:19.539 [INFO] Delete UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b
+2025-08-12 20:38:19.552 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 20:38:19.578 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 20:38:19.583 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 20:38:19.642 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 20:38:19.681 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 20:43:50.351 [INFO] Delete UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b
+2025-08-12 20:43:50.375 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 20:43:50.419 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 20:43:50.509 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 20:43:50.591 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 20:43:50.635 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 20:44:42.985 [INFO] Express server has started on port 8081.
+2025-08-12 21:02:09.516 [INFO] Express server has started on port 8081.
+2025-08-12 21:02:29.180 [INFO] Delete UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b
+2025-08-12 21:02:29.185 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 21:02:29.190 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 21:02:29.209 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 21:02:29.214 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 21:02:29.232 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 21:03:09.732 [INFO] Delete UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b
+2025-08-12 21:03:09.736 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 21:03:09.742 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 21:03:09.748 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 21:03:09.752 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-12 21:03:09.755 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null

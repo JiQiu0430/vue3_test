@@ -72,7 +72,30 @@
               </div>
             </th>
             <th>姓名</th>
-            <th>檔案上傳</th>
+            <th>
+              <span>檔案上傳</span>
+              <img
+                src="/filter.png"
+                class="filter-icon"
+                @click="toggleFilterMenu('upload')"
+              />
+              <div v-if="showFilterMenu.upload" class="filter-menu">
+              <span
+                @click="filterData('upload', 'all')"
+                :class="{ selected: filterConditions.upload === 'all' }"
+              >全部</span>
+              <div class="divider"></div>
+              <span
+                @click="filterData('upload', 1)"
+                :class="{ selected: filterConditions.upload === 1 }"
+              >正常</span>
+              <div class="divider"></div>
+              <span
+                @click="filterData('upload', 0)"
+                :class="{ selected: filterConditions.upload === 0 }"
+              >錯誤</span>
+              </div>
+            </th>
             <th>
               <span>對應工單號</span>
               <img
@@ -177,7 +200,7 @@
             <td :style="{ color: getTextColor(row) }">{{ row.serialNumber }}</td>
             <td :style="{ color: getTextColor(row) }">{{ row.id }}</td>
             <td :style="{ color: getTextColor(row) }">{{ row.name }}</td>
-            <td v-html="checkMark(row.upload)"></td>
+            <td v-html="renderUpload(row.upload)"></td>
             <td :style="{ color: getTextColor(row) }">
               <!-- 圓圈選擇 -->
               <div class="circle-select" v-if="isSameId(row)">
@@ -197,10 +220,10 @@
               >
                 <img src="/eye.png" class="action-icon" title="點擊查看此檔案Dicom" />
               </button>
-              <span v-html="checkMark(row.mapping)"></span>
+              <span v-html="renderMapping(row.mapping)"></span>
             </td>
-            <td v-html="checkMark(row.postAI)"></td>
-            <td v-html="checkMark(row.postPACS)"></td>
+            <td v-html="renderPost(row.postAI)"></td>
+            <td v-html="renderPost(row.postPACS)"></td>
             <td class="retry-cell">
               <div class="retry-buttons">
                 <button class="icon-button reload" @click="handleRetry(row, $event)">
@@ -300,26 +323,27 @@ onMounted(() => {
 })
 
 const errorFilesCount = computed(() => {
-  return caseData.value.filter(row => row.upload === 0 || row.postAI === false || row.postPACS === false || row.mapping === 'false').length;
+  return caseData.value.filter(row => row.upload === 0 || row.postAI === 0 || row.postPACS === 0 || row.mapping === 'false').length;
 });
 
 const errorFilterEnabled = ref(false);
 // 篩選錯誤檔案
 const filterErrorFiles = () => {
   errorFilterEnabled.value = true;
+  filterConditions.value.upload = 0;
   filterConditions.value.ai = 0;
   filterConditions.value.pacs = 0;
   filterConditions.value.mapping = 'false';
-  showFilterMenu.value = { ai: false, pacs: false, mapping: false };
+  showFilterMenu.value = { upload: false, ai: false, pacs: false, mapping: false };
   page.value = 1;
 };
 
 // 清除篩選條件
 const clearFilters = () => {
-  filterConditions.value = { ai: 'all', pacs: 'all', mapping: 'all' };
+  filterConditions.value = { ai: 'all', pacs: 'all', mapping: 'all', upload: 'all' };
   errorFilterEnabled.value = false;
   page.value = 1;
-  showFilterMenu.value = { ai: false, pacs: false, mapping: false };
+  showFilterMenu.value = { ai: false, pacs: false, mapping: false, upload: false };
 };
 
 // 解析 caseName
@@ -362,15 +386,8 @@ const isSameId = (row) => {
 
 // 當選擇圓圈時，顯示確認提示
 const handleRadioChange = (row, event) => {
-  const isConfirmed = confirm(`您確定選擇 ${row.serialNumber} 嗎？`);
+  const isConfirmed = confirm(`您真的確定選擇 ${row.serialNumber} 嗎？`);
   if (!isConfirmed) {
-    event.preventDefault();
-    return;
-  }
-
-  // 第二次確認
-  const isDoubleConfirmed = confirm(`您十分確定真的肯定選擇 ${row.serialNumber} 嗎？`);
-  if (!isDoubleConfirmed) {
     event.preventDefault();
     return;
   }
@@ -428,17 +445,15 @@ const loadDicomFromOrthanc = async () => {
 
   let imageId = null
 
-  // 方案A：有三個 DICOM UID（建議你之後把 0008,0018 存起來）
   if (selectedStudyUID.value && selectedSeriesUID.value && selectedSOPInstanceUID.value) {
     const wadoPath =
       `/wado?requestType=WADO` +
       `&studyUID=${encodeURIComponent(selectedStudyUID.value)}` +
       `&seriesUID=${encodeURIComponent(selectedSeriesUID.value)}` +
       `&objectUID=${encodeURIComponent(selectedSOPInstanceUID.value)}`
-    // 走相對路徑 → dev/prod 都會由你的後端代理出去
     imageId = `wadouri:${wadoPath}`
   }
-  // 方案B：只有 Orthanc 的 Instance UUID（你現在有）
+
   else if (selectedInstanceUUID.value) {
     const filePath = `/instances/${encodeURIComponent(selectedInstanceUUID.value)}/file`
     imageId = `wadouri:${filePath}`
@@ -506,8 +521,8 @@ const sortData = (field, order) => {
 };
 
 // 篩選功能
-const showFilterMenu = ref({ ai: false, pacs: false, mapping: false });
-const filterConditions = ref({ ai: 'all', pacs: 'all', mapping: 'all' });
+const showFilterMenu = ref({ ai: false, pacs: false, mapping: false, upload: false });
+const filterConditions = ref({ ai: 'all', pacs: 'all', mapping: 'all', upload: 'all' });
 
 const filterData = (field, value) => {
   filterConditions.value[field] = value;
@@ -520,9 +535,12 @@ const paginatedData = computed(() => {
 
   if (errorFilterEnabled.value) {
     data = data.filter(item => 
-      item.postAI === 0 || item.postPACS === 0 || item.mapping === 'false'
+      Number(item.upload) === 0 || Number(item.postAI) === 0 || Number(item.postPACS) === 0 || item.mapping === 'false'
     );
   } else{
+    if (filterConditions.value.upload !== 'all') {
+      data = data.filter(item => Number(item.upload) === Number(filterConditions.value.upload));
+    }
     if (filterConditions.value.ai !== 'all') {
       data = data.filter(item => item.postAI === filterConditions.value.ai);
     }
@@ -636,14 +654,33 @@ const prevPage = () => { if (page.value > 1) page.value-- }
 const nextPage = () => { if (page.value < totalPages.value) page.value++ }
 
 // 顯示勾/叉
-const checkMark = (value) => {
-  if (value === 2) return '<span class="gray-cross">✔</span>'
-  if (value === 0) return '<span class="red-cross">✘</span>'
-  if (value === 1) return '<span class="gray-cross">--</span>'
-  if (value === 'false') return '✘';
-  if (value) return value;
-  return '<span class="gray-cross">--</span>'
-}
+// 檔案上傳
+const renderUpload = (val) => {
+  const n = Number(val);
+  if (n === 1) return '<span class="gray-cross">✔</span>';
+  return '<span class="red-cross">✘</span>';
+};
+
+// AI / PACS
+const renderPost = (val) => {
+  const n = Number(val);
+  if (n === 2) return '<span class="gray-cross">✔</span>';
+  if (n === 1) return '<span class="gray-cross">--</span>';
+  if (n === 0) return '<span class="red-cross">✘</span>';
+  return '<span class="gray-cross">--</span>';
+};
+
+// 對應工單號
+const renderMapping = (mapping) => {
+  if (mapping == null || mapping === '') {
+  return '<span class="gray-cross">--</span>';
+  }
+  if (mapping === 'false' || mapping === false || Number(mapping) === 0) {
+    return '<span class="red-cross">✘</span>';
+  }
+  return String(mapping).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+};
+
 
 const selectedSerialNumber = ref(null)
 
@@ -652,7 +689,7 @@ const getTextColor = (row) => {
   if (row.mapping === 'false') {
     return '#e74c3c';
   }
-  if (row.upload === false || row.postAI === 0 || row.postPACS === 0) {
+  if (row.upload === 0 || row.postAI === 0 || row.postPACS === 0) {
     return '#e74c3c';
   }
   if (isSameId(row) && !selectedSerialNumber.value) {
