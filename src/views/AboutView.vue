@@ -193,7 +193,7 @@
               <button
                 v-if="isSameId(row)"
                 class="icon-button dicom-view"
-                @click="showDicomViewer"
+                @click="showDicomViewer(row)"
               >
                 <img src="/eye.png" class="action-icon" title="點擊查看此檔案Dicom" />
               </button>
@@ -215,7 +215,7 @@
       <!-- 顯示 DICOM 的彈出視窗 -->
       <div v-if="dicomVisible" class="dicom-modal" @click="closeDicomViewer">
         <div class="dicom-modal-content" @click.stop>
-          <h2>DICOM 影像</h2>
+          <h2>DICOM 影像 | 流水號：{{ selectedDicomSerial || 'N/A' }}</h2>
           <div class="dicom-viewer">
             <!-- 使用 ref 來獲取 DICOM 顯示區域 -->
             <div ref="dicomCanvas" class="dicom-canvas"></div>
@@ -284,6 +284,7 @@ const fetchCaseData = async () => {
         ...parsedData,
       };
     })
+    originalCaseData.value = [...caseData.value];
     } else {
       console.error('返回的資料不是陣列:', response.data.result);
       caseData.value = [];
@@ -378,55 +379,82 @@ const handleRadioChange = (row, event) => {
 
 // 彈出 DICOM 視窗
 const dicomVisible = ref(false)
-const showDicomViewer = () => {
+const dicomCanvas = ref(null)
+const selectedDicomSerial = ref(null)
+const selectedStudyUID = ref(null)
+const selectedSeriesUID = ref(null)
+const selectedSOPInstanceUID = ref(null)
+const selectedInstanceUUID = ref(null)
+const showDicomViewer = (row) => {
+  selectedDicomSerial.value = row?.serialNumber || null
+  selectedStudyUID.value = row?.studyId || null
+  selectedSeriesUID.value = row?.seriesId || null
+  selectedSOPInstanceUID.value = row?.instanceUID || row?.instancesId || null
+  selectedInstanceUUID.value = row?.instancesUUId || null
+
   dicomVisible.value = true
   nextTick(() => {
-    loadDicomFile()  // 確保 DOM 元素渲染後再載入 DICOM 影像
+    loadDicomFromOrthanc()
   })
 }
 const closeDicomViewer = () => {
   dicomVisible.value = false
+  selectedDicomSerial.value = null
+  selectedStudyUID.value = null
+  selectedSeriesUID.value = null
+  selectedSOPInstanceUID.value = null
+  selectedInstanceUUID.value = null
 }
-// 使用 Vue3 的 ref 來獲取 DOM 引用
-const dicomCanvas = ref(null)
+
 onMounted(() => {
   // 配置 cornerstoneWADOImageLoader，並啟用 Web Workers
   cornerstoneWADOImageLoader.external.cornerstone = cornerstone
   cornerstoneWADOImageLoader.configure({
-    useWebWorkers: true, // 使用 Web Worker 加速影像處理
+    useWebWorkers: true,
+    beforeSend: (xhr) => {
+     // 若 Orthanc/CORS 需要憑證（建議一起開）：
+      xhr.withCredentials = true
+      const token = btoa(`orthanc:orthanc`)
+      xhr.setRequestHeader('Authorization', `Basic ${token}`)
+    },
   })
 })
 
 // 載入 DICOM 檔案
-const loadDicomFile = () => {
-  const dicomFilePath = '/1-040.dcm' // 放在 public 資料夾中的 DICOM 檔案路徑
+const loadDicomFromOrthanc = async () => {
+  const element = dicomCanvas.value
+  if (!element) return
+  cornerstone.enable(element)
 
-  // 取得顯示區域
-  const element = dicomCanvas.value // 使用 ref 獲取 DOM 元素
-  cornerstone.enable(element) // 啟用 Cornerstone 來顯示影像
+  let imageId = null
 
-  // 使用 fetch 來讀取檔案並將其轉換為 Blob
-  fetch(dicomFilePath)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Failed to fetch DICOM file')
-      }
-      return response.blob()  // 轉換為 Blob
-    })
-    .then(blob => {
-      // 創建 URL
-      const imageId = cornerstoneWADOImageLoader.wadouri.fileManager.add(blob)
+  // 方案A：有三個 DICOM UID（建議你之後把 0008,0018 存起來）
+  if (selectedStudyUID.value && selectedSeriesUID.value && selectedSOPInstanceUID.value) {
+    const wadoPath =
+      `/wado?requestType=WADO` +
+      `&studyUID=${encodeURIComponent(selectedStudyUID.value)}` +
+      `&seriesUID=${encodeURIComponent(selectedSeriesUID.value)}` +
+      `&objectUID=${encodeURIComponent(selectedSOPInstanceUID.value)}`
+    // 走相對路徑 → dev/prod 都會由你的後端代理出去
+    imageId = `wadouri:${wadoPath}`
+  }
+  // 方案B：只有 Orthanc 的 Instance UUID（你現在有）
+  else if (selectedInstanceUUID.value) {
+    const filePath = `/instances/${encodeURIComponent(selectedInstanceUUID.value)}/file`
+    imageId = `wadouri:${filePath}`
+  }
 
-      // 載入影像並顯示
-      cornerstone.loadImage(imageId).then((image) => {
-        cornerstone.displayImage(element, image)
-      }).catch((err) => {
-        console.error("DICOM 影像載入錯誤:", err)
-      })
-    })
-    .catch((err) => {
-      console.error("無法載入 DICOM 檔案:", err)
-    })
+  if (!imageId) {
+    console.error('缺少可用識別（DICOM UIDs 或 Orthanc UUID），無法載入 DICOM')
+    return
+  }
+
+  try {
+    const image = await cornerstone.loadImage(imageId)
+    cornerstone.displayImage(element, image)
+  } catch (err) {
+    console.error('載入 Orthanc 影像失敗：', err)
+  }
 }
 
 // 排序功能
@@ -440,41 +468,39 @@ const originalCaseData = ref([...caseData.value]);
 // 控制箭頭圖標
 const getArrowIcon = (field) => {
   if (sortState.value[field] === 'asc') {
-    return '/arrowDown.png'; // 向下箭頭
+    return '/arrowDown.png';
   } else if (sortState.value[field] === 'desc') {
-    return '/arrowUp.png'; // 向上箭頭
+    return '/arrowUp.png';
   } else {
-    return '/arrowBoth.png'; // 上下箭頭圖標
+    return '/arrowBoth.png';
   }
 };
-
 const toggleSort = (field) => {
-  // 依據目前的排序狀態切換
   if (sortState.value[field] === 'none') {
-    sortState.value[field] = 'asc'; // 初次點擊升序
+    sortState.value[field] = 'asc';
   } else if (sortState.value[field] === 'asc') {
-    sortState.value[field] = 'desc'; // 第二次點擊降序
+    sortState.value[field] = 'desc';
   } else {
-    sortState.value[field] = 'none'; // 第三次點擊恢復原樣
-    caseData.value = [...originalCaseData.value]; // 恢復原始資料順序
+    sortState.value[field] = 'none';
+    caseData.value = [...originalCaseData.value];
   }
-  sortData(field, sortState.value[field]); // 根據當前排序狀態進行排序
+  sortData(field, sortState.value[field]);
 };
 
 const sortData = (field, order) => {
   if (order === 'asc') {
     caseData.value.sort((a, b) => {
       if (field === 'serialNumber') {
-        return a.caseName.localeCompare(b.caseName); // 按流水號排序
+        return a.caseName.localeCompare(b.caseName);
       }
-      return a.id.localeCompare(b.id); // 按身份證字號排序
+      return a.id.localeCompare(b.id);
     });
   } else if (order === 'desc') {
     caseData.value.sort((a, b) => {
       if (field === 'serialNumber') {
-        return b.caseName.localeCompare(a.caseName); // 按流水號降序
+        return b.caseName.localeCompare(a.caseName);
       }
-      return b.id.localeCompare(a.id); // 按身份證字號降序
+      return b.id.localeCompare(a.id);
     });
   }
 };
@@ -485,7 +511,7 @@ const filterConditions = ref({ ai: 'all', pacs: 'all', mapping: 'all' });
 
 const filterData = (field, value) => {
   filterConditions.value[field] = value;
-  showFilterMenu.value[field] = false; // 點擊選擇篩選後，隱藏對應選單
+  showFilterMenu.value[field] = false;
 };
 
 // 篩選的結果
@@ -497,7 +523,6 @@ const paginatedData = computed(() => {
       item.postAI === 0 || item.postPACS === 0 || item.mapping === 'false'
     );
   } else{
-    // 篩選條件：根據 ai、pacs 和 mapping 進行過濾
     if (filterConditions.value.ai !== 'all') {
       data = data.filter(item => item.postAI === filterConditions.value.ai);
     }
@@ -507,16 +532,12 @@ const paginatedData = computed(() => {
 
     // 處理篩選選項
     if (filterConditions.value.mapping === 'false') {
-      // 顯示 mapping 為字串 'false' 的資料
       data = data.filter(item => item.mapping === 'false');
     } else if (filterConditions.value.mapping === 'hasValue') {
-      // 顯示所有正常工單號的資料
       data = data.filter(item => item.mapping && item.mapping !== '' && item.mapping !== 'false');
     } else if (filterConditions.value.mapping === null) {
-      // 篩選出 mapping 為 null 或空字串的資料
       data = data.filter(item => item.mapping === null || item.mapping === '');
     } else if (filterConditions.value.mapping === 'sameId') {
-      // 篩選出相同身份證字號的工單號
       data = data.filter(item => {
         return caseData.value.filter(subItem => subItem.id === item.id).length > 1;
       });
@@ -524,7 +545,7 @@ const paginatedData = computed(() => {
   }
   // 如果選擇 "全部"，不進行過濾，顯示所有資料
   if (filterConditions.value.mapping === 'all') {
-    // 保持篩選後的資料，不覆蓋
+    // 保持篩選後的資料
   }
   return data.slice((page.value - 1) * pageSize.value, page.value * pageSize.value);
 });
@@ -550,37 +571,44 @@ const retryAll = () => {
 };
 
 // 導出資料
-const exportCSV = () => {
-  const headers = ['流水號', '身份證字號', '姓名', '檔案上傳', '對應工單號', '傳給AI', '傳給PACS']
-  const rows = caseData.value.map(row => [
-    row.serialNumber,
-    row.id,
-    row.name,
-    row.upload ? 'V' : 'X',
-    formatMapping(row.mapping),
-    row.postAI ? 'V' : 'X',
-    row.postPACS ? 'V' : 'X',
-  ])
-  const csvContent = [headers, ...rows]
-    .map(e => e.map(v => `"${v}"`).join(','))
-    .join('\n')
-
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-  const link = document.createElement('a')
-  link.href = URL.createObjectURL(blob)
-  link.setAttribute('download', 'case_data.csv')
-  link.click()
-}
-
-// 根據 Mapping 的值來決定導出的內容
-const formatMapping = (mapping) => {
-  if (mapping === 'false') {
-    return '✘';
-  } 
-  if (mapping) {
-    return mapping;
-  }
+const toMark01 = (val) => Number(val) === 1 ? 'V' : 'X';
+const toMark012 = (val) => {
+  const n = Number(val);
+  if (Number.isNaN(n)) return '--';
+  if (n === 0) return 'X';
+  if (n === 1) return '--';
+  if (n === 2) return 'V';
   return '--';
+};
+
+const formatMapping = (mapping) => {
+  if (mapping == null) return '--'; // null 或 undefined
+  if (mapping === 'false' || mapping === false || Number(mapping) === 0) return 'X';
+  return String(mapping);
+};
+
+const exportCSV = () => {
+  const headers = ['流水號', '身份證字號', '姓名', '檔案上傳', '對應工單號', '傳給AI', '傳給PACS'];
+
+  const rows = caseData.value.map(row => [
+    row.serialNumber ?? '',
+    row.id ?? '',
+    row.name ?? '',
+    toMark01(row.upload),
+    formatMapping(row.mapping),
+    toMark012(row.postAI),
+    toMark012(row.postPACS),
+  ]);
+
+  const csvContent = [headers, ...rows]
+    .map(e => e.map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
+    .join('\n');
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.setAttribute('download', 'case_data.csv');
+  link.click();
 };
 
 // 頁數計算
@@ -589,7 +617,6 @@ const pageSize = ref(10);
 
 const totalPages = computed(() => Math.ceil(filteredData.value.length / pageSize.value))
 
-// 根據頁數計算需要顯示的頁碼（最多顯示3個頁碼）
 const pageNumbers = computed(() => {
   if (totalPages.value <= 3) {
     return Array.from({ length: totalPages.value }, (_, i) => i + 1);

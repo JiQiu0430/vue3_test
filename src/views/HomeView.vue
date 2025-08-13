@@ -82,9 +82,6 @@
               <button class="icon-button" @click="selectFileForJob(item.job)" title="點擊上傳檔案">
                 <img src="/upload.png" class="action-icon" alt="upload file" />
               </button>
-              <button class="icon-button" title="點擊下載批次">
-                <img src="/download.png" class="action-icon" alt="download" />
-              </button>
               <button class="icon-button" @click="deleteJob(item.job)" title="點擊刪除批次">
                 <img src="/trash-bin.png" class="action-icon" alt="delete" />
               </button>
@@ -676,8 +673,8 @@ const handleSingleFileUpload = async (e) => {
       patientId: dicomData.patientId || '',
       studyId: dicomData.studyId || '',
       seriesId: dicomData.seriesId || '',
-      series: "6", // 固定值
-      upload: 1    // 固定值
+      series: "1",
+      upload: 1
     };
 
     const res = await axios.post(`http://localhost:8081/tourCarCase/${currentUploadJob.value}`,payload);
