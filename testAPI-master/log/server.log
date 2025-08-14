@@ -1,75 +1,25 @@
-2025-08-13 14:56:06.453 [ERROR] Error: connect ECONNREFUSED ::1:3306
-    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1555:16)
-    --------------------
-    at Protocol._enqueue (C:\Users\霽秋\OneDrive\桌面\demo\testAPI-master\node_modules\mysql\lib\protocol\Protocol.js:144:48)
-    at Protocol.handshake (C:\Users\霽秋\OneDrive\桌面\demo\testAPI-master\node_modules\mysql\lib\protocol\Protocol.js:51:23)
-    at PoolConnection.connect (C:\Users\霽秋\OneDrive\桌面\demo\testAPI-master\node_modules\mysql\lib\Connection.js:116:18)
-    at Pool.getConnection (C:\Users\霽秋\OneDrive\桌面\demo\testAPI-master\node_modules\mysql\lib\Pool.js:48:16)
-    at C:\Users\霽秋\OneDrive\桌面\demo\testAPI-master\node_modules\typeorm\driver\mysql\MysqlDriver.js:1011:18
-    at new Promise (<anonymous>)
-    at MysqlDriver.createPool (C:\Users\霽秋\OneDrive\桌面\demo\testAPI-master\node_modules\typeorm\driver\mysql\MysqlDriver.js:1008:16)
-    at MysqlDriver.connect (C:\Users\霽秋\OneDrive\桌面\demo\testAPI-master\node_modules\typeorm\driver\mysql\MysqlDriver.js:305:36)
-    at DataSource.initialize (C:\Users\霽秋\OneDrive\桌面\demo\testAPI-master\node_modules\typeorm\data-source\DataSource.js:137:27)
-    at DataSource.connect (C:\Users\霽秋\OneDrive\桌面\demo\testAPI-master\node_modules\typeorm\data-source\DataSource.js:176:21) {
-  errno: -4078,
-  code: 'ECONNREFUSED',
-  syscall: 'connect',
-  address: '::1',
-  port: 3306,
-  fatal: true
-}
-2025-08-13 14:56:59.887 [ERROR] Error: connect ECONNREFUSED ::1:3306
-    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1555:16)
-    --------------------
-    at Protocol._enqueue (C:\Users\霽秋\OneDrive\桌面\demo\testAPI-master\node_modules\mysql\lib\protocol\Protocol.js:144:48)
-    at Protocol.handshake (C:\Users\霽秋\OneDrive\桌面\demo\testAPI-master\node_modules\mysql\lib\protocol\Protocol.js:51:23)
-    at PoolConnection.connect (C:\Users\霽秋\OneDrive\桌面\demo\testAPI-master\node_modules\mysql\lib\Connection.js:116:18)
-    at Pool.getConnection (C:\Users\霽秋\OneDrive\桌面\demo\testAPI-master\node_modules\mysql\lib\Pool.js:48:16)
-    at C:\Users\霽秋\OneDrive\桌面\demo\testAPI-master\node_modules\typeorm\driver\mysql\MysqlDriver.js:1011:18
-    at new Promise (<anonymous>)
-    at MysqlDriver.createPool (C:\Users\霽秋\OneDrive\桌面\demo\testAPI-master\node_modules\typeorm\driver\mysql\MysqlDriver.js:1008:16)
-    at MysqlDriver.connect (C:\Users\霽秋\OneDrive\桌面\demo\testAPI-master\node_modules\typeorm\driver\mysql\MysqlDriver.js:305:36)
-    at DataSource.initialize (C:\Users\霽秋\OneDrive\桌面\demo\testAPI-master\node_modules\typeorm\data-source\DataSource.js:137:27)
-    at DataSource.connect (C:\Users\霽秋\OneDrive\桌面\demo\testAPI-master\node_modules\typeorm\data-source\DataSource.js:176:21) {
-  errno: -4078,
-  code: 'ECONNREFUSED',
-  syscall: 'connect',
-  address: '::1',
-  port: 3306,
-  fatal: true
-}
-2025-08-13 15:01:17.284 [INFO] Express server has started on port 8081.
-2025-08-13 15:03:00.063 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
-2025-08-13 15:03:00.069 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
-2025-08-13 15:03:00.073 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
-2025-08-13 15:03:00.077 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
-2025-08-13 15:03:00.081 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
-2025-08-13 15:03:00.084 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
-2025-08-13 15:03:00.087 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
-2025-08-13 15:03:02.743 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
-2025-08-13 15:03:02.749 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
-2025-08-13 15:03:02.754 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
-2025-08-13 15:03:02.760 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
-2025-08-13 15:03:02.764 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
-2025-08-13 15:03:02.768 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
-2025-08-13 16:19:03.395 [INFO] Delete UUID: 98b318c0-f9681cf2-cb69c21b-832ac0f0-cfa7c0c8
-2025-08-13 16:19:06.179 [INFO] Delete UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b
-2025-08-13 16:19:06.184 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
-2025-08-13 16:19:06.187 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
-2025-08-13 16:19:06.191 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
-2025-08-13 16:19:06.195 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
-2025-08-13 16:19:06.198 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
-2025-08-13 16:19:07.923 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
-2025-08-13 16:19:07.927 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
-2025-08-13 16:19:07.931 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
-2025-08-13 16:19:07.934 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
-2025-08-13 16:19:07.938 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
-2025-08-13 16:19:07.941 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
-2025-08-13 16:19:07.944 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
-2025-08-13 16:20:42.740 [INFO] Delete UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b
-2025-08-13 16:20:42.744 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
-2025-08-13 16:20:42.748 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
-2025-08-13 16:20:42.751 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
-2025-08-13 16:20:42.754 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
-2025-08-13 16:20:42.757 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
-2025-08-13 16:20:42.761 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-14 17:31:00.001 [INFO] Delete UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b
+2025-08-14 17:31:00.153 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-14 17:31:00.160 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-14 17:31:00.167 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-14 17:31:00.214 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-14 17:31:00.218 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-14 17:31:00.221 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-14 17:31:02.864 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-14 17:31:02.888 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-14 17:31:02.891 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-14 17:31:02.894 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-14 17:31:02.906 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-14 17:31:02.909 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-14 18:14:24.638 [INFO] Delete UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b
+2025-08-14 18:14:24.644 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-14 18:14:24.648 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-14 18:14:24.651 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-14 18:14:24.653 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-14 18:14:24.657 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-14 18:15:28.860 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-14 18:15:28.863 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-14 18:15:28.866 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-14 18:15:28.869 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-14 18:15:28.872 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-14 18:15:28.875 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null

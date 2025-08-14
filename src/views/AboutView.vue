@@ -206,10 +206,10 @@
               <div class="circle-select" v-if="isSameId(row)">
                 <input
                   type="radio"
-                  :name="row.id"
+                  :name="`pick-${row.id}`"
                   :value="row.serialNumber"
-                  @click="handleRadioChange(row, $event)"
-                  v-model="selectedSerialNumber"
+                  @change="handleRadioChange(row, $event)"
+                  v-model="selectedMapping[row.id]"
                 />
               </div>
               <!-- 顯示查看 DICOM 按鈕 -->
@@ -220,7 +220,7 @@
               >
                 <img src="/eye.png" class="action-icon" title="點擊查看此檔案Dicom" />
               </button>
-              <span v-html="renderMapping(row.mapping)"></span>
+              <span v-html="renderMappingCell(row)"></span>
             </td>
             <td v-html="renderPost(row.postAI)"></td>
             <td v-html="renderPost(row.postPACS)"></td>
@@ -298,16 +298,17 @@ const fetchCaseData = async () => {
     console.log('7:', response);
 
     if (Array.isArray(response.data.result)) {
-      caseData.value = response.data.result;
       caseData.value = response.data.result.map(item => {
         console.log(item);
       const parsedData = parseCaseName(item.caseName);
       return {
         ...item,
+        dbId: item.id,
         ...parsedData,
       };
     })
     originalCaseData.value = [...caseData.value];
+    initSelectionFromDB();
     } else {
       console.error('返回的資料不是陣列:', response.data.result);
       caseData.value = [];
@@ -383,15 +384,91 @@ const selectedMapping = ref({})
 const isSameId = (row) => {
   return caseData.value.filter(item => item.id === row.id).length > 1;
 }
+const isBadMapping = (m) => (m == null || m === '' || m === 'false' || m === false || Number(m) === 0);
+const isGroupCommitted = (idCard) => {
+  return caseData.value
+    .filter(r => r.id === idCard)
+    .some(r => !isBadMapping(r.mapping));
+};
+const initSelectionFromDB = () => {
+  selectedMapping.value = {};
+  const groups = new Map();
+  for (const row of caseData.value) {
+    if (!groups.has(row.id)) groups.set(row.id, []);
+    groups.get(row.id).push(row);
+  }
+
+  groups.forEach((rows, idCard) => {
+    if (!isGroupCommitted(idCard)) return;
+
+    let chosen = rows.find(r => !isBadMapping(r.mapping) && String(r.mapping) === String(r.accNumbers));
+    if (!chosen) chosen = rows.find(r => !isBadMapping(r.mapping));
+
+    if (chosen && chosen.serialNumber != null) {
+      selectedMapping.value[idCard] = chosen.serialNumber;
+    }
+  });
+};
+
+const escapeHtml = (s) => String(s).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const renderMappingHTML = (mapping) => {
+  if (mapping == null || mapping === '') return '<span class="gray-cross">--</span>';
+  if (mapping === 'false' || mapping === false || Number(mapping) === 0) return '<span class="red-cross">✘</span>';
+  return escapeHtml(String(mapping));
+};
+const renderMappingCell = (row) => {
+  if (isSameId(row) && !isGroupCommitted(row.id)) {
+    const txt = row.accNumbers ?? '--';
+    return `<span class="gray-cross">${escapeHtml(txt)}</span>`;
+  }
+  return renderMappingHTML(row.mapping);
+};
+
+const updateMappingSingle = async (row, newMapping) => {
+  const url = `http://localhost:8081/tourCarCase`;
+  const payload = {
+    caseName: row.caseName,
+    mapping: (newMapping ?? null),
+  };
+
+  const res = await axios.put(url, payload, {
+    headers: { 'Content-Type': 'application/json' }
+  });
+
+  const ok = (res?.status === 200) && (res?.data?.codeStatus === 200);
+  if (!ok) {
+    throw new Error(res?.data?.message || `更新失敗 (status=${res?.status})`);
+  }
+  return res.data?.result;
+};
 
 // 當選擇圓圈時，顯示確認提示
-const handleRadioChange = (row, event) => {
-  const isConfirmed = confirm(`您真的確定選擇 ${row.serialNumber} 嗎？`);
-  if (!isConfirmed) {
+const handleRadioChange = async (row, event) => {
+  const ok = confirm(`您確定選擇 ${row.serialNumber}（身分證：${row.id}）嗎？`);
+  if (!ok) {
     event.preventDefault();
     return;
   }
-  selectedSerialNumber.value = row.serialNumber;
+  const group = caseData.value.filter(r => r.id === row.id);
+  const prevSelected = selectedMapping.value[row.id];
+  const chosenMapping = row.accNumbers ?? null;
+  const snapshots = group.map(g => ({ g, prev: g.mapping }));
+  group.forEach(g => {
+    g.mapping = (g.caseName === row.caseName) ? chosenMapping : null;
+  });
+
+  try {
+    await Promise.all(group.map(g => {
+      const target = (g.caseName === row.caseName) ? chosenMapping : null;
+      return updateMappingSingle(g, target);
+    }));
+    selectedMapping.value[row.id] = row.serialNumber;
+  } catch (e) {
+    alert('更新失敗，已還原。');
+    snapshots.forEach(({ g, prev }) => { g.mapping = prev; });
+    selectedMapping.value[row.id] = prevSelected;
+    event.preventDefault();
+  }
 };
 
 // 彈出 DICOM 視窗
@@ -560,7 +637,6 @@ const paginatedData = computed(() => {
       });
     }
   }
-  // 如果選擇 "全部"，不進行過濾，顯示所有資料
   if (filterConditions.value.mapping === 'all') {
     // 保持篩選後的資料
   }
@@ -669,37 +745,37 @@ const renderPost = (val) => {
   return '<span class="gray-cross">--</span>';
 };
 
-// 對應工單號
-const renderMapping = (mapping) => {
-  if (mapping == null || mapping === '') {
-  return '<span class="gray-cross">--</span>';
-  }
-  if (mapping === 'false' || mapping === false || Number(mapping) === 0) {
-    return '<span class="red-cross">✘</span>';
-  }
-  return String(mapping).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const getChosenSerialForId = (idCard) => {
+  const picked = selectedMapping.value?.[idCard];
+  if (picked) return picked;
+  const group = caseData.value.filter(r => r.id === idCard);
+  let chosen = group.find(r => !isBadMapping(r.mapping) && String(r.mapping) === String(r.accNumbers));
+  if (!chosen) chosen = group.find(r => !isBadMapping(r.mapping));
+  return chosen?.serialNumber ?? null;
 };
 
-
-const selectedSerialNumber = ref(null)
-
-// 顏色變化邏輯
 const getTextColor = (row) => {
-  if (row.mapping === 'false') {
-    return '#e74c3c';
-  }
-  if (row.upload === 0 || row.postAI === 0 || row.postPACS === 0) {
-    return '#e74c3c';
-  }
-  if (isSameId(row) && !selectedSerialNumber.value) {
+  if (isSameId(row) && !isGroupCommitted(row.id) && !selectedMapping.value[row.id]) {
     return '#FFFF00';
   }
-  // 根據是否選中來設置文字顏色
-  if (selectedMapping.value[row.id] === row.mapping) {
-    return '#ffffff !important';
-  } 
-  return '#ffffff';
-}
+  if (isSameId(row) && isGroupCommitted(row.id)) {
+    const chosenSerial = getChosenSerialForId(row.id);
+    if (chosenSerial && row.serialNumber !== chosenSerial) {
+      return '#bfbfbf';
+    }
+    return '#ffffff';
+  }
+  let color = '#ffffff';
+  if (
+    Number(row.upload) === 0 ||
+    Number(row.postAI) === 0 ||
+    Number(row.postPACS) === 0 ||
+    row.mapping === 'false' || row.mapping === false || Number(row.mapping) === 0
+  ) {
+    color = '#e74c3c';
+  }
+  return color;
+};
 
 // 當點擊 "重新嘗試" 時顯示確認提示
 const handleRetry = (row, event) => {
