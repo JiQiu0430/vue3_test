@@ -429,7 +429,6 @@ onMounted(() => {
   cornerstoneWADOImageLoader.configure({
     useWebWorkers: true,
     beforeSend: (xhr) => {
-     // 若 Orthanc/CORS 需要憑證（建議一起開）：
       xhr.withCredentials = true
       const token = btoa(`orthanc:orthanc`)
       xhr.setRequestHeader('Authorization', `Basic ${token}`)

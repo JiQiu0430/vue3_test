@@ -38,3 +38,17 @@
   port: 3306,
   fatal: true
 }
+2025-08-13 15:01:17.284 [INFO] Express server has started on port 8081.
+2025-08-13 15:03:00.063 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-13 15:03:00.069 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-13 15:03:00.073 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-13 15:03:00.077 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-13 15:03:00.081 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-13 15:03:00.084 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-13 15:03:00.087 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-13 15:03:02.743 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-13 15:03:02.749 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-13 15:03:02.754 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-13 15:03:02.760 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-13 15:03:02.764 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-13 15:03:02.768 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
