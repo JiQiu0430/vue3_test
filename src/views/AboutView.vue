@@ -754,23 +754,25 @@ const getChosenSerialForId = (idCard) => {
   return chosen?.serialNumber ?? null;
 };
 
+const isExplicitMappingFail = (m) =>
+  m === 'false' || m === false || m === 0 || m === '0';
+
 const getTextColor = (row) => {
   if (isSameId(row) && !isGroupCommitted(row.id) && !selectedMapping.value[row.id]) {
     return '#FFFF00';
   }
   if (isSameId(row) && isGroupCommitted(row.id)) {
     const chosenSerial = getChosenSerialForId(row.id);
-    if (chosenSerial && row.serialNumber !== chosenSerial) {
-      return '#bfbfbf';
-    }
+    if (chosenSerial && row.serialNumber !== chosenSerial) return '#6b7280';
     return '#ffffff';
   }
   let color = '#ffffff';
+
   if (
     Number(row.upload) === 0 ||
     Number(row.postAI) === 0 ||
     Number(row.postPACS) === 0 ||
-    row.mapping === 'false' || row.mapping === false || Number(row.mapping) === 0
+    isExplicitMappingFail(row.mapping)
   ) {
     color = '#e74c3c';
   }
