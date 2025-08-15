@@ -208,7 +208,7 @@
                   type="radio"
                   :name="`pick-${row.id}`"
                   :value="row.serialNumber"
-                  @change="handleRadioChange(row, $event)"
+                  @click="handleRadioChange(row, $event)"
                   v-model="selectedMapping[row.id]"
                 />
               </div>
@@ -729,7 +729,6 @@ const prevPage = () => { if (page.value > 1) page.value-- }
 const nextPage = () => { if (page.value < totalPages.value) page.value++ }
 
 // 顯示勾/叉
-// 檔案上傳
 const renderUpload = (val) => {
   const n = Number(val);
   if (n === 1) return '<span class="gray-cross">✔</span>';

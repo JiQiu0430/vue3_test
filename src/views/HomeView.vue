@@ -670,6 +670,7 @@ const handleSingleFileUpload = async (e) => {
 
     const payload = {
       caseName: dicomData.caseName,
+      instancesId: dicomData.instancesId || '',
       patientId: dicomData.patientId || '',
       studyId: dicomData.studyId || '',
       seriesId: dicomData.seriesId || '',

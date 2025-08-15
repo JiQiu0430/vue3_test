@@ -296,6 +296,7 @@ class TourCarController {
                                         instancesUUID += "-";
                                     }
                                 }
+                                console.log(_body.patientId, _body.studyId, _body.seriesId, _body.instancesId)
                                 const _obj = new TourCarCase_1.TourCarCase();
                                 if (isMapping) {
                                     _obj.mapping = testData.accNum;
