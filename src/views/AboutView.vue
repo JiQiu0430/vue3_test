@@ -222,8 +222,8 @@
               </button>
               <span v-html="renderMappingCell(row)"></span>
             </td>
-            <td v-html="renderPost(row.postAI)"></td>
             <td v-html="renderPost(row.postPACS)"></td>
+            <td v-html="renderPost(row.postAI)"></td>
             <td class="retry-cell">
               <div class="retry-buttons">
                 <button class="icon-button reload" @click="handleRetry(row, $event)">
@@ -429,8 +429,10 @@ const updateMappingSingle = async (row, newMapping) => {
   const payload = {
     caseName: row.caseName,
     mapping: (newMapping ?? null),
+    postPACS: row.postPACS,
+    postAI: row.postAI
   };
-
+  
   const res = await axios.put(url, payload, {
     headers: { 'Content-Type': 'application/json' }
   });

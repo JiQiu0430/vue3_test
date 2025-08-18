@@ -179,6 +179,9 @@ import { ref, computed } from 'vue'
 import { onMounted } from 'vue'
 import axios from 'axios'
 import * as dicomParser from "dicom-parser";
+import { onUnmounted } from 'vue'
+import { io } from 'socket.io-client'
+const socket = io('http://localhost:8081', { transports: ['websocket'] })
 
 const router = useRouter()
 
@@ -212,6 +215,36 @@ onMounted(async () => {
     console.error("無法加載 jobs 資料", error);
   }
 });
+
+// 新增：只給 socket 用的刷新函式（沿用你現有 formatDate）
+const refreshJobs = async () => {
+  try {
+    const { data } = await axios.get('http://localhost:8081/tourCar')
+    if (Array.isArray(data?.result)) {
+      jobs.value = data.result.map(item => {
+        item.time = formatDate(item.time)   // 保留你的顯示格式
+        return item
+      })
+      originalJobs.value = [...jobs.value]
+      applySorting()
+      applyFilters()
+    }
+  } catch (e) {
+    console.error('即時刷新失敗', e)
+  }
+}
+
+// 綁定事件（不要改你原本的 onMounted；這段只是附加監聽）
+onMounted(() => {
+  socket.on('tourcar:update', refreshJobs)
+  // 若你同時有 'tourcar:message' 也順手綁上（可選）
+  socket.on('tourcar:message', refreshJobs)
+})
+
+onUnmounted(() => {
+  socket.off('tourcar:update', refreshJobs)
+  socket.off('tourcar:message', refreshJobs)
+})
 
 // 控制上傳視窗顯示
 const showDialog = ref(false)

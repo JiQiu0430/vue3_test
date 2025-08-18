@@ -33,8 +33,35 @@ class TourCarController {
     }
     /** 取得TourCar結果 ([httpget] /tourCar) */
     getTourCar(request, response, next) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             const getTourCarResult = yield this.orm_car.find();
+            for (let i = 0; i < getTourCarResult.length; i++) {
+                let _batchStatus = 'Finish';
+                const jobName = getTourCarResult[i].job;
+                const _allCase = yield this.orm_case.find({ where: { map_job: jobName } });
+                for (let j = 0; j < _allCase.length; j++) {
+                    const samePatient = yield this.orm_case.find({ where: { patientId: _allCase[j].patientId } });
+                    let _case_upload_status = _allCase[j].upload;
+                    let _case_pacs_status = _allCase[j].postPACS;
+                    let _case_ai_status = _allCase[j].postAI;
+                    if (samePatient.length > 1) {
+                        for (let p = 0; p < samePatient.length; p++) {
+                            if ((_a = samePatient[p]) === null || _a === void 0 ? void 0 : _a.mapping) {
+                                _case_pacs_status = samePatient[p].postPACS;
+                                _case_ai_status = samePatient[p].postAI;
+                            }
+                        }
+                    }
+                    if (_case_upload_status == 0 || _case_pacs_status == 0 || _case_ai_status == 0) {
+                        _batchStatus = "Error";
+                    }
+                    else if ((_case_pacs_status == 1 || _case_ai_status == 1) && _batchStatus != "Error") {
+                        _batchStatus = "Pending";
+                    }
+                }
+                getTourCarResult[i].status = _batchStatus;
+            }
             return { codeStatus: 200, result: getTourCarResult };
         });
     }
@@ -76,7 +103,6 @@ class TourCarController {
                                 }
                             });
                             for (let i = 0; i < caseFiles.length; i++) {
-                                console.log(i)
                                 const getTourCarCaseRec = yield _this.orm_case.findOne({ where: { caseName: caseFiles[i].caseName } });
                                 if (!getTourCarCaseRec) {
                                     //TODO get His資訊放到Minipacs回傳Dicom，此處用於測試選擇accNumber accNum需要選擇則要status顯示需人工介入
@@ -178,7 +204,7 @@ class TourCarController {
                         else {
                             yield _this.orm_car.remove(getTourCarRec);
                         }
-                        yield _this.orm_car_mapping.clear()
+                        yield _this.orm_car_mapping.clear();
                         yield _this.orm_Log.save(LogMessage);
                         resolve({ codeStatus: 200, message: LogMessage.content });
                     }
@@ -296,7 +322,6 @@ class TourCarController {
                                         instancesUUID += "-";
                                     }
                                 }
-                                console.log(_body.patientId, _body.studyId, _body.seriesId, _body.instancesId)
                                 const _obj = new TourCarCase_1.TourCarCase();
                                 if (isMapping) {
                                     _obj.mapping = testData.accNum;
@@ -366,8 +391,15 @@ class TourCarController {
                 return __awaiter(this, void 0, void 0, function* () {
                     try {
                         const getTourCarCaseResult = yield _this.orm_case.findOne({ where: { caseName: _body.caseName } });
+                        const prevMappingTourCarCase = yield _this.orm_case.findOne({ where: { mapping: _body.mapping } });
+                        if (prevMappingTourCarCase) {
+                            prevMappingTourCarCase.mapping = null;
+                            yield _this.orm_case.save(prevMappingTourCarCase);
+                        }
                         if (getTourCarCaseResult) {
                             getTourCarCaseResult.mapping = _body === null || _body === void 0 ? void 0 : _body.mapping;
+                            getTourCarCaseResult.postAI = (_body === null || _body === void 0 ? void 0 : _body.postAI) == 0 ? 0 : (_body === null || _body === void 0 ? void 0 : _body.postAI) || 1;
+                            getTourCarCaseResult.postPACS = (_body === null || _body === void 0 ? void 0 : _body.postPACS) == 0 ? 0 : (_body === null || _body === void 0 ? void 0 : _body.postPACS) || 1;
                             yield _this.orm_case.save(getTourCarCaseResult);
                             yield _this.orm_Log.save(LogMessage);
                             let s = [
@@ -387,7 +419,7 @@ class TourCarController {
                             resolve({ codeStatus: 200, message: LogMessage.content, result: getTourCarCaseResult });
                         }
                         else {
-                            resolve({ codeStatus: 404, message: `Not found this caseName ${_body.caseName}.` });
+                            reject({ codeStatus: 404, message: `Not found this caseName ${_body.caseName}.` });
                         }
                     }
                     catch (err) {
@@ -623,7 +655,7 @@ class TourCarController {
     testMappingData(caseName) {
         let _random = Math.floor(Math.random() * 3);
         const MapAI = ["No", "Test", "GO"];
-        const MapAccNum = [`Iron_${caseName}`, `Gauva_${caseName}`, `Hamster_${caseName}`];
+        const MapAccNum = [`Apple_${caseName}`, `Test_${caseName}`, `News_${caseName}`];
         const accNum = MapAccNum[_random];
         let testData = {
             caseName,
