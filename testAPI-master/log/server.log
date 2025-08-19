@@ -244,3 +244,22 @@
 2025-08-19 16:41:48.187 [INFO] socket is connection!
 2025-08-19 16:41:59.949 [INFO] socket is connection!
 2025-08-19 16:42:06.316 [INFO] socket is connection!
+2025-08-19 17:20:18.135 [INFO] socket is connection!
+2025-08-19 17:20:20.372 [INFO] Delete UUID: 68ad8241-8d3e3f01-0053a337-4dec88f0-8223a09c
+2025-08-19 17:20:20.390 [INFO] Delete UUID: 57e8d96b-740ff845-27a75bf9-8fa3a180-a976f3a6
+2025-08-19 17:20:20.411 [INFO] Delete UUID: 46531e40-ff1c50d4-9478bc2f-d0bfeca6-626746b2
+2025-08-19 17:20:20.416 [ERROR] Delete dicom failed UUID: 68ad8241-8d3e3f01-0053a337-4dec88f0-8223a09c. errorMessage: null
+2025-08-19 17:20:22.777 [ERROR] Delete dicom failed UUID: 68ad8241-8d3e3f01-0053a337-4dec88f0-8223a09c. errorMessage: null
+2025-08-19 17:20:22.783 [ERROR] Delete dicom failed UUID: 68ad8241-8d3e3f01-0053a337-4dec88f0-8223a09c. errorMessage: null
+2025-08-19 17:20:22.801 [INFO] Delete UUID: 812b37eb-864e9b6c-437fabc9-ab1a0e47-9ea3c067
+2025-08-19 17:20:22.811 [INFO] Delete UUID: 838c9c0c-a5d356bf-5f02ae4d-404ccf77-7f99fb0d
+2025-08-19 17:20:22.817 [INFO] Delete UUID: ebd09a41-a1f7f785-9becb7c4-6f17c676-841f1afc
+2025-08-19 17:20:22.821 [INFO] Delete UUID: 6c2fc32c-c17a5b81-8df89673-655286ef-52fb509c
+2025-08-19 17:20:22.832 [INFO] Delete UUID: 6f17f9f9-64098871-027a161a-3aef591f-81483ff0
+2025-08-19 17:20:25.974 [INFO] Delete UUID: a301ec1a-96516aeb-ca33f2a4-1834221a-08697728
+2025-08-19 17:20:26.015 [INFO] Delete UUID: 88b54f2a-02fc98ad-9a3a87ca-60c0ab48-da8a1e49
+2025-08-19 17:20:26.018 [ERROR] Delete dicom failed UUID: c739d1cf-b3107cfa-7f68d418-8a0d7a0f-12eb45b2. errorMessage: null
+2025-08-19 17:20:29.669 [INFO] Delete UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b
+2025-08-19 17:20:29.673 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-19 17:20:29.676 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-19 17:31:15.347 [INFO] socket is connection!
