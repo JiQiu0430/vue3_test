@@ -799,7 +799,7 @@ const getTextColor = (row) => {
 
 // 當點擊 "重新嘗試" 時顯示確認提示
 const handleRetry = async (row, event) => {
-  const isConfirmed = confirm(`您確定要重新嘗試流水號 ${row.serialNumber}（同時重設 AI 與 PACS）嗎？`);
+  const isConfirmed = confirm(`您確定要重新嘗試流水號 ${row.serialNumber} 嗎？`);
   if (!isConfirmed) {
     event?.preventDefault?.();
     return;
