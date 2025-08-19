@@ -152,3 +152,95 @@
 2025-08-19 11:35:58.961 [INFO] socket is connection!
 2025-08-19 11:38:00.498 [INFO] socket closed!!
 2025-08-19 11:41:25.263 [INFO] socket is connection!
+2025-08-19 12:55:08.422 [INFO] socket is connection!
+2025-08-19 13:29:17.954 [INFO] socket is connection!
+2025-08-19 13:31:43.962 [INFO] socket is connection!
+2025-08-19 13:31:47.778 [INFO] socket closed!!
+2025-08-19 13:31:47.780 [INFO] socket closed!!
+2025-08-19 13:31:47.780 [INFO] socket closed!!
+2025-08-19 13:31:47.781 [INFO] socket closed!!
+2025-08-19 13:31:48.900 [INFO] socket is connection!
+2025-08-19 13:37:50.905 [INFO] socket is connection!
+2025-08-19 14:05:36.099 [INFO] socket is connection!
+2025-08-19 14:06:03.930 [INFO] socket is connection!
+2025-08-19 14:06:21.040 [INFO] socket is connection!
+2025-08-19 14:08:19.999 [INFO] socket is connection!
+2025-08-19 14:08:43.039 [INFO] socket is connection!
+2025-08-19 14:09:29.822 [INFO] socket is connection!
+2025-08-19 14:13:25.702 [INFO] socket is connection!
+2025-08-19 14:14:43.494 [INFO] socket is connection!
+2025-08-19 14:15:56.981 [INFO] socket is connection!
+2025-08-19 14:22:33.641 [INFO] socket closed!!
+2025-08-19 14:22:33.644 [INFO] socket closed!!
+2025-08-19 14:22:33.645 [INFO] socket closed!!
+2025-08-19 14:22:33.645 [INFO] socket closed!!
+2025-08-19 14:22:33.646 [INFO] socket closed!!
+2025-08-19 14:22:33.647 [INFO] socket closed!!
+2025-08-19 14:22:33.650 [INFO] socket closed!!
+2025-08-19 14:22:33.651 [INFO] socket closed!!
+2025-08-19 14:22:33.652 [INFO] socket closed!!
+2025-08-19 14:22:33.653 [INFO] socket closed!!
+2025-08-19 14:22:33.654 [INFO] socket closed!!
+2025-08-19 14:25:33.106 [INFO] socket is connection!
+2025-08-19 14:25:41.159 [INFO] socket is connection!
+2025-08-19 14:25:44.140 [INFO] socket is connection!
+2025-08-19 14:25:51.803 [INFO] socket is connection!
+2025-08-19 14:25:54.501 [INFO] Delete UUID: e4c41e78-0d7ad0ab-cfd5bf46-7d821f46-90c4b9f8
+2025-08-19 14:25:54.521 [INFO] Delete UUID: 15d3e9db-e2cc5ea8-9179ab77-163e59f3-fcfa5451
+2025-08-19 14:25:54.530 [ERROR] Delete dicom failed UUID: c739d1cf-b3107cfa-7f68d418-8a0d7a0f-12eb45b2. errorMessage: null
+2025-08-19 14:25:54.574 [INFO] Delete UUID: a287ce73-1f56ceb4-81c840ee-2a6e4a5e-5c539094
+2025-08-19 14:25:54.854 [INFO] Delete UUID: 51af05c2-ffef66d1-52509613-5f220507-3d45d071
+2025-08-19 14:25:54.918 [INFO] Delete UUID: 445d7d9c-f8d82385-de251313-e6c40e5f-0643a602
+2025-08-19 14:25:57.931 [INFO] Delete UUID: 68ad8241-8d3e3f01-0053a337-4dec88f0-8223a09c
+2025-08-19 14:25:59.259 [INFO] Delete UUID: 57e8d96b-740ff845-27a75bf9-8fa3a180-a976f3a6
+2025-08-19 14:25:59.400 [INFO] Delete UUID: 46531e40-ff1c50d4-9478bc2f-d0bfeca6-626746b2
+2025-08-19 14:25:59.408 [ERROR] Delete dicom failed UUID: 68ad8241-8d3e3f01-0053a337-4dec88f0-8223a09c. errorMessage: null
+2025-08-19 14:28:52.734 [INFO] socket closed!!
+2025-08-19 14:28:52.737 [INFO] socket closed!!
+2025-08-19 14:28:52.737 [INFO] socket closed!!
+2025-08-19 14:28:52.738 [INFO] socket closed!!
+2025-08-19 14:28:56.417 [INFO] socket is connection!
+2025-08-19 14:29:43.394 [INFO] socket closed!!
+2025-08-19 14:31:16.565 [INFO] socket is connection!
+2025-08-19 15:38:42.872 [INFO] socket closed!!
+2025-08-19 15:39:10.155 [INFO] socket is connection!
+2025-08-19 15:39:19.860 [INFO] socket is connection!
+2025-08-19 15:39:21.635 [ERROR] Delete dicom failed UUID: 68ad8241-8d3e3f01-0053a337-4dec88f0-8223a09c. errorMessage: null
+2025-08-19 15:39:21.663 [ERROR] Delete dicom failed UUID: 68ad8241-8d3e3f01-0053a337-4dec88f0-8223a09c. errorMessage: null
+2025-08-19 15:39:21.888 [INFO] Delete UUID: 812b37eb-864e9b6c-437fabc9-ab1a0e47-9ea3c067
+2025-08-19 15:39:21.960 [INFO] Delete UUID: 838c9c0c-a5d356bf-5f02ae4d-404ccf77-7f99fb0d
+2025-08-19 15:39:21.978 [INFO] Delete UUID: ebd09a41-a1f7f785-9becb7c4-6f17c676-841f1afc
+2025-08-19 15:39:21.995 [INFO] Delete UUID: 6c2fc32c-c17a5b81-8df89673-655286ef-52fb509c
+2025-08-19 15:39:22.009 [INFO] Delete UUID: 6f17f9f9-64098871-027a161a-3aef591f-81483ff0
+2025-08-19 15:39:29.903 [INFO] socket is connection!
+2025-08-19 15:39:31.796 [INFO] Delete UUID: a301ec1a-96516aeb-ca33f2a4-1834221a-08697728
+2025-08-19 15:39:31.843 [INFO] Delete UUID: 88b54f2a-02fc98ad-9a3a87ca-60c0ab48-da8a1e49
+2025-08-19 15:39:31.887 [ERROR] Delete dicom failed UUID: c739d1cf-b3107cfa-7f68d418-8a0d7a0f-12eb45b2. errorMessage: null
+2025-08-19 15:39:36.263 [INFO] Delete UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b
+2025-08-19 15:39:36.297 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-19 15:39:36.301 [ERROR] Delete dicom failed UUID: 61af62b9-54162615-e473cdc1-e3676d55-0b5d7a4b. errorMessage: null
+2025-08-19 15:39:40.069 [INFO] socket closed!!
+2025-08-19 15:39:40.070 [INFO] socket closed!!
+2025-08-19 15:39:40.071 [INFO] socket closed!!
+2025-08-19 15:39:40.472 [INFO] socket is connection!
+2025-08-19 15:42:10.567 [INFO] socket closed!!
+2025-08-19 15:42:12.103 [INFO] socket is connection!
+2025-08-19 15:43:26.748 [INFO] socket is connection!
+2025-08-19 15:44:59.026 [INFO] socket is connection!
+2025-08-19 15:45:11.515 [INFO] socket is connection!
+2025-08-19 15:46:10.465 [INFO] socket is connection!
+2025-08-19 15:48:21.374 [INFO] socket is connection!
+2025-08-19 15:48:23.776 [INFO] socket is connection!
+2025-08-19 16:01:10.628 [INFO] socket is connection!
+2025-08-19 16:01:14.734 [INFO] socket is connection!
+2025-08-19 16:06:23.121 [INFO] Delete UUID: 68ad8241-8d3e3f01-0053a337-4dec88f0-8223a09c
+2025-08-19 16:06:23.185 [INFO] Delete UUID: 57e8d96b-740ff845-27a75bf9-8fa3a180-a976f3a6
+2025-08-19 16:07:49.538 [INFO] socket is connection!
+2025-08-19 16:10:55.266 [INFO] socket is connection!
+2025-08-19 16:15:12.005 [INFO] socket is connection!
+2025-08-19 16:19:37.669 [INFO] socket is connection!
+2025-08-19 16:19:46.559 [INFO] socket is connection!
+2025-08-19 16:41:45.993 [INFO] socket is connection!
+2025-08-19 16:41:48.187 [INFO] socket is connection!
+2025-08-19 16:41:59.949 [INFO] socket is connection!
+2025-08-19 16:42:06.316 [INFO] socket is connection!

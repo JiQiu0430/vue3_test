@@ -372,10 +372,13 @@ const parseCaseName = (caseName) => {
 // 搜尋框
 const searchQuery = ref('')
 const filteredData = computed(() => {
+  const q = searchQuery.value.trim().toLowerCase();
+  if (!q) return caseData.value;
   return caseData.value.filter(item => {
-    return item?.serialNumber?.toLowerCase()?.includes(searchQuery.value) ||
-           item?.id?.toLowerCase()?.includes(searchQuery.value) ||
-           item?.name?.toLowerCase()?.includes(searchQuery.value);
+    const sn   = String(item?.serialNumber ?? '').toLowerCase();
+    const id   = String(item?.id ?? '').toLowerCase();
+    const name = String(item?.name ?? '').toLowerCase();
+    return sn.includes(q) || id.includes(q) || name.includes(q);
   });
 });
 
