@@ -225,7 +225,7 @@
             <td v-html="renderPost(row.postPACS)"></td>
             <td v-html="renderPost(row.postAI)"></td>
             <td class="retry-cell">
-              <div class="retry-buttons">
+              <div v-if="row.mapping !== null" class="retry-buttons">
                 <button class="icon-button reload" @click="handleRetry(row, $event)">
                   <img src="/reload.png" class="action-icon" />
                 </button>
