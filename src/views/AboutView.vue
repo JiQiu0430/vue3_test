@@ -225,7 +225,7 @@
             <td v-html="renderPost(row.postPACS)"></td>
             <td v-html="renderPost(row.postAI)"></td>
             <td class="retry-cell">
-              <div v-if="row.mapping !== null" class="retry-buttons">
+              <div v-if="shouldShowRetry(row)" class="retry-buttons">
                 <button class="icon-button reload" @click="handleRetry(row, $event)">
                   <img src="/reload.png" class="action-icon" />
                 </button>
@@ -653,36 +653,28 @@ const toggleFilterMenu = (field) => {
   showFilterMenu.value[field] = !showFilterMenu.value[field]
 }
 
-const retryAll = async () => {
-  const filesToRetry = caseData.value.filter(row =>
-    Number(row.postAI) === 0 || Number(row.postPACS) === 0 || row.mapping === 'false'
-  );
-  if (filesToRetry.length === 0) {
-    alert('沒有需要重試的檔案！');
-    return;
-  }
+const retryAll = async () => { 
+  const filesToRetry = caseData.value.filter(row => Number(row.postAI) === 0 || Number(row.postPACS) === 0 || row.mapping === 'false' ); 
+  if (filesToRetry.length === 0) { 
+    alert('沒有需要重試的檔案！'); 
+    return; 
+  } 
   if (!confirm(`有 ${filesToRetry.length} 檔案需要重試，確定要繼續嗎？`)) return;
-  const calls = [];
-  for (const row of filesToRetry) {
-    const caseName = encodeURIComponent(row.caseName);
+  const calls = []; 
+  for (const row of filesToRetry) { 
+    const caseName = encodeURIComponent(row.caseName); 
 
-    if (Number(row.postPACS) !== 2) {
-      calls.push(
-        axios.post(`http://localhost:8081/tourCarCase/${caseName}/retryPACS`)
-          .then(res => ({ res, row, type: 'pacs' }))
-      );
-    }
-    if (Number(row.postAI) !== 2) {
-      calls.push(
-        axios.post(`http://localhost:8081/tourCarCase/${caseName}/retryAI`)
-          .then(res => ({ res, row, type: 'ai' }))
-      );
-    }
-  }
-  await Promise.allSettled(calls);
-  // 同步最新資料
-  try { await fetchCaseData(); } catch {() => null}
-  alert('重試完成');
+    if (Number(row.postPACS) !== 2) { 
+      calls.push( axios.post(`http://localhost:8081/tourCarCase/${caseName}/retryPACS`) .then(res => ({ res, row, type: 'pacs' })) );
+    } 
+  if (Number(row.postAI) !== 2) { 
+    calls.push( axios.post(`http://localhost:8081/tourCarCase/${caseName}/retryAI`) .then(res => ({ res, row, type: 'ai' })) ); 
+    } 
+  } 
+  await Promise.allSettled(calls); 
+  // 同步最新資料 
+  try { await fetchCaseData(); } catch {() => null} 
+  alert('重試完成'); 
 };
 
 // 導出資料
@@ -800,17 +792,24 @@ const getTextColor = (row) => {
   return color;
 };
 
-// 當點擊 "重新嘗試" 時顯示確認提示
-const handleRetry = async (row, event) => {
-  const isConfirmed = confirm(`您確定要重新嘗試流水號 ${row.serialNumber} 嗎？`);
-  if (!isConfirmed) {
-    event?.preventDefault?.();
-    return;
+const shouldShowRetry = (row) => {
+  if (isSameId(row)) {
+    const chosenSerial = getChosenSerialForId(row.id);
+    if (!chosenSerial) return false;
+    return row.serialNumber === chosenSerial;
   }
-  const caseName = encodeURIComponent(row.caseName);
+  return true;
+};
 
-  try {
-    const [pacsRes, aiRes] = await Promise.all([
+// 當點擊 "重新嘗試" 時顯示確認提示
+const handleRetry = async (row, event) => { 
+  const isConfirmed = confirm(`您確定要重新嘗試流水號 ${row.serialNumber} 嗎？`); 
+  if (!isConfirmed) { 
+    event?.preventDefault?.(); 
+    return; 
+  } 
+  const caseName = encodeURIComponent(row.caseName); 
+    try { const [pacsRes, aiRes] = await Promise.all([
       axios.post(`http://localhost:8081/tourCarCase/${caseName}/retryPACS`),
       axios.post(`http://localhost:8081/tourCarCase/${caseName}/retryAI`)
     ]);
@@ -820,14 +819,14 @@ const handleRetry = async (row, event) => {
       throw new Error(msg);
     }
     row.postPACS = 2;
-    row.postAI   = 2;
+    row.postAI = 2;
 
     alert('已送出重試');
     // 若有 socket 即時刷新就不必手動重抓；沒有的話可以呼叫 await refreshJobs();
-  } catch (e) {
-    alert(`重試失敗：${e.message}`);
+    } catch (e) { 
+    alert(`重試失敗：${e.message}`); 
     event?.preventDefault?.();
-  }
+  } 
 };
 </script>
 
