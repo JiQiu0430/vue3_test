@@ -324,7 +324,7 @@ onMounted(() => {
 })
 
 const errorFilesCount = computed(() => {
-  return caseData.value.filter(row => row.upload === 0 || row.postAI === 0 || row.postPACS === 0 || row.mapping === 'false').length;
+  return caseData.value.filter(row => row.upload === 0 || row.postAI === 0 || row.postPACS === 0 || hasNoMappingAndNoCandidate(row)).length;
 });
 
 const errorFilterEnabled = ref(false);
@@ -387,7 +387,7 @@ const selectedMapping = ref({})
 const isSameId = (row) => {
   return caseData.value.filter(item => item.id === row.id).length > 1;
 }
-const isBadMapping = (m) => (m == null || m === '' || m === 'false' || m === false || Number(m) === 0);
+const isBadMapping = (m) => (m == null || m === '');
 const isGroupCommitted = (idCard) => {
   return caseData.value
     .filter(r => r.id === idCard)
@@ -414,17 +414,21 @@ const initSelectionFromDB = () => {
 };
 
 const escapeHtml = (s) => String(s).replace(/</g, '&lt;').replace(/>/g, '&gt;');
-const renderMappingHTML = (mapping) => {
-  if (mapping == null || mapping === '') return '<span class="gray-cross">--</span>';
-  if (mapping === 'false' || mapping === false || Number(mapping) === 0) return '<span class="red-cross">✘</span>';
-  return escapeHtml(String(mapping));
-};
+const hasNoMappingAndNoCandidate = (row) =>
+  (row?.mapping == null || row.mapping === '') &&
+  (row?.accNumbers == null || row.accNumbers === '');
 const renderMappingCell = (row) => {
   if (isSameId(row) && !isGroupCommitted(row.id)) {
     const txt = row.accNumbers ?? '--';
     return `<span class="gray-cross">${escapeHtml(txt)}</span>`;
   }
-  return renderMappingHTML(row.mapping);
+  if (hasNoMappingAndNoCandidate(row)) {
+    return '<span class="red-cross">✘</span>';
+  }
+  if (row.mapping == null || row.mapping === '') {
+    return '<span class="gray-cross">--</span>';
+  }
+  return escapeHtml(String(row.mapping));
 };
 
 const updateMappingSingle = async (row, newMapping) => {
@@ -617,7 +621,7 @@ const paginatedData = computed(() => {
 
   if (errorFilterEnabled.value) {
     data = data.filter(item => 
-      Number(item.upload) === 0 || Number(item.postAI) === 0 || Number(item.postPACS) === 0 || item.mapping === 'false'
+      Number(item.upload) === 0 || Number(item.postAI) === 0 || Number(item.postPACS) === 0 || hasNoMappingAndNoCandidate(item)
     );
   } else{
     if (filterConditions.value.upload !== 'all') {
@@ -630,17 +634,14 @@ const paginatedData = computed(() => {
       data = data.filter(item => item.postPACS === filterConditions.value.pacs);
     }
 
-    // 處理篩選選項
     if (filterConditions.value.mapping === 'false') {
-      data = data.filter(item => item.mapping === 'false');
+      data = data.filter(item => hasNoMappingAndNoCandidate(item));
     } else if (filterConditions.value.mapping === 'hasValue') {
-      data = data.filter(item => item.mapping && item.mapping !== '' && item.mapping !== 'false');
+      data = data.filter(item => item.mapping != null && item.mapping !== '');
     } else if (filterConditions.value.mapping === null) {
-      data = data.filter(item => item.mapping === null || item.mapping === '');
+      data = data.filter(item => item.mapping == null || item.mapping === '');
     } else if (filterConditions.value.mapping === 'sameId') {
-      data = data.filter(item => {
-        return caseData.value.filter(subItem => subItem.id === item.id).length > 1;
-      });
+      data = data.filter(item => caseData.value.filter(sub => sub.id === item.id).length > 1);
     }
   }
   if (filterConditions.value.mapping === 'all') {
@@ -654,7 +655,7 @@ const toggleFilterMenu = (field) => {
 }
 
 const retryAll = async () => { 
-  const filesToRetry = caseData.value.filter(row => Number(row.postAI) === 0 || Number(row.postPACS) === 0 || row.mapping === 'false' ); 
+  const filesToRetry = caseData.value.filter(row => Number(row.postAI) === 0 || Number(row.postPACS) === 0 || hasNoMappingAndNoCandidate(row) ); 
   if (filesToRetry.length === 0) { 
     alert('沒有需要重試的檔案！'); 
     return; 
@@ -688,12 +689,11 @@ const toMark012 = (val) => {
   return '--';
 };
 
-const formatMapping = (mapping) => {
-  if (mapping == null) return '--'; // null 或 undefined
-  if (mapping === 'false' || mapping === false || Number(mapping) === 0) return 'X';
-  return String(mapping);
+const formatMappingForCSV = (row) => {
+  if (hasNoMappingAndNoCandidate(row)) return 'X';
+  if (row.mapping == null || row.mapping === '') return '--';
+  return String(row.mapping);
 };
-
 const exportCSV = () => {
   const headers = ['流水號', '身份證字號', '姓名', '檔案上傳', '對應工單號', '傳給AI', '傳給PACS'];
 
@@ -702,7 +702,7 @@ const exportCSV = () => {
     row.id ?? '',
     row.name ?? '',
     toMark01(row.upload),
-    formatMapping(row.mapping),
+    formatMappingForCSV(row),
     toMark012(row.postAI),
     toMark012(row.postPACS),
   ]);
@@ -767,8 +767,7 @@ const getChosenSerialForId = (idCard) => {
   return chosen?.serialNumber ?? null;
 };
 
-const isExplicitMappingFail = (m) =>
-  m === 'false' || m === false || m === 0 || m === '0';
+const isExplicitMappingFail = (row) => hasNoMappingAndNoCandidate(row);
 
 const getTextColor = (row) => {
   if (isSameId(row) && !isGroupCommitted(row.id) && !selectedMapping.value[row.id]) {
@@ -785,7 +784,7 @@ const getTextColor = (row) => {
     Number(row.upload) === 0 ||
     Number(row.postAI) === 0 ||
     Number(row.postPACS) === 0 ||
-    isExplicitMappingFail(row.mapping)
+    isExplicitMappingFail(row)
   ) {
     color = '#e74c3c';
   }
