@@ -251,7 +251,7 @@
       <div class="pagination-container">
         <!-- 顯示數量選擇 -->
         <div class="items-per-page">
-          <label for="itemsPerPage">每頁顯示：</label>
+          <label for="itemsPerPage">數量顯示：</label>
           <select id="itemsPerPage" v-model="pageSize" @change="applyFilters">
             <option value="10">10</option>
             <option value="20">20</option>
@@ -1194,7 +1194,7 @@ input[type="radio"]:checked{
   object-fit: contain;
 }
 
-/* 分頁 */
+/* 翻頁 */
 .pagination-container {
   display: flex;
   justify-content: space-between;
