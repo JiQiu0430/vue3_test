@@ -304,6 +304,7 @@ const fetchCaseData = async () => {
       return {
         ...item,
         dbId: item.id,
+        patientId: item.patientId,
         ...parsedData,
       };
     })
@@ -654,28 +655,27 @@ const toggleFilterMenu = (field) => {
   showFilterMenu.value[field] = !showFilterMenu.value[field]
 }
 
-const retryAll = async () => { 
-  const filesToRetry = caseData.value.filter(row => Number(row.postAI) === 0 || Number(row.postPACS) === 0 || hasNoMappingAndNoCandidate(row) ); 
-  if (filesToRetry.length === 0) { 
-    alert('沒有需要重試的檔案！'); 
-    return; 
-  } 
-  if (!confirm(`有 ${filesToRetry.length} 檔案需要重試，確定要繼續嗎？`)) return;
-  const calls = []; 
-  for (const row of filesToRetry) { 
-    const caseName = encodeURIComponent(row.caseName); 
+const retryAll = async () => {
+  const candidates = caseData.value.filter(row =>
+    mappingIsX(row) || pacsIsX(row) || aiIsX(row)
+  );
+  if (candidates.length === 0) {
+    alert('沒有需要重試的檔案！');
+    return;
+  }
+  if (!confirm(`共有 ${candidates.length} 筆有錯誤，確定要重試嗎？`)) return;
 
-    if (Number(row.postPACS) !== 2) { 
-      calls.push( axios.post(`http://localhost:8081/tourCarCase/${caseName}/retryPACS`) .then(res => ({ res, row, type: 'pacs' })) );
-    } 
-  if (Number(row.postAI) !== 2) { 
-    calls.push( axios.post(`http://localhost:8081/tourCarCase/${caseName}/retryAI`) .then(res => ({ res, row, type: 'ai' })) ); 
-    } 
-  } 
-  await Promise.allSettled(calls); 
-  // 同步最新資料 
-  try { await fetchCaseData(); } catch {() => null} 
-  alert('重試完成'); 
+  const results = await Promise.allSettled(candidates.map(row => stagedRetry(row)));
+  const failed = results.filter(r => r.status === 'rejected').length;
+
+  // 跑完後若沒有 socket 即時更新，抓一次最新資料
+  try { await fetchCaseData(); } catch { /* 忽略 */ }
+
+  if (failed === 0) {
+    alert('全部重試完成');
+  } else {
+    alert(`重試完成，其中 ${failed} 筆失敗`);
+  }
 };
 
 // 導出資料
@@ -802,30 +802,80 @@ const shouldShowRetry = (row) => {
 
 // 當點擊 "重新嘗試" 時顯示確認提示
 const handleRetry = async (row, event) => { 
-  const isConfirmed = confirm(`您確定要重新嘗試流水號 ${row.serialNumber} 嗎？`); 
+  const isConfirmed = confirm(
+    `您要對流水號 ${row.serialNumber} 執行重試嗎？\n`
+  ); 
   if (!isConfirmed) { 
     event?.preventDefault?.(); 
     return; 
   } 
-  const caseName = encodeURIComponent(row.caseName); 
-    try { const [pacsRes, aiRes] = await Promise.all([
-      axios.post(`http://localhost:8081/tourCarCase/${caseName}/retryPACS`),
-      axios.post(`http://localhost:8081/tourCarCase/${caseName}/retryAI`)
-    ]);
-    const ok = (r) => r?.status === 200 && r?.data?.codeStatus === 200;
-    if (!ok(pacsRes) || !ok(aiRes)) {
-      const msg = pacsRes?.data?.message || aiRes?.data?.message || '更新失敗';
-      throw new Error(msg);
-    }
-    row.postPACS = 2;
-    row.postAI = 2;
-
-    alert('已送出重試');
-    // 若有 socket 即時刷新就不必手動重抓；沒有的話可以呼叫 await refreshJobs();
-    } catch (e) { 
+  try { 
+    await stagedRetry(row);
+    alert('重試完成');
+  } catch (e) { 
     alert(`重試失敗：${e.message}`); 
     event?.preventDefault?.();
   } 
+};
+
+// 判斷是否為叉
+const mappingIsX = (row) => hasNoMappingAndNoCandidate(row); // 你的定義：mapping==null/'' 且 accNumbers==null/''
+const pacsIsX    = (row) => Number(row.postPACS) === 0;
+const aiIsX      = (row) => Number(row.postAI)   === 0;
+
+// 需求payload
+const requestMapping = async (row) => {
+  const payload = {
+    job: jobInfo.value.job,
+    patientId: row.patientId,
+    caseName: row.caseName,
+  };
+  const res = await axios.post('http://localhost:8081/case/mapping', payload, {
+    headers: { 'Content-Type': 'application/json' }
+  });
+  const ok = res?.status === 200 && (res?.data?.codeStatus ? res.data.codeStatus === 200 : true);
+  if (!ok) throw new Error(res?.data?.message || 'mapping 請求失敗');
+  return res.data;
+};
+
+const syncRowFromLatest = async (row) => {
+  await fetchCaseData();
+  const fresh = caseData.value.find(r => r.caseName === row.caseName);
+  if (fresh) Object.assign(row, fresh);
+};
+
+// 重試
+const retryPACS = async (row) => {
+  const caseName = encodeURIComponent(row.caseName);
+  const res = await axios.post(`http://localhost:8081/tourCarCase/${caseName}/retryPACS`);
+  const ok = (res?.status === 200) && (res?.data?.codeStatus === 200);
+  if (!ok) throw new Error(res?.data?.message || 'PACS 重試失敗');
+  row.postPACS = 2;
+};
+
+const retryAI = async (row) => {
+  const caseName = encodeURIComponent(row.caseName);
+  const res = await axios.post(`http://localhost:8081/tourCarCase/${caseName}/retryAI`);
+  const ok = (res?.status === 200) && (res?.data?.codeStatus === 200);
+  if (!ok) throw new Error(res?.data?.message || 'AI 重試失敗');
+  row.postAI = 2;
+};
+
+const stagedRetry = async (row) => {
+  const hasAnyX = mappingIsX(row) || pacsIsX(row) || aiIsX(row);
+  if (!hasAnyX) {
+    return;
+  }
+  if (mappingIsX(row)) {
+    await requestMapping(row);
+  }
+  if (Number(row.postPACS) !== 2) {
+    await retryPACS(row);
+  }
+  if (Number(row.postAI) !== 2) {
+    await retryAI(row);
+  }
+  await syncRowFromLatest(row);
 };
 </script>
 
