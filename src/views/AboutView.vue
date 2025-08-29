@@ -825,6 +825,7 @@ const aiIsX      = (row) => Number(row.postAI)   === 0;
 
 // 需求payload
 const requestMapping = async (row) => {
+  if (!row.patientId) throw new Error('缺少 DICOM patientId');
   const payload = {
     job: jobInfo.value.job,
     patientId: row.patientId,
@@ -833,15 +834,9 @@ const requestMapping = async (row) => {
   const res = await axios.post('http://localhost:8081/case/mapping', payload, {
     headers: { 'Content-Type': 'application/json' }
   });
-  const ok = res?.status === 200 && (res?.data?.codeStatus ? res.data.codeStatus === 200 : true);
-  if (!ok) throw new Error(res?.data?.message || 'mapping 請求失敗');
-  return res.data;
-};
-
-const syncRowFromLatest = async (row) => {
-  await fetchCaseData();
-  const fresh = caseData.value.find(r => r.caseName === row.caseName);
-  if (fresh) Object.assign(row, fresh);
+  if (res?.status !== 200 || (res?.data?.codeStatus && res.data.codeStatus !== 200)) {
+    throw new Error(res?.data?.message || 'mapping 更新失敗');
+  }
 };
 
 // 重試
@@ -862,10 +857,6 @@ const retryAI = async (row) => {
 };
 
 const stagedRetry = async (row) => {
-  const hasAnyX = mappingIsX(row) || pacsIsX(row) || aiIsX(row);
-  if (!hasAnyX) {
-    return;
-  }
   if (mappingIsX(row)) {
     await requestMapping(row);
   }
@@ -875,7 +866,7 @@ const stagedRetry = async (row) => {
   if (Number(row.postAI) !== 2) {
     await retryAI(row);
   }
-  await syncRowFromLatest(row);
+  await fetchCaseData();
 };
 </script>
 

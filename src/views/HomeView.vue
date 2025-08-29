@@ -216,7 +216,6 @@ onMounted(async () => {
   }
 });
 
-// 新增：只給 socket 用的刷新函式（沿用你現有 formatDate）
 const refreshJobs = async () => {
   try {
     const { data } = await axios.get('http://localhost:8081/tourCar')
@@ -234,10 +233,8 @@ const refreshJobs = async () => {
   }
 }
 
-// 綁定事件（不要改你原本的 onMounted；這段只是附加監聽）
 onMounted(() => {
   socket.on('tourcar:update', refreshJobs)
-  // 若你同時有 'tourcar:message' 也順手綁上（可選）
   socket.on('tourcar:message', refreshJobs)
 })
 
