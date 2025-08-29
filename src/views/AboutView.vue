@@ -819,7 +819,7 @@ const handleRetry = async (row, event) => {
 };
 
 // 判斷是否為叉
-const mappingIsX = (row) => hasNoMappingAndNoCandidate(row); // 你的定義：mapping==null/'' 且 accNumbers==null/''
+const mappingIsX = (row) => hasNoMappingAndNoCandidate(row);
 const pacsIsX    = (row) => Number(row.postPACS) === 0;
 const aiIsX      = (row) => Number(row.postAI)   === 0;
 
